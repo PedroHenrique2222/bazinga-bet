@@ -1,0 +1,183 @@
+/* Bazinga BET - estilos especificos da Roleta */
+
+.stage {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 45, 58, 0.08), transparent 60%);
+  min-height: 340px;
+  padding-top: 52px;
+}
+
+#wheel-canvas {
+  max-width: 340px;
+  width: 100%;
+  height: auto;
+}
+
+.roulette-results {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.roulette-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.roulette-dot--red { background: linear-gradient(160deg, var(--red), var(--red-dark)); }
+.roulette-dot--black { background: linear-gradient(160deg, #2b2b33, #111114); }
+.roulette-dot--green { background: linear-gradient(160deg, #2ecc71, #1a8a4a); }
+
+.roulette-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.roulette-total span {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.roulette-total strong {
+  color: var(--yellow-dark);
+  font-size: 16px;
+}
+
+:root[data-theme="dark"] .roulette-total strong {
+  color: var(--yellow);
+}
+
+/* ---------- Mesa ---------- */
+
+.roulette-board {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 560px;
+}
+
+.board-main {
+  display: flex;
+  gap: 5px;
+}
+
+.board-zero {
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 900;
+  cursor: pointer;
+  background: linear-gradient(160deg, #2ecc71, #1a8a4a);
+  color: #fff;
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(3, 44px);
+  gap: 5px;
+  flex: 1;
+}
+
+.board-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  color: #fff;
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.board-cell--red { background: linear-gradient(160deg, var(--red), var(--red-dark)); }
+.board-cell--black { background: linear-gradient(160deg, #2b2b33, #111114); }
+
+.board-cell:hover, .board-zero:hover, .board-outside:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 204, 0, 0.35);
+}
+
+.board-row {
+  display: grid;
+  gap: 5px;
+}
+
+.board-row--dozens {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.board-row--outside {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.board-outside {
+  padding: 10px 4px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 12.5px;
+  cursor: pointer;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.board-outside--red { background: linear-gradient(160deg, var(--red), var(--red-dark)); color: #fff; border: none; }
+.board-outside--black { background: linear-gradient(160deg, #2b2b33, #111114); color: #fff; border: none; }
+
+/* ficha de aposta sobre a casa */
+.chip {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: linear-gradient(160deg, #ffcc00, #d1a300);
+  color: #241a00;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 204, 0, 0.5);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.board-cell.winner, .board-zero.winner, .board-outside.winner {
+  box-shadow: 0 0 0 3px var(--yellow), 0 0 18px rgba(255, 204, 0, 0.6);
+  animation: bump 0.4s ease;
+}

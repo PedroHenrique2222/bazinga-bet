@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plinko — Bazinga BET</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/plinko.css" />
+</head>
+<body data-page="plinko" data-title="Plinko" data-icon="🎱">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <div class="game-layout">
+          <section class="panel controls">
+            <label for="bet-amount">Valor por bolinha (BZ$)</label>
+            <input type="number" id="bet-amount" min="1" step="1" value="100" />
+            <div class="input-row" style="margin-top:8px;">
+              <button class="btn btn--ghost" id="bet-half">½</button>
+              <button class="btn btn--ghost" id="bet-double">2x</button>
+              <button class="btn btn--ghost" id="bet-max">Máx</button>
+            </div>
+
+            <label>Nível de risco</label>
+            <div class="risk-options" id="risk-options">
+              <button class="btn btn--ghost active" data-risk="low">Baixo</button>
+              <button class="btn btn--ghost" data-risk="medium">Médio</button>
+              <button class="btn btn--ghost" data-risk="high">Alto</button>
+            </div>
+
+            <label>Linhas de pinos</label>
+            <div class="risk-options" id="rows-options">
+              <button class="btn btn--ghost" data-rows="8">8</button>
+              <button class="btn btn--ghost active" data-rows="12">12</button>
+              <button class="btn btn--ghost" data-rows="16">16</button>
+            </div>
+
+            <button id="drop-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+              Soltar bolinha
+            </button>
+
+            <label for="auto-count">Modo automático</label>
+            <div class="input-row">
+              <input type="number" id="auto-count" min="1" max="200" step="1" value="20" />
+              <button class="btn btn--gold" id="auto-btn" style="flex-shrink:0;">Auto</button>
+            </div>
+
+            <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
+              Clique rápido para soltar várias bolinhas, ou use o modo automático.
+            </p>
+
+            <div class="history-list">
+              <h2 class="section-title" style="margin-top:20px;">Últimas bolinhas</h2>
+              <div id="history-list"></div>
+            </div>
+          </section>
+
+          <section class="panel stage" id="plinko-stage">
+            <canvas id="plinko-canvas" width="560" height="600"></canvas>
+          </section>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/bots.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/plinko.js"></script>
+</body>
+</html>

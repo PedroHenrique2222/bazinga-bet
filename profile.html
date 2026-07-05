@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil — Bazinga BET</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/profile.css" />
+</head>
+<body data-page="profile" data-title="Meu perfil" data-icon="👤">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <div class="profile-layout">
+          <section class="panel">
+            <div class="profile-card">
+              <div class="profile-avatar" id="profile-avatar">😎</div>
+              <div class="profile-level-badge" id="profile-level-badge">Lv 1</div>
+
+              <label for="nickname-input">Apelido</label>
+              <input type="text" id="nickname-input" maxlength="18" placeholder="Seu apelido" />
+
+              <label>Avatar</label>
+              <div class="avatar-picker" id="avatar-picker"></div>
+
+              <button id="save-profile-btn" class="btn btn--primary" style="width:100%; margin-top:18px;">
+                Salvar perfil
+              </button>
+            </div>
+          </section>
+
+          <div>
+            <section class="panel" style="margin-bottom:20px;">
+              <h2 class="section-title">⭐ Nível</h2>
+              <div class="level-info">
+                <span id="level-label">Nível 1</span>
+                <span id="xp-label" style="color:var(--text-muted); font-size:13px;"></span>
+              </div>
+              <div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div>
+              <p style="color:var(--text-muted); font-size:12.5px; margin:10px 0 0;">
+                Você ganha 1 XP a cada BZ$ 10 apostados, em qualquer jogo.
+              </p>
+            </section>
+
+            <section class="panel" style="margin-bottom:20px;">
+              <h2 class="section-title">📊 Suas estatísticas</h2>
+              <div class="stats-grid" id="stats-grid"></div>
+            </section>
+
+            <section class="panel">
+              <h2 class="section-title">🕑 Últimas apostas (todos os jogos)</h2>
+              <div id="recent-bets"></div>
+            </section>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/bots.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

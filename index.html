@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bazinga BET</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-page="lobby" data-title="Lobby" data-icon="🏠">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <div class="banner" id="banner">
+          <div class="banner-slide banner-slide--1 active">
+            <div class="banner-copy">
+              <h2>🚀 CRASH AO VIVO</h2>
+              <p>Rodadas o tempo todo. Retire antes de explodir!</p>
+              <a class="btn btn--gold" href="crash.html">Jogar agora</a>
+            </div>
+            <div class="banner-emoji">🚀</div>
+          </div>
+          <div class="banner-slide banner-slide--2">
+            <div class="banner-copy">
+              <h2>🎡 DOUBLE — BRANCO PAGA 14x</h2>
+              <p>Vermelho, preto ou branco. A roleta não para.</p>
+              <a class="btn btn--gold" href="double.html">Girar roleta</a>
+            </div>
+            <div class="banner-emoji">🎡</div>
+          </div>
+          <div class="banner-slide banner-slide--3">
+            <div class="banner-copy">
+              <h2>🗼 SUBA A TORRE</h2>
+              <p>8 andares, multiplicadores até 25x. Até onde você vai?</p>
+              <a class="btn btn--primary" href="tower.html">Desafiar</a>
+            </div>
+            <div class="banner-emoji">🗼</div>
+          </div>
+          <div class="banner-dots" id="banner-dots"></div>
+        </div>
+
+        <div class="ticker">
+          <div class="ticker-track" id="ticker-track"></div>
+        </div>
+
+        <section class="lobby-section">
+          <h2 class="section-title">🎮 Todos os jogos</h2>
+          <div class="lobby-grid" id="games-grid"></div>
+        </section>
+
+        <div class="two-col">
+          <section class="panel">
+            <h2 class="section-title">🏆 Maiores ganhos de hoje</h2>
+            <div id="ranking-list"></div>
+          </section>
+
+          <section class="panel">
+            <h2 class="section-title">📊 Suas estatísticas</h2>
+            <div class="stats-grid" id="stats-grid"></div>
+          </section>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/bots.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/lobby.js"></script>
+</body>
+</html>

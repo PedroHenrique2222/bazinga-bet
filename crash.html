@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crash — Bazinga BET</title>
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/crash.css" />
+</head>
+<body data-page="crash" data-title="Crash" data-icon="🚀">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <div class="game-layout">
+          <section class="panel controls">
+            <label for="bet-amount">Valor da aposta (BZ$)</label>
+            <input type="number" id="bet-amount" min="1" step="1" value="100" />
+            <div class="input-row" style="margin-top:8px;">
+              <button class="btn btn--ghost" id="bet-half">½</button>
+              <button class="btn btn--ghost" id="bet-double">2x</button>
+              <button class="btn btn--ghost" id="bet-max">Máx</button>
+            </div>
+
+            <label for="auto-cashout">Retirada automática (opcional)</label>
+            <input type="number" id="auto-cashout" min="1.01" step="0.1" placeholder="ex: 2.00" />
+
+            <button id="action-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+              Apostar
+            </button>
+
+            <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
+              Faça sua aposta antes da rodada começar.
+            </p>
+
+            <div class="bets-panel">
+              <h2 class="section-title" style="margin-top:20px;">Apostas da rodada</h2>
+              <div id="round-bets"></div>
+            </div>
+          </section>
+
+          <div>
+            <section class="panel stage" id="crash-stage">
+              <div class="crash-history" id="crash-history"></div>
+              <canvas id="crash-canvas" width="720" height="380"></canvas>
+              <div class="multiplier-display" id="multiplier-display">1.00x</div>
+              <div class="round-countdown" id="round-countdown">
+                <span class="label">Próxima rodada em</span>
+                <span class="time" id="countdown-time">7.0s</span>
+                <div class="countdown-bar"><div class="fill" id="countdown-fill"></div></div>
+              </div>
+            </section>
+
+            <section class="panel history-list" style="margin-top:20px;">
+              <h2 class="section-title">Suas últimas apostas</h2>
+              <div id="history-list"></div>
+            </section>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/sounds.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/bots.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/crash.js"></script>
+</body>
+</html>

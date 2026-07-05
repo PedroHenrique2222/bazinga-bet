@@ -1,0 +1,208 @@
+/* Bazinga BET - estilos especificos do jogo Double */
+
+.color-options {
+  display: flex;
+  gap: 8px;
+}
+
+.color-btn {
+  flex: 1;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-weight: 800;
+  color: #fff;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, outline 0.1s ease;
+  outline: 2px solid transparent;
+  font: inherit;
+}
+
+.color-btn small {
+  font-weight: 700;
+  opacity: 0.85;
+  font-size: 11px;
+}
+
+.color-btn--red {
+  background: linear-gradient(135deg, var(--red), var(--red-dark));
+}
+
+.color-btn--black {
+  background: linear-gradient(135deg, #2b2b33, #111114);
+}
+
+.color-btn--white {
+  background: linear-gradient(135deg, #f5f5f7, #c9c9d1);
+  color: #1a1a1a;
+}
+
+.color-btn.selected {
+  outline-color: var(--yellow);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(255, 204, 0, 0.35);
+}
+
+.color-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stage {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 45, 58, 0.08), transparent 60%);
+  gap: 20px;
+  min-height: 300px;
+  padding-top: 52px;
+}
+
+/* bolinhas de resultados anteriores */
+.double-results {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.double-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.double-dot--red { background: linear-gradient(160deg, var(--red), var(--red-dark)); }
+.double-dot--black { background: linear-gradient(160deg, #2b2b33, #111114); }
+.double-dot--white { background: linear-gradient(160deg, #f5f5f7, #c9c9d1); color: #1a1a1a; }
+
+.double-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 92px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.double-track {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 8px;
+  will-change: transform;
+}
+
+.double-tile {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 22px;
+  color: #fff;
+}
+
+.double-tile--red { background: linear-gradient(160deg, var(--red), var(--red-dark)); }
+.double-tile--black { background: linear-gradient(160deg, #2b2b33, #111114); }
+.double-tile--white { background: linear-gradient(160deg, #f5f5f7, #c9c9d1); color: #1a1a1a; }
+
+.double-tile.landed {
+  box-shadow: 0 0 0 3px var(--yellow), 0 0 22px rgba(255, 204, 0, 0.6);
+}
+
+.double-pointer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 100%;
+  background: var(--yellow);
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.8);
+  z-index: 2;
+}
+
+.double-pointer::before, .double-pointer::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
+.double-pointer::before {
+  top: -1px;
+  border-top: 7px solid var(--yellow);
+}
+
+.double-pointer::after {
+  bottom: -1px;
+  border-bottom: 7px solid var(--yellow);
+}
+
+/* colunas de apostas por cor */
+.double-bets-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .double-bets-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.double-bets-col {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  min-height: 120px;
+}
+
+.double-bets-col.winner {
+  box-shadow: 0 0 0 2px var(--yellow), 0 0 18px rgba(255, 204, 0, 0.4);
+}
+
+.col-head {
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 8px 10px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.col-head--red { background: linear-gradient(120deg, var(--red), var(--red-dark)); }
+.col-head--black { background: linear-gradient(120deg, #2b2b33, #111114); }
+.col-head--white { background: linear-gradient(120deg, #f5f5f7, #c9c9d1); color: #1a1a1a; }
+
+.double-bets-col .bet-row {
+  padding: 5px 10px;
+}

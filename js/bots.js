@@ -1,0 +1,185 @@
+/* Bazinga BET - jogadores falsos (bots): feed de vitorias, apostas nas rodadas, ranking */
+window.BZG = window.BZG || {};
+
+BZG.bots = (function () {
+  var NAMES = [
+    "Carlao_77", "Duda.Martins", "ReiDoPix", "Luquinhas", "Bia_Sortuda", "ZeDaManga",
+    "PedrinGamer", "Nathy22", "TioPatinhas", "MestreYoda", "Foguetinho", "AnaClara_s2",
+    "VitinDoGrau", "Sr.Milhao", "LoirinhaBet", "JhowRico", "Cria_da_7", "MaduLima",
+    "Robertinho", "GugaFlash", "PretinhaTop", "DomCorleone", "XandeVIP", "Leozin_013",
+    "MariaFumaca", "Bruxao_66", "KakaDaVila", "PrincesaBet", "TurboNando", "SortudoBR"
+  ];
+  var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
+  var GAMES = [
+    { id: "crash", name: "Crash", icon: "🚀" },
+    { id: "double", name: "Double", icon: "🎡" },
+    { id: "mines", name: "Mines", icon: "💎" },
+    { id: "tower", name: "Tower", icon: "🗼" },
+    { id: "plinko", name: "Plinko", icon: "🎱" },
+    { id: "dice", name: "Dice", icon: "🎲" },
+    { id: "hilo", name: "HiLo", icon: "🃏" },
+    { id: "slots", name: "Slots", icon: "🎰" },
+    { id: "roulette", name: "Roleta", icon: "🎯" },
+    { id: "blackjack", name: "Blackjack", icon: "🎭" }
+  ];
+
+  function rand(n) {
+    return Math.floor(Math.random() * n);
+  }
+
+  function pick(arr) {
+    return arr[rand(arr.length)];
+  }
+
+  function randomBot() {
+    return { name: pick(NAMES), avatar: pick(AVATARS) };
+  }
+
+  /* Valor de ganho com distribuicao realista: muitos pequenos, poucos grandes */
+  function randomWinAmount() {
+    var r = Math.random();
+    if (r < 0.6) return 10 + rand(290);
+    if (r < 0.9) return 300 + rand(1700);
+    if (r < 0.985) return 2000 + rand(8000);
+    return 10000 + rand(40000);
+  }
+
+  function randomWin() {
+    var bot = randomBot();
+    var game = pick(GAMES);
+    return {
+      name: bot.name,
+      avatar: bot.avatar,
+      game: game,
+      amount: randomWinAmount(),
+      mult: (1.1 + Math.random() * Math.random() * 20)
+    };
+  }
+
+  /* Multiplicador-alvo de um bot no Crash (distribuicao parecida com jogadores reais) */
+  function randomCrashTarget() {
+    var r = Math.random();
+    if (r < 0.45) return 1.1 + Math.random() * 0.9;   // conservador
+    if (r < 0.8) return 2 + Math.random() * 3;         // medio
+    if (r < 0.95) return 5 + Math.random() * 10;       // ousado
+    return 15 + Math.random() * 35;                    // maluco
+  }
+
+  function randomBetAmount() {
+    var r = Math.random();
+    if (r < 0.5) return (1 + rand(20)) * 5;
+    if (r < 0.85) return (1 + rand(20)) * 25;
+    return (1 + rand(16)) * 250;
+  }
+
+  /* Gera os bots de uma rodada de Crash: cada um com aposta e alvo */
+  function crashRoundBots() {
+    var count = 6 + rand(8);
+    var used = {};
+    var bots = [];
+    for (var i = 0; i < count; i++) {
+      var bot = randomBot();
+      if (used[bot.name]) continue;
+      used[bot.name] = true;
+      bots.push({
+        name: bot.name,
+        avatar: bot.avatar,
+        bet: randomBetAmount(),
+        target: randomCrashTarget(),
+        status: "in" // "in" | "cashed" | "lost"
+      });
+    }
+    return bots;
+  }
+
+  /* Gera os bots de uma rodada de Double: cada um aposta numa cor */
+  function doubleRoundBots() {
+    var count = 8 + rand(10);
+    var used = {};
+    var bots = [];
+    for (var i = 0; i < count; i++) {
+      var bot = randomBot();
+      if (used[bot.name]) continue;
+      used[bot.name] = true;
+      var r = Math.random();
+      var color = r < 0.45 ? "red" : (r < 0.9 ? "black" : "white");
+      bots.push({
+        name: bot.name,
+        avatar: bot.avatar,
+        bet: randomBetAmount(),
+        color: color
+      });
+    }
+    return bots;
+  }
+
+  /* ---------- Ranking diario (estavel durante o dia via seed da data) ---------- */
+
+  function seededRandom(seed) {
+    var s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
+    return function () {
+      s = (s * 16807) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  }
+
+  function hashString(str) {
+    var h = 0;
+    for (var i = 0; i < str.length; i++) {
+      h = (h * 31 + str.charCodeAt(i)) | 0;
+    }
+    return Math.abs(h);
+  }
+
+  function getDailyRanking() {
+    var d = new Date();
+    var dateKey = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+    var rnd = seededRandom(hashString(dateKey));
+
+    var entries = [];
+    var usedIdx = {};
+    var amount = 18000 + Math.floor(rnd() * 30000);
+    for (var i = 0; i < 8; i++) {
+      var nameIdx = Math.floor(rnd() * NAMES.length);
+      while (usedIdx[nameIdx]) nameIdx = (nameIdx + 1) % NAMES.length;
+      usedIdx[nameIdx] = true;
+      entries.push({
+        name: NAMES[nameIdx],
+        avatar: AVATARS[Math.floor(rnd() * AVATARS.length)],
+        game: GAMES[Math.floor(rnd() * GAMES.length)],
+        amount: amount,
+        isUser: false
+      });
+      amount = Math.floor(amount * (0.55 + rnd() * 0.3));
+    }
+
+    // insere o usuario se ele ganhou algo hoje
+    var userWon = BZG.storage.getDailyWon();
+    if (userWon > 0) {
+      var profile = BZG.storage.getProfile();
+      entries.push({
+        name: profile.nickname + " (você)",
+        avatar: profile.avatar,
+        game: null,
+        amount: userWon,
+        isUser: true
+      });
+      entries.sort(function (a, b) { return b.amount - a.amount; });
+      entries = entries.slice(0, 8);
+    }
+
+    return entries;
+  }
+
+  return {
+    GAMES: GAMES,
+    randomBot: randomBot,
+    randomWin: randomWin,
+    randomBetAmount: randomBetAmount,
+    randomCrashTarget: randomCrashTarget,
+    crashRoundBots: crashRoundBots,
+    doubleRoundBots: doubleRoundBots,
+    getDailyRanking: getDailyRanking
+  };
+})();

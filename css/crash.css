@@ -1,0 +1,94 @@
+/* Bazinga BET - estilos especificos do jogo Crash */
+
+.stage {
+  background: radial-gradient(circle at 50% 100%, rgba(255, 45, 58, 0.1), transparent 60%);
+  padding-top: 54px;
+}
+
+#crash-canvas {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+/* bolinhas do historico de rodadas */
+.crash-history {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.crash-chip {
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.crash-chip--low {
+  background: rgba(255, 45, 58, 0.85);
+}
+
+.crash-chip--mid {
+  background: rgba(209, 163, 0, 0.9);
+}
+
+.crash-chip--high {
+  background: linear-gradient(120deg, #ffcc00, #ff8a00);
+  color: #241a00;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
+
+.multiplier-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 62px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+  text-shadow: 0 0 24px rgba(255, 204, 0, 0.4);
+  pointer-events: none;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+  z-index: 2;
+  font-variant-numeric: tabular-nums;
+}
+
+:root[data-theme="dark"] .multiplier-display {
+  color: var(--yellow);
+}
+
+.multiplier-display .sub {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-muted);
+  text-shadow: none;
+  letter-spacing: 0.08em;
+}
+
+.multiplier-display.tier-low { color: #2ecc71; text-shadow: 0 0 22px rgba(46, 204, 113, 0.5); }
+.multiplier-display.tier-mid { color: var(--yellow-dark); text-shadow: 0 0 24px rgba(255, 204, 0, 0.55); }
+.multiplier-display.tier-high { color: #ff5a3c; text-shadow: 0 0 30px rgba(255, 90, 60, 0.7); }
+
+:root[data-theme="dark"] .multiplier-display.tier-mid { color: var(--yellow); }
+
+.multiplier-display.crashed {
+  color: var(--red);
+  text-shadow: 0 0 28px rgba(255, 45, 58, 0.7);
+}
+
+.multiplier-display.cashed {
+  color: var(--green);
+  text-shadow: 0 0 24px rgba(46, 204, 113, 0.6);
+}

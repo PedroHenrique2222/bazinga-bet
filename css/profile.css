@@ -1,0 +1,103 @@
+/* Bazinga BET - estilos da pagina de perfil */
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profile-card label {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 16px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.profile-avatar {
+  font-size: 72px;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--panel-alt);
+  border: 3px solid var(--yellow);
+  box-shadow: 0 0 26px rgba(255, 204, 0, 0.3);
+}
+
+.profile-level-badge {
+  margin-top: -16px;
+  background: linear-gradient(120deg, var(--red), var(--yellow));
+  color: #fff;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(255, 45, 58, 0.4);
+}
+
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.avatar-option {
+  font-size: 22px;
+  padding: 8px 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.avatar-option:hover {
+  transform: translateY(-2px);
+  border-color: var(--yellow);
+}
+
+.avatar-option.selected {
+  border-color: var(--yellow);
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.4);
+  background: rgba(255, 204, 0, 0.12);
+}
+
+.level-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.level-info span:first-child {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+}
+
+:root[data-theme="dark"] .level-info span:first-child {
+  color: var(--yellow);
+}
+
+.xp-bar {
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.xp-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--red), var(--yellow));
+  transition: width 0.4s ease;
+}

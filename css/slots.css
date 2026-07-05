@@ -1,0 +1,141 @@
+/* Bazinga BET - estilos especificos do Slots */
+
+.stage {
+  background: radial-gradient(circle at 50% 30%, rgba(255, 204, 0, 0.1), transparent 60%);
+}
+
+.slots-machine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(170deg, #b00814, #7c040d);
+  border-radius: 20px;
+  padding: 22px 26px 26px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 40px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 204, 0, 0.5);
+}
+
+.slots-header {
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  color: #ffd400;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  animation: slots-header-glow 1.8s ease-in-out infinite;
+}
+
+@keyframes slots-header-glow {
+  0%, 100% { text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); }
+  50% { text-shadow: 0 0 16px rgba(255, 212, 0, 0.9); }
+}
+
+.slots-window {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payline {
+  color: #ffd400;
+  font-size: 20px;
+  filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.8));
+}
+
+.slots-reels {
+  display: flex;
+  gap: 8px;
+  background: #0e0e13;
+  border-radius: 12px;
+  padding: 10px;
+  border: 2px solid rgba(255, 204, 0, 0.35);
+}
+
+.reel {
+  width: 84px;
+  height: 234px; /* 3 celulas de 78px */
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a1a22, #23232d 50%, #1a1a22);
+  border-radius: 8px;
+  position: relative;
+}
+
+.reel::before, .reel::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.reel::before {
+  top: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent);
+}
+
+.reel::after {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.65), transparent);
+}
+
+.reel-strip {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.reel-cell {
+  height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  flex-shrink: 0;
+}
+
+.slots-result {
+  min-height: 30px;
+  font-weight: 900;
+  font-size: 19px;
+  color: #ffd400;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.slots-result.win {
+  animation: bump 0.4s ease;
+}
+
+.slots-result.jackpot {
+  font-size: 24px;
+  animation: slots-jackpot 0.5s ease infinite alternate;
+}
+
+@keyframes slots-jackpot {
+  from { transform: scale(1); color: #ffd400; }
+  to { transform: scale(1.15); color: #fff; }
+}
+
+/* tabela de premios */
+.paytable-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.paytable-row:last-child {
+  border-bottom: none;
+}
+
+.paytable-row strong {
+  color: var(--yellow-dark);
+}
+
+:root[data-theme="dark"] .paytable-row strong {
+  color: var(--yellow);
+}

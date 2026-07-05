@@ -1,0 +1,116 @@
+/* Bazinga BET - estilos especificos do Blackjack */
+
+.stage {
+  background: radial-gradient(circle at 50% 40%, rgba(46, 204, 113, 0.07), transparent 60%);
+}
+
+.bj-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+.bj-hand-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 150px;
+}
+
+.bj-hand-label {
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bj-total {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: var(--yellow-dark);
+}
+
+:root[data-theme="dark"] .bj-total {
+  color: var(--yellow);
+}
+
+.bj-cards {
+  display: flex;
+  gap: 10px;
+  min-height: 110px;
+}
+
+.bj-card {
+  width: 76px;
+  height: 108px;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #f5f5f7, #d8d8e0);
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-weight: 900;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  animation: bj-deal 0.3s ease;
+}
+
+@keyframes bj-deal {
+  from { transform: translateY(-24px) rotate(-6deg); opacity: 0; }
+  to { transform: translateY(0) rotate(0); opacity: 1; }
+}
+
+.bj-card .rank {
+  font-size: 26px;
+}
+
+.bj-card .suit {
+  font-size: 22px;
+}
+
+.bj-card.suit-red {
+  color: var(--red);
+}
+
+.bj-card--back {
+  background: linear-gradient(160deg, #b00814, #7c040d);
+  color: #ffd400;
+  border: 2px solid rgba(255, 204, 0, 0.4);
+  font-size: 30px;
+}
+
+.bj-vs {
+  min-height: 34px;
+  font-weight: 900;
+  font-size: 20px;
+  text-align: center;
+}
+
+.bj-vs.win { color: var(--green); }
+.bj-vs.lose { color: var(--red); }
+.bj-vs.push { color: var(--yellow-dark); }
+
+:root[data-theme="dark"] .bj-vs.push { color: var(--yellow); }
+
+.bj-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.bj-actions .btn {
+  flex: 1;
+  padding: 12px 6px;
+  font-size: 14px;
+}
