@@ -68,9 +68,10 @@
   /* ---------- Renderizacao ---------- */
 
   function cardHTML(card) {
-    return '<div class="bj-card' + (card.suit.red ? " suit-red" : "") + '">' +
-      '<span class="rank">' + card.rank + '</span>' +
-      '<span class="suit">' + card.suit.symbol + '</span>' +
+    return '<div class="bj-card pcard' + (card.suit.red ? " suit-red" : "") + '">' +
+      '<span class="pcard-corner pcard-corner--tl">' + card.rank + '<em>' + card.suit.symbol + '</em></span>' +
+      '<span class="pcard-pip">' + card.suit.symbol + '</span>' +
+      '<span class="pcard-corner pcard-corner--br">' + card.rank + '<em>' + card.suit.symbol + '</em></span>' +
       '</div>';
   }
 

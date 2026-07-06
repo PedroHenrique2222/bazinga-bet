@@ -16,23 +16,34 @@ BZG.layout = (function () {
     { href: "blackjack.html", icon: "🎭", label: "Blackjack", page: "blackjack" }
   ];
 
+  /* Starburst comic: estrela de pontas alternadas gerada por codigo (fica simetrica e limpa) */
+  function starPoints(cx, cy, spikes, outerR, innerR) {
+    var pts = [];
+    for (var i = 0; i < spikes * 2; i++) {
+      var r = i % 2 === 0 ? outerR : innerR;
+      var a = (Math.PI * i) / spikes - Math.PI / 2;
+      pts.push((cx + Math.cos(a) * r).toFixed(1) + "," + (cy + Math.sin(a) * r).toFixed(1));
+    }
+    return pts.join(" ");
+  }
+
   function logoHTML() {
     return '' +
       '<a class="logo-card" href="index.html" aria-label="Bazinga BET">' +
-        '<svg class="logo-svg" viewBox="0 0 200 120" aria-hidden="true">' +
-          /* explosao de quadrinhos (starburst) atras */
-          '<polygon class="logo-burst" points="100,4 113,26 138,10 140,36 170,28 158,52 192,54 164,70 188,90 156,86 162,114 136,96 128,118 112,98 88,118 84,94 60,112 62,86 32,96 48,72 8,66 40,56 16,34 48,42 42,12 68,28 78,6 92,26"/>' +
-          '<polygon class="logo-burst-inner" points="100,14 110,30 129,18 130,38 154,33 145,51 172,55 149,66 166,82 142,79 146,100 126,87 119,104 107,88 88,104 85,84 66,97 68,77 44,84 57,65 26,60 51,53 33,37 57,43 53,20 73,32 81,14 91,29"/>' +
+        '<svg class="logo-svg" viewBox="0 0 200 132" aria-hidden="true">' +
+          /* explosao comic em duas camadas simetricas */
+          '<polygon class="logo-burst" points="' + starPoints(100, 60, 12, 62, 44) + '"/>' +
+          '<polygon class="logo-burst-inner" points="' + starPoints(100, 60, 12, 52, 40) + '"/>' +
           /* circulo branco central */
-          '<circle class="logo-white" cx="100" cy="60" r="46"/>' +
-          /* texto BAZINGA! em arco comic */
-          '<g class="logo-word" transform="rotate(-7 100 58)">' +
-            '<text class="logo-stroke" x="100" y="66" text-anchor="middle">BAZINGA!</text>' +
-            '<text class="logo-fill" x="100" y="66" text-anchor="middle">BAZINGA!</text>' +
+          '<circle class="logo-white" cx="100" cy="60" r="44"/>' +
+          '<circle class="logo-white-edge" cx="100" cy="60" r="44"/>' +
+          /* texto BAZINGA! inclinado, com contorno grosso e sombra dura */
+          '<g transform="rotate(-6 100 58)">' +
+            '<text class="logo-shadow" x="102.5" y="70.5" text-anchor="middle">BAZINGA!</text>' +
+            '<text class="logo-fill" x="100" y="68" text-anchor="middle">BAZINGA!</text>' +
           '</g>' +
-          /* raio detalhado cortando embaixo */
-          '<polygon class="logo-bolt" points="18,92 78,78 66,84 128,72 96,94 108,86 44,102 58,92"/>' +
-          '<polygon class="logo-bolt logo-bolt--2" points="128,72 182,60 148,82 160,74 112,90"/>' +
+          /* raio classico cortando embaixo do texto */
+          '<path class="logo-bolt" d="M22,95 L88,79 L76,87 L152,68 L98,102 L112,92 L36,110 L52,99 Z"/>' +
         '</svg>' +
         '<span class="logo-bet">B&nbsp;E&nbsp;T</span>' +
       '</a>';
@@ -58,6 +69,7 @@ BZG.layout = (function () {
         nav +
       '</nav>' +
       '<div class="sidebar-footer">' +
+        '<div class="online-count"><span class="online-dot"></span><span id="online-count-value">—</span> online</div>' +
         '<a class="nav-item' + (activePage === "profile" ? " active" : "") + '" href="profile.html">' +
           '<span class="nav-icon" id="sidebar-avatar">😎</span>' +
           '<span class="nav-label" id="sidebar-nick">Perfil</span>' +
@@ -149,6 +161,33 @@ BZG.layout = (function () {
     }
   }
 
+  /* Contador de "jogadores online": varia com a hora do dia + ruido, atualiza sozinho */
+  function updateOnlineCount() {
+    var el = document.getElementById("online-count-value");
+    if (!el) return;
+    var now = new Date();
+    var dayCycle = Math.sin(((now.getHours() * 60 + now.getMinutes()) / 1440) * Math.PI * 2 - Math.PI / 2);
+    var base = 1900 + Math.round(dayCycle * 700);
+    var slowNoise = Math.sin(now.getTime() / 47000) * 120 + Math.sin(now.getTime() / 13000) * 45;
+    el.textContent = (base + Math.round(slowNoise)).toLocaleString("pt-BR");
+  }
+
+  /* Notificacoes globais: de vez em quando um bot "ganha" e aparece um aviso discreto */
+  function startWinFeed() {
+    function schedule() {
+      var delay = 22000 + Math.random() * 28000;
+      setTimeout(function () {
+        if (!document.hidden) {
+          var win = BZG.bots.randomWin();
+          BZG.ui.toast("🎉 " + win.avatar + " " + win.name + " ganhou " +
+            BZG.ui.formatMoney(win.amount) + " no " + win.game.icon + " " + win.game.name, "success");
+        }
+        schedule();
+      }, delay);
+    }
+    schedule();
+  }
+
   function init() {
     var body = document.body;
     var page = body.dataset.page || "";
@@ -158,6 +197,10 @@ BZG.layout = (function () {
     renderSidebar(page);
     renderTopbar(title, icon);
     BZG.sounds.armMusicAutostart();
+
+    updateOnlineCount();
+    setInterval(updateOnlineCount, 5000);
+    startWinFeed();
   }
 
   document.addEventListener("DOMContentLoaded", init);

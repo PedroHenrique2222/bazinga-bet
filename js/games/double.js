@@ -21,9 +21,20 @@
   var selectedColor = null;
   var userBet = null; // { amount, color }
   var bots = [];
+  var roundIdEl = null;
 
   var spinTarget = null; // { number, color, tileIndex, offset }
   var lastCrossed = 0;
+
+  /* numero da rodada persistido: da a sensacao de plataforma "vivida" */
+  function nextRoundId() {
+    var v = 0;
+    try { v = Number(localStorage.getItem("bzgRoundDouble")) || 0; } catch (e) {}
+    if (!v) v = 31000 + Math.floor(Math.random() * 7000);
+    v++;
+    try { localStorage.setItem("bzgRoundDouble", String(v)); } catch (e) {}
+    return v;
+  }
 
   function colorOf(n) {
     if (n === 0) return "white";
@@ -144,6 +155,7 @@
     bots = BZG.bots.doubleRoundBots();
     userBet = null;
     spinTarget = null;
+    if (roundIdEl) roundIdEl.textContent = "Rodada #" + nextRoundId();
 
     buildTrack();
     highlightWinnerColumn(null);
@@ -318,6 +330,7 @@
     countdownTimeEl = document.getElementById("countdown-time");
     countdownFillEl = document.getElementById("countdown-fill");
     resultsEl = document.getElementById("double-results");
+    roundIdEl = document.getElementById("round-id");
 
     BZG.ui.refreshBalance();
     renderHistory();

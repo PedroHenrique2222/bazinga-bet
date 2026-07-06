@@ -18,6 +18,18 @@
   var bots = [];
   var userBet = null;   // { amount, auto, status: "in"|"cashed"|"lost", cashMult, payout }
   var queuedBet = null; // aposta feita durante uma rodada, entra na proxima
+  var cashMarkers = []; // pontos de retirada exibidos no grafico
+  var roundIdEl = null;
+
+  /* numero da rodada persistido: da a sensacao de plataforma "vivida" */
+  function nextRoundId() {
+    var v = 0;
+    try { v = Number(localStorage.getItem("bzgRoundCrash")) || 0; } catch (e) {}
+    if (!v) v = 47000 + Math.floor(Math.random() * 9000);
+    v++;
+    try { localStorage.setItem("bzgRoundCrash", String(v)); } catch (e) {}
+    return v;
+  }
 
   function formatMult(m) {
     return m.toFixed(2) + "x";
@@ -185,6 +197,39 @@
     ctx.stroke();
     ctx.shadowBlur = 0;
 
+    // eixo de tempo (segundos) na base
+    ctx.fillStyle = labelColor;
+    ctx.font = "11px Inter, Segoe UI, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "alphabetic";
+    var tStep = Math.max(1, Math.ceil(maxT / 5));
+    for (var ts = tStep; ts <= maxT; ts += tStep) {
+      var tx = padding + (ts / maxT) * (w - padding * 1.4);
+      ctx.fillText(ts + "s", tx, h - 10);
+    }
+
+    // marcadores de quem ja retirou nesta subida
+    for (var mk = 0; mk < cashMarkers.length; mk++) {
+      var marker = cashMarkers[mk];
+      if (marker.mult > mult) continue;
+      var mxy = toXY(Math.log(marker.mult) / GROWTH_RATE, marker.mult);
+      ctx.beginPath();
+      if (marker.user) {
+        ctx.fillStyle = "#ffcc00";
+        ctx.arc(mxy[0], mxy[1], 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 204, 0, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(mxy[0], mxy[1], 8, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = "rgba(46, 204, 113, 0.9)";
+        ctx.arc(mxy[0], mxy[1], 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
     // foguete na ponta
     ctx.font = "30px serif";
     ctx.textAlign = "center";
@@ -204,6 +249,8 @@
     lastBeepSecond = -1;
     bots = BZG.bots.crashRoundBots();
     userBet = null;
+    cashMarkers = [];
+    if (roundIdEl) roundIdEl.textContent = "Rodada #" + nextRoundId();
 
     multiplierEl.textContent = "1.00x";
     multiplierEl.classList.remove("crashed", "cashed", "tier-low", "tier-mid", "tier-high");
@@ -341,6 +388,7 @@
           if (b.status === "in" && mult >= b.target) {
             b.status = "cashed";
             b.cashMult = b.target;
+            cashMarkers.push({ mult: b.target });
             changed = true;
           }
         });
@@ -408,6 +456,7 @@
     userBet.status = "cashed";
     userBet.cashMult = mult;
     userBet.payout = payout;
+    cashMarkers.push({ mult: mult, user: true });
 
     BZG.storage.recordBet("crash", {
       bet: userBet.amount,
@@ -490,6 +539,7 @@
     countdownTimeEl = document.getElementById("countdown-time");
     countdownFillEl = document.getElementById("countdown-fill");
     crashHistoryEl = document.getElementById("crash-history");
+    roundIdEl = document.getElementById("round-id");
 
     BZG.ui.refreshBalance();
     renderHistory();

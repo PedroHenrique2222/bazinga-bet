@@ -42,16 +42,18 @@
   }
 
   function renderCard(el, value, suit, faceUp) {
-    var rankEl = el.querySelector(".rank");
-    var suitEl = el.querySelector(".suit");
     if (faceUp) {
-      rankEl.textContent = rankLabel(value);
-      suitEl.textContent = suit.symbol;
+      el.classList.remove("facedown");
       el.classList.toggle("suit-red", suit.red);
+      var r = rankLabel(value);
+      el.innerHTML =
+        '<span class="pcard-corner pcard-corner--tl">' + r + '<em>' + suit.symbol + '</em></span>' +
+        '<span class="pcard-pip">' + suit.symbol + '</span>' +
+        '<span class="pcard-corner pcard-corner--br">' + r + '<em>' + suit.symbol + '</em></span>';
     } else {
-      rankEl.textContent = "?";
-      suitEl.textContent = "🂠";
+      el.classList.add("facedown");
       el.classList.remove("suit-red");
+      el.innerHTML = '<span class="pcard-back">⚡</span>';
     }
   }
 

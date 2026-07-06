@@ -51,17 +51,8 @@
 }
 
 .bj-card {
-  width: 76px;
-  height: 108px;
-  border-radius: 10px;
-  background: linear-gradient(160deg, #f5f5f7, #d8d8e0);
-  color: #1a1a1a;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-weight: 900;
+  width: 78px;
+  height: 110px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
   animation: bj-deal 0.3s ease;
 }
@@ -71,22 +62,15 @@
   to { transform: translateY(0) rotate(0); opacity: 1; }
 }
 
-.bj-card .rank {
-  font-size: 26px;
-}
-
-.bj-card .suit {
-  font-size: 22px;
-}
-
-.bj-card.suit-red {
-  color: var(--red);
+.bj-card .pcard-pip {
+  font-size: 28px;
 }
 
 .bj-card--back {
-  background: linear-gradient(160deg, #b00814, #7c040d);
-  color: #ffd400;
-  border: 2px solid rgba(255, 204, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
   font-size: 30px;
 }
 

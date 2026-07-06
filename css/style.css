@@ -200,87 +200,95 @@ a {
 .logo-card {
   position: relative;
   display: block;
-  background: linear-gradient(160deg, #e01020, #a00612);
+  background:
+    radial-gradient(rgba(0, 0, 0, 0.14) 1.1px, transparent 1.4px),
+    radial-gradient(circle at 50% 30%, #f01426, #b00815 70%);
+  background-size: 9px 9px, 100% 100%;
   border-radius: 14px;
-  padding: 8px 6px 10px;
+  padding: 6px 6px 10px;
   text-align: center;
   overflow: hidden;
-  box-shadow: 0 6px 18px rgba(224, 16, 32, 0.35), inset 0 0 30px rgba(0, 0, 0, 0.2);
-  transition: box-shadow 0.25s ease;
+  box-shadow: 0 6px 18px rgba(224, 16, 32, 0.4), inset 0 -14px 26px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.25s ease, transform 0.2s ease;
 }
 
 .logo-card:hover {
-  box-shadow: 0 6px 26px rgba(224, 16, 32, 0.55), 0 0 22px rgba(255, 204, 0, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(224, 16, 32, 0.55), 0 0 24px rgba(255, 204, 0, 0.3), inset 0 -14px 26px rgba(0, 0, 0, 0.25);
 }
 
 .logo-svg {
   width: 100%;
   height: auto;
   display: block;
+  overflow: visible;
 }
 
 .logo-burst {
-  fill: #ffd400;
-  opacity: 0.22;
+  fill: #ff9d00;
   transform-origin: 100px 60px;
-  animation: logo-burst-spin 24s linear infinite;
+  animation: logo-burst-pulse 3.2s ease-in-out infinite;
 }
 
 .logo-burst-inner {
   fill: #ffd400;
-  opacity: 0.35;
   transform-origin: 100px 60px;
-  animation: logo-burst-spin 24s linear infinite reverse;
+  animation: logo-burst-pulse 3.2s ease-in-out infinite;
+  animation-delay: 0.15s;
 }
 
-@keyframes logo-burst-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes logo-burst-pulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.045) rotate(3deg); }
 }
 
 .logo-white {
   fill: #ffffff;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
-.logo-word text {
-  font-family: "Arial Black", "Segoe UI", sans-serif;
+.logo-white-edge {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.12);
+  stroke-width: 1.5;
+}
+
+.logo-shadow, .logo-fill {
+  font-family: "Inter", "Arial Black", "Segoe UI", sans-serif;
   font-weight: 900;
   font-style: italic;
-  font-size: 33px;
-  letter-spacing: -2px;
+  font-size: 35px;
+  letter-spacing: -1.5px;
 }
 
-.logo-stroke {
+.logo-shadow {
   fill: #14100a;
-  stroke: #14100a;
-  stroke-width: 7;
-  stroke-linejoin: round;
-  transform: translate(2.5px, 2.5px);
 }
 
 .logo-fill {
   fill: #ffd400;
-  animation: logo-glow 2.6s ease-in-out infinite;
+  paint-order: stroke;
+  stroke: #14100a;
+  stroke-width: 5.5;
+  stroke-linejoin: round;
+  animation: logo-glow 2.8s ease-in-out infinite;
 }
 
 @keyframes logo-glow {
   0%, 100% { filter: none; }
-  50% { filter: drop-shadow(0 0 5px rgba(255, 212, 0, 0.9)); }
+  50% { filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.85)); }
 }
 
 .logo-bolt {
   fill: #14100a;
-  animation: logo-bolt-flash 3.4s ease-in-out infinite;
-}
-
-.logo-bolt--2 {
-  animation-delay: 0.12s;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  animation: logo-bolt-flash 4s ease-in-out infinite;
 }
 
 @keyframes logo-bolt-flash {
-  0%, 88%, 100% { fill: #14100a; }
-  92%, 96% { fill: #ffd400; filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.9)); }
+  0%, 88%, 100% { fill: #14100a; filter: none; }
+  92%, 96% { fill: #ffd400; filter: drop-shadow(0 0 7px rgba(255, 212, 0, 0.95)); }
 }
 
 .logo-bet {
@@ -289,7 +297,7 @@ a {
   font-size: 12px;
   letter-spacing: 0.55em;
   color: #fff;
-  margin-top: 2px;
+  margin-top: 1px;
   margin-left: 0.55em;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
@@ -369,6 +377,25 @@ a {
 .sidebar-footer {
   border-top: 1px solid var(--border);
   padding-top: 10px;
+}
+
+.online-count {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 4px 12px 10px;
+}
+
+.online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: live-pulse 2s ease-in-out infinite;
 }
 
 /* ---------- Topbar ---------- */
@@ -1175,6 +1202,59 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   background: linear-gradient(90deg, var(--red), var(--yellow));
   border-radius: 999px;
   transition: width 0.1s linear;
+}
+
+/* ---------- Cartas de baralho (Blackjack / HiLo) ---------- */
+
+.pcard {
+  position: relative;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #ffffff, #e9e9ef);
+  color: #16161c;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.pcard.suit-red {
+  color: #d6222e;
+}
+
+.pcard-corner {
+  position: absolute;
+  font-size: 15px;
+  line-height: 1.05;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.pcard-corner em {
+  display: block;
+  font-style: normal;
+  font-size: 12px;
+}
+
+.pcard-corner--tl { top: 7px; left: 8px; }
+.pcard-corner--br { bottom: 7px; right: 8px; transform: rotate(180deg); }
+
+.pcard-pip {
+  font-size: 34px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.pcard.facedown, .bj-card--back {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 212, 0, 0.14) 0 6px, transparent 6px 12px),
+    linear-gradient(160deg, #c00d1b, #7c040d);
+  color: #ffd400;
+  border: 2px solid rgba(255, 204, 0, 0.35);
+}
+
+.pcard-back {
+  font-size: 30px;
+  filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.5));
 }
 
 /* ---------- Toasts ---------- */

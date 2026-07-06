@@ -206,3 +206,14 @@
 .double-bets-col .bet-row {
   padding: 5px 10px;
 }
+
+.round-id {
+  position: absolute;
+  top: 44px;
+  right: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  z-index: 3;
+  letter-spacing: 0.04em;
+}
