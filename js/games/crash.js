@@ -16,7 +16,8 @@
   var lastBeepSecond = -1;
 
   var bots = [];
-  var userBet = null; // { amount, auto, status: "in"|"cashed"|"lost", cashMult, payout }
+  var userBet = null;   // { amount, auto, status: "in"|"cashed"|"lost", cashMult, payout }
+  var queuedBet = null; // aposta feita durante uma rodada, entra na proxima
 
   function formatMult(m) {
     return m.toFixed(2) + "x";
@@ -215,6 +216,19 @@
     autoCashoutInput.disabled = false;
     setStatus("Faça sua aposta! A rodada começa em instantes.");
     drawCurve(0, 1);
+
+    // se o jogador deixou uma aposta na fila durante a rodada anterior, entra agora
+    if (queuedBet) {
+      userBet = { amount: queuedBet.amount, auto: queuedBet.auto, status: "in" };
+      queuedBet = null;
+      actionBtn.textContent = "Aposta feita ✓";
+      actionBtn.disabled = true;
+      betInput.disabled = true;
+      autoCashoutInput.disabled = true;
+      setStatus("Aposta de " + BZG.ui.formatMoney(userBet.amount) + " entrou nesta rodada!");
+      BZG.sounds.bet();
+    }
+
     renderRoundBets();
   }
 
@@ -226,17 +240,21 @@
     lastTickTime = phaseStart;
 
     countdownEl.classList.remove("visible");
-    betInput.disabled = true;
-    autoCashoutInput.disabled = true;
 
     if (userBet) {
+      betInput.disabled = true;
+      autoCashoutInput.disabled = true;
       actionBtn.disabled = false;
       actionBtn.className = "btn btn--gold";
       setStatus("Voando! Clique em retirar antes que exploda.");
     } else {
-      actionBtn.disabled = true;
-      actionBtn.textContent = "Rodada em andamento...";
-      setStatus("Rodada em andamento. Aposte na próxima!");
+      // sem aposta nesta rodada: pode deixar uma na fila para a proxima
+      betInput.disabled = false;
+      autoCashoutInput.disabled = false;
+      actionBtn.disabled = false;
+      actionBtn.className = "btn btn--primary";
+      actionBtn.textContent = "Apostar na próxima";
+      setStatus("Rodada em andamento. Sua aposta entra na próxima rodada.");
     }
     renderRoundBets();
   }
@@ -413,11 +431,40 @@
     BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);
   }
 
+  function queueBet() {
+    var amount = Math.round(Number(betInput.value));
+    var balance = BZG.storage.getBalance();
+
+    if (!amount || amount <= 0) {
+      BZG.ui.toast("Digite um valor de aposta válido.", "error");
+      return;
+    }
+    if (amount > balance) {
+      BZG.ui.toast("Você não tem saldo suficiente.", "error");
+      return;
+    }
+
+    var auto = Number(autoCashoutInput.value);
+    queuedBet = {
+      amount: amount,
+      auto: auto && auto > 1 ? auto : null
+    };
+
+    actionBtn.textContent = "Na fila para a próxima ✓";
+    actionBtn.disabled = true;
+    betInput.disabled = true;
+    autoCashoutInput.disabled = true;
+    setStatus("Aposta de " + BZG.ui.formatMoney(amount) + " na fila. Entra na próxima rodada.");
+    BZG.sounds.click();
+  }
+
   function onActionClick() {
     if (phase === "betting" && !userBet) {
       placeBet();
     } else if (phase === "running" && userBet && userBet.status === "in") {
       doCashOut(lastMultiplier);
+    } else if (phase === "running" && !userBet && !queuedBet) {
+      queueBet();
     }
   }
 

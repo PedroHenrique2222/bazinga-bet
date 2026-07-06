@@ -88,7 +88,8 @@ BZG.layout = (function () {
         '<span id="balance-value">BZ$ 0</span>' +
       '</div>' +
       '<button id="reset-balance-btn" class="btn btn--gold btn--sm" title="Recarrega o saldo para BZ$ 10.000">Recarregar</button>' +
-      '<button class="icon-btn" id="mute-btn" title="Som ligado/desligado"></button>' +
+      '<button class="icon-btn" id="music-btn" title="Música ligada/desligada">🎵</button>' +
+      '<button class="icon-btn" id="sfx-btn" title="Efeitos sonoros ligados/desligados">🔊</button>' +
       '<button class="icon-btn" id="theme-btn" title="Tema claro/escuro"></button>';
 
     BZG.ui.refreshBalance();
@@ -101,18 +102,23 @@ BZG.layout = (function () {
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     });
 
-    var muteBtn = document.getElementById("mute-btn");
-    function syncMuteIcon() {
-      muteBtn.textContent = BZG.sounds.isMuted() ? "🔇" : "🔊";
+    var musicBtn = document.getElementById("music-btn");
+    var sfxBtn = document.getElementById("sfx-btn");
+    function syncSoundIcons() {
+      musicBtn.classList.toggle("off", !BZG.sounds.isMusicEnabled());
+      sfxBtn.textContent = BZG.sounds.isSfxEnabled() ? "🔊" : "🔇";
+      sfxBtn.classList.toggle("off", !BZG.sounds.isSfxEnabled());
     }
-    syncMuteIcon();
-    muteBtn.addEventListener("click", function () {
-      BZG.sounds.toggleMuted();
-      syncMuteIcon();
-      if (!BZG.sounds.isMuted()) {
-        BZG.sounds.startMusic();
-        BZG.sounds.click();
-      }
+    syncSoundIcons();
+    musicBtn.addEventListener("click", function () {
+      BZG.sounds.toggleMusic();
+      syncSoundIcons();
+      BZG.sounds.click();
+    });
+    sfxBtn.addEventListener("click", function () {
+      BZG.sounds.toggleSfx();
+      syncSoundIcons();
+      BZG.sounds.click();
     });
 
     var themeBtn = document.getElementById("theme-btn");

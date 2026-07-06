@@ -11,7 +11,39 @@
   --radius: 16px;
   --radius-sm: 10px;
   --sidebar-w: 232px;
-  font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  font-family: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+}
+
+::selection {
+  background: rgba(255, 204, 0, 0.35);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 204, 0, 0.35) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 204, 0, 0.3);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 204, 0, 0.55);
+}
+
+:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
 }
 
 /* ---------- Tema escuro (padrao) ---------- */
@@ -395,6 +427,23 @@ a {
   transform: translateY(-1px);
 }
 
+.icon-btn.off {
+  opacity: 0.4;
+  position: relative;
+}
+
+.icon-btn.off::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 50%;
+  height: 2px;
+  background: var(--red);
+  transform: rotate(-35deg);
+  border-radius: 2px;
+}
+
 .balance-box {
   display: flex;
   align-items: baseline;
@@ -729,9 +778,21 @@ a {
 }
 
 .game-card .icon {
-  font-size: 40px;
+  font-size: 36px;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255, 204, 0, 0.18), rgba(255, 45, 58, 0.1));
+  border: 1px solid var(--border);
   filter: drop-shadow(0 0 14px rgba(255, 204, 0, 0.35));
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.game-card:hover .icon {
+  box-shadow: 0 0 22px rgba(255, 204, 0, 0.3);
 }
 
 .game-card:hover .icon {

@@ -71,6 +71,23 @@
   function updateGuessButtons() {
     higherBtn.disabled = state !== "running" || currentValue >= 13;
     lowerBtn.disabled = state !== "running" || currentValue <= 1;
+
+    // mostra chance e multiplicador de cada palpite direto nos botoes
+    if (state === "running" && currentValue >= 1 && currentValue <= 13) {
+      var chanceHigher = (13 - currentValue) / 12;
+      var chanceLower = (currentValue - 1) / 12;
+      higherBtn.innerHTML = chanceHigher > 0
+        ? "▲ Maior<br><small>" + Math.round(chanceHigher * 100) + "% · paga " +
+          (fairProduct * (1 / chanceHigher) * (1 - HOUSE_EDGE)).toFixed(2) + "x</small>"
+        : "▲ Maior";
+      lowerBtn.innerHTML = chanceLower > 0
+        ? "▼ Menor<br><small>" + Math.round(chanceLower * 100) + "% · paga " +
+          (fairProduct * (1 / chanceLower) * (1 - HOUSE_EDGE)).toFixed(2) + "x</small>"
+        : "▼ Menor";
+    } else {
+      higherBtn.innerHTML = "▲ Maior";
+      lowerBtn.innerHTML = "▼ Menor";
+    }
   }
 
   function startGame() {

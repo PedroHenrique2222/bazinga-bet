@@ -128,7 +128,11 @@
       var safeTotal = TOTAL_CELLS - mineCount;
       cashoutBtn.style.display = "block";
       cashoutBtn.textContent = "Colher " + BZG.ui.formatMoney(currentBet * mult) + " (" + formatMult(mult) + ")";
-      setStatus(revealedCount + "/" + safeTotal + " células reveladas. Multiplicador atual: " + formatMult(mult));
+      if (revealedCount < safeTotal) {
+        var nextMult = currentMultiplier(revealedCount + 1);
+        setStatus(revealedCount + "/" + safeTotal + " diamantes · atual " + formatMult(mult) +
+          " · o próximo paga " + formatMult(nextMult));
+      }
 
       multiplierEl.textContent = formatMult(mult);
       multiplierEl.classList.remove("bump");

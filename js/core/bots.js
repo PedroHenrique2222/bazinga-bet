@@ -3,11 +3,21 @@ window.BZG = window.BZG || {};
 
 BZG.bots = (function () {
   var NAMES = [
-    "Carlao_77", "Duda.Martins", "ReiDoPix", "Luquinhas", "Bia_Sortuda", "ZeDaManga",
-    "PedrinGamer", "Nathy22", "TioPatinhas", "MestreYoda", "Foguetinho", "AnaClara_s2",
-    "VitinDoGrau", "Sr.Milhao", "LoirinhaBet", "JhowRico", "Cria_da_7", "MaduLima",
-    "Robertinho", "GugaFlash", "PretinhaTop", "DomCorleone", "XandeVIP", "Leozin_013",
-    "MariaFumaca", "Bruxao_66", "KakaDaVila", "PrincesaBet", "TurboNando", "SortudoBR"
+    // apelidos de bet brasileiros
+    "ReiDoPix", "PatraoDoCrash", "SortudoBR", "LendaDoGreen", "VidaDeGreen", "SoGreenHoje",
+    "BetadorRaiz", "CriaDa7", "MalandroDoRJ", "PaiDoDouble", "TubaraoDaBet", "MilGrau013",
+    // nome + numero, estilo usuario comum
+    "Carlao_77", "Leozin013", "Nathy22", "Bruxao66", "Luquinhas777", "Betao_10",
+    "Rafinha_sp", "Digo_zl", "Kaka_021", "Vini047", "Pedrin011", "Dudu_098",
+    // nomes proprios estilizados
+    "Duda.Martins", "AnaClara_s2", "MaduLima", "BiaSortuda", "JuhCerqueira", "ThaisFlor",
+    "Gabizinha", "PaulinhaGG", "LariCry", "YasminRJ", "MariEduarda_", "CamisDuarte",
+    // personagens e apelidos criativos
+    "TioPatinhas", "MestreDosMagos", "DonCorleone", "UrsoPolarr", "LoboDaMadruga", "ZecaUrubu",
+    "Foguetinho", "TurboNando", "GugaFlash", "MariaFumaca", "KakaDaVila", "TonhoDaMata",
+    // VIPs e ostentacao
+    "SrMilhao", "XandeVIP", "RicoDaNet", "PatraoJunin", "MagnataDoDado", "JhowRico",
+    "VitinDoGrau", "PrincesaBet", "ImperadorBet", "Bilionario2030"
   ];
   var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
   var GAMES = [
