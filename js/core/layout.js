@@ -42,8 +42,8 @@ BZG.layout = (function () {
             '<text class="logo-shadow" x="102.5" y="70.5" text-anchor="middle">BAZINGA!</text>' +
             '<text class="logo-fill" x="100" y="68" text-anchor="middle">BAZINGA!</text>' +
           '</g>' +
-          /* raio classico cortando embaixo do texto */
-          '<path class="logo-bolt" d="M22,95 L88,79 L76,87 L152,68 L98,102 L112,92 L36,110 L52,99 Z"/>' +
+          /* raio classico (mesmo desenho do favicon) cortando na diagonal sob o texto */
+          '<path class="logo-bolt" transform="translate(100 94) rotate(72) scale(1.8) translate(-32 -32)" d="M35 8 L17 37 L28 37 L24 56 L47 25 L35 25 Z"/>' +
         '</svg>' +
         '<span class="logo-bet">B&nbsp;E&nbsp;T</span>' +
       '</a>';
