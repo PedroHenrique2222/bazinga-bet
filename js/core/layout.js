@@ -107,6 +107,18 @@ BZG.layout = (function () {
     BZG.ui.refreshBalance();
 
     document.getElementById("reset-balance-btn").addEventListener("click", function () {
+      var current = BZG.storage.getBalance();
+
+      // recarregar com saldo acima do inicial REDUZIRIA o saldo - avisa antes
+      if (current > BZG.storage.STARTING_BALANCE) {
+        var ok = window.confirm(
+          "Atenção: você tem " + BZG.ui.formatMoney(current) + ".\n\n" +
+          "Recarregar vai REDUZIR seu saldo para " +
+          BZG.ui.formatMoney(BZG.storage.STARTING_BALANCE) + ". Deseja continuar?"
+        );
+        if (!ok) return;
+      }
+
       BZG.storage.resetBalance();
       BZG.ui.refreshBalance();
       BZG.sounds.click();
