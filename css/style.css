@@ -280,15 +280,15 @@ a {
 
 .logo-bolt {
   fill: #14100a;
-  stroke: rgba(255, 255, 255, 0.55);
-  stroke-width: 1.4;
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 1;
   stroke-linejoin: round;
-  animation: logo-bolt-flash 4s ease-in-out infinite;
+  animation: logo-bolt-flash 4.5s ease-in-out infinite;
 }
 
 @keyframes logo-bolt-flash {
-  0%, 88%, 100% { fill: #14100a; filter: none; }
-  92%, 96% { fill: #ffd400; filter: drop-shadow(0 0 7px rgba(255, 212, 0, 0.95)); }
+  0%, 90%, 100% { fill: #14100a; filter: none; }
+  93%, 97% { fill: #2a2118; filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.5)); }
 }
 
 .logo-bet {
