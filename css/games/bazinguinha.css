@@ -1,0 +1,121 @@
+/* Bazinga BET - Bazinguinha (Tigrinho 3x3) */
+
+.stage {
+  background: radial-gradient(circle at 50% 30%, rgba(255, 138, 0, 0.14), transparent 60%);
+}
+
+.tiger-machine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(170deg, #c00d1b, #7c040d);
+  border-radius: 20px;
+  padding: 20px 22px 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 40px rgba(0, 0, 0, 0.22);
+  border: 2px solid rgba(255, 204, 0, 0.55);
+}
+
+.tiger-header {
+  font-weight: 900;
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  color: #ffd400;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  animation: slots-header-glow 1.8s ease-in-out infinite;
+}
+
+@keyframes slots-header-glow {
+  0%, 100% { text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); }
+  50% { text-shadow: 0 0 16px rgba(255, 212, 0, 0.9); }
+}
+
+.tiger-frame {
+  background: #0e0e13;
+  border-radius: 14px;
+  padding: 8px;
+  border: 2px solid rgba(255, 204, 0, 0.35);
+}
+
+.tiger-grid {
+  display: flex;
+  gap: 8px;
+}
+
+.tiger-col {
+  width: 76px;
+  height: 228px; /* 3 celulas de 76px */
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a1a22, #23232d 50%, #1a1a22);
+  border-radius: 8px;
+  position: relative;
+}
+
+.tiger-strip {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.tiger-cell {
+  width: 76px;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* grade final estatica (apos o giro) */
+.tiger-grid-final {
+  display: grid;
+  grid-template-columns: repeat(3, 76px);
+  grid-auto-rows: 76px;
+  gap: 8px;
+}
+
+.tiger-fcell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #23232d, #1a1a22);
+  position: relative;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.tiger-fcell.win {
+  background: linear-gradient(160deg, rgba(255, 204, 0, 0.3), rgba(255, 138, 0, 0.12));
+  box-shadow: 0 0 16px rgba(255, 204, 0, 0.5), inset 0 0 0 2px var(--yellow);
+  animation: tiger-winpulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes tiger-winpulse {
+  from { box-shadow: 0 0 12px rgba(255, 204, 0, 0.4), inset 0 0 0 2px var(--yellow); }
+  to { box-shadow: 0 0 26px rgba(255, 204, 0, 0.8), inset 0 0 0 2px var(--yellow); }
+}
+
+.tiger-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #241a00;
+  background: linear-gradient(120deg, var(--yellow), #ff8a00);
+  border-radius: 6px;
+  padding: 0 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.tiger-result {
+  font-size: 20px;
+  font-weight: 900;
+  color: #ffd400;
+  min-height: 26px;
+  text-align: center;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}

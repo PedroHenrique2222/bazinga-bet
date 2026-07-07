@@ -30,7 +30,12 @@ BZG.bots = (function () {
     { id: "hilo", name: "HiLo", icon: "🃏" },
     { id: "slots", name: "Slots", icon: "🎰" },
     { id: "roulette", name: "Roleta", icon: "🎯" },
-    { id: "blackjack", name: "Blackjack", icon: "🎭" }
+    { id: "blackjack", name: "Blackjack", icon: "🎭" },
+    { id: "bazinguinha", name: "Bazinguinha", icon: "🐯" },
+    { id: "raspadinha", name: "Raspadinha", icon: "🎟️" },
+    { id: "limbo", name: "Limbo", icon: "📉" },
+    { id: "wheel", name: "Roda da Sorte", icon: "🎡" },
+    { id: "coinflip", name: "Cara ou Coroa", icon: "🪙" }
   ];
 
   function rand(n) {

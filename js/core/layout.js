@@ -13,7 +13,12 @@ BZG.layout = (function () {
     { href: "hilo.html", icon: "🃏", label: "HiLo", page: "hilo" },
     { href: "slots.html", icon: "🎰", label: "Slots", page: "slots" },
     { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette" },
-    { href: "blackjack.html", icon: "🎭", label: "Blackjack", page: "blackjack" }
+    { href: "blackjack.html", icon: "🎭", label: "Blackjack", page: "blackjack" },
+    { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", hot: true },
+    { href: "raspadinha.html", icon: "🎟️", label: "Raspadinha", page: "raspadinha" },
+    { href: "limbo.html", icon: "📉", label: "Limbo", page: "limbo" },
+    { href: "wheel.html", icon: "🎡", label: "Roda da Sorte", page: "wheel" },
+    { href: "coinflip.html", icon: "🪙", label: "Cara ou Coroa", page: "coinflip" }
   ];
 
   /* Starburst comic: estrela de pontas alternadas gerada por codigo (fica simetrica e limpa) */
@@ -55,11 +60,12 @@ BZG.layout = (function () {
 
     var nav = NAV_ITEMS.map(function (item) {
       var cls = "nav-item" + (item.page === activePage ? " active" : "");
-      var liveBadge = item.live ? '<span class="nav-live">AO VIVO</span>' : "";
+      var badge = item.live ? '<span class="nav-live">AO VIVO</span>'
+        : (item.hot ? '<span class="nav-hot">HOT</span>' : "");
       return '<a class="' + cls + '" href="' + item.href + '">' +
         '<span class="nav-icon">' + item.icon + '</span>' +
         '<span class="nav-label">' + item.label + '</span>' +
-        liveBadge +
+        badge +
         '</a>';
     }).join("");
 
@@ -74,6 +80,10 @@ BZG.layout = (function () {
           '<span class="nav-icon" id="sidebar-avatar">😎</span>' +
           '<span class="nav-label" id="sidebar-nick">Perfil</span>' +
           '<span class="nav-lvl" id="sidebar-lvl"></span>' +
+        '</a>' +
+        '<a class="nav-item' + (activePage === "settings" ? " active" : "") + '" href="settings.html">' +
+          '<span class="nav-icon">⚙️</span>' +
+          '<span class="nav-label">Configurações</span>' +
         '</a>' +
       '</div>';
 
@@ -184,6 +194,42 @@ BZG.layout = (function () {
     el.textContent = (base + Math.round(slowNoise)).toLocaleString("pt-BR");
   }
 
+  /* Bonus diario: mostra um modal se o bonus de hoje ainda nao foi coletado */
+  function showDailyBonus() {
+    if (!BZG.storage.getBonusInfo) return;
+    var info = BZG.storage.getBonusInfo();
+    if (!info.available) return;
+
+    var modal = document.createElement("div");
+    modal.className = "modal-backdrop";
+    modal.innerHTML =
+      '<div class="modal-card bonus-card">' +
+        '<div class="bonus-gift">🎁</div>' +
+        '<h2>Bônus diário</h2>' +
+        '<p class="bonus-sub">Dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
+        '<div class="bonus-amount">+' + BZG.ui.formatMoney(info.amount) + '</div>' +
+        '<p class="bonus-hint">Volte amanhã para aumentar sua sequência e ganhar mais!</p>' +
+        '<button class="btn btn--gold" id="claim-bonus-btn" style="width:100%; padding:13px; font-size:16px; margin-top:6px;">Coletar</button>' +
+      '</div>';
+    document.body.appendChild(modal);
+    requestAnimationFrame(function () { modal.classList.add("show"); });
+
+    document.getElementById("claim-bonus-btn").addEventListener("click", function () {
+      var res = BZG.storage.claimBonus();
+      BZG.ui.refreshBalance();
+      document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
+      if (res) {
+        BZG.sounds.coin();
+        BZG.ui.toast("🎁 Bônus coletado: +" + BZG.ui.formatMoney(res.amount) + "!", "success");
+        var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+        BZG.effects.confetti(cx, cy, 80);
+      }
+      if (BZG.achievements) BZG.achievements.check();
+      modal.classList.remove("show");
+      setTimeout(function () { if (modal.parentNode) modal.parentNode.removeChild(modal); }, 300);
+    });
+  }
+
   /* Notificacoes globais: de vez em quando um bot "ganha" e aparece um aviso discreto */
   function startWinFeed() {
     function schedule() {
@@ -213,6 +259,16 @@ BZG.layout = (function () {
     updateOnlineCount();
     setInterval(updateOnlineCount, 5000);
     startWinFeed();
+
+    // verifica conquistas sempre que o saldo muda (apos apostas, bonus etc.)
+    if (BZG.achievements) {
+      document.addEventListener("bzg:balance-changed", function () {
+        BZG.achievements.check();
+      });
+    }
+
+    // bonus diario aparece pouco depois de carregar
+    setTimeout(showDailyBonus, 700);
   }
 
   document.addEventListener("DOMContentLoaded", init);

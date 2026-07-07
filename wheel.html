@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roleta — Bazinga BET</title>
+  <title>Roda da Sorte — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/roulette.css" />
+  <link rel="stylesheet" href="css/games/wheel.css" />
 </head>
-<body data-page="roulette" data-title="Roleta" data-icon="🎯">
+<body data-page="wheel" data-title="Roda da Sorte" data-icon="🎡">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -22,7 +22,7 @@
 
         <div class="game-layout">
           <section class="panel controls">
-            <label for="bet-amount">Valor da ficha (BZ$)</label>
+            <label for="bet-amount">Valor da aposta (BZ$)</label>
             <input type="number" id="bet-amount" min="1" step="1" value="100" />
             <div class="input-row" style="margin-top:8px;">
               <button class="btn btn--ghost" id="bet-half">½</button>
@@ -30,24 +30,19 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
-            <p style="color:var(--text-muted); font-size:12.5px; margin:14px 0 0;">
-              Clique nas casas da mesa para apostar (pode apostar em várias). Cada clique adiciona o valor da ficha.
-            </p>
-
-            <div class="roulette-total">
-              <span>Total apostado</span>
-              <strong id="total-staked">BZ$ 0</strong>
+            <label>Nível de risco</label>
+            <div class="risk-options" id="risk-options">
+              <button class="btn btn--ghost active" data-risk="low">Baixo</button>
+              <button class="btn btn--ghost" data-risk="medium">Médio</button>
+              <button class="btn btn--ghost" data-risk="high">Alto</button>
             </div>
 
-            <button id="spin-btn" class="btn btn--primary" style="width:100%; margin-top:12px; padding:14px; font-size:16px;">
-              Girar roleta
-            </button>
-            <button id="clear-btn" class="btn btn--ghost" style="width:100%; margin-top:8px;">
-              Limpar apostas
+            <button id="spin-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+              Girar a roda
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Monte suas apostas e gire.
+              Escolha o risco e gire. Onde parar, é seu multiplicador.
             </p>
 
             <div class="history-list">
@@ -56,17 +51,14 @@
             </div>
           </section>
 
-          <div>
-            <section class="panel stage" id="roulette-stage">
-              <div class="roulette-results" id="roulette-results"></div>
-              <canvas id="wheel-canvas" width="340" height="340"></canvas>
-            </section>
-
-            <section class="panel" style="margin-top:20px; overflow-x:auto;">
-              <h2 class="section-title">Mesa de apostas</h2>
-              <div class="roulette-board" id="roulette-board"></div>
-            </section>
-          </div>
+          <section class="panel stage" id="wheel-stage">
+            <div class="wheel-wrap">
+              <div class="wheel-pointer"></div>
+              <canvas id="wheel-canvas" width="380" height="380"></canvas>
+              <div class="wheel-center" id="wheel-center">🎡</div>
+            </div>
+            <div class="wheel-result" id="wheel-result">Gire a roda!</div>
+          </section>
         </div>
 
       </main>
@@ -83,6 +75,6 @@
   <script src="js/core/particles.js"></script>
   <script src="js/core/effects.js"></script>
   <script src="js/core/achievements.js"></script>
-  <script src="js/games/roulette.js"></script>
+  <script src="js/games/wheel.js"></script>
 </body>
 </html>

@@ -117,9 +117,47 @@ BZG.effects = (function () {
     overlay.classList.add(color === "gold" ? "flash-gold" : "flash-red");
   }
 
+  /* ---------- Big Win: overlay de tela cheia para premios grandes ---------- */
+
+  var bigWinBusy = false;
+
+  function bigWin(amount, mult) {
+    if (bigWinBusy) return;
+    bigWinBusy = true;
+
+    var overlay = document.createElement("div");
+    overlay.className = "bigwin-overlay";
+    overlay.innerHTML =
+      '<div class="bigwin-rays"></div>' +
+      '<div class="bigwin-content">' +
+        '<div class="bigwin-title">BIG WIN!</div>' +
+        '<div class="bigwin-amount">' + (BZG.ui ? BZG.ui.formatMoney(amount) : amount) + '</div>' +
+        (mult ? '<div class="bigwin-mult">' + mult.toFixed(2) + 'x</div>' : '') +
+      '</div>';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function () { overlay.classList.add("show"); });
+
+    if (BZG.sounds && BZG.sounds.bigWin) BZG.sounds.bigWin();
+
+    // rajadas de confete de varios pontos
+    var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    confetti(cx, cy, 120);
+    setTimeout(function () { confetti(cx - 200, cy - 40, 70); }, 220);
+    setTimeout(function () { confetti(cx + 200, cy - 40, 70); }, 420);
+
+    setTimeout(function () {
+      overlay.classList.remove("show");
+      setTimeout(function () {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        bigWinBusy = false;
+      }, 400);
+    }, 2400);
+  }
+
   return {
     confetti: confetti,
     shake: shake,
-    flash: flash
+    flash: flash,
+    bigWin: bigWin
   };
 })();

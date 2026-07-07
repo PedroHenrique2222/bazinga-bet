@@ -4,7 +4,9 @@
   var GAME_LABELS = {
     crash: "🚀 Crash", mines: "💎 Mines", plinko: "🎱 Plinko",
     double: "🎡 Double", tower: "🗼 Tower", dice: "🎲 Dice", hilo: "🃏 HiLo",
-    slots: "🎰 Slots", roulette: "🎯 Roleta", blackjack: "🎭 Blackjack"
+    slots: "🎰 Slots", roulette: "🎯 Roleta", blackjack: "🎭 Blackjack",
+    bazinguinha: "🐯 Bazinguinha", raspadinha: "🎟️ Raspadinha", limbo: "📉 Limbo",
+    wheel: "🎡 Roda da Sorte", coinflip: "🪙 Cara ou Coroa"
   };
 
   var selectedAvatar = null;
@@ -90,6 +92,28 @@
     if (avatarEl) avatarEl.textContent = selectedAvatar;
   }
 
+  function renderAchievements() {
+    var el = document.getElementById("achv-grid");
+    if (!el || !BZG.achievements) return;
+    var unlocked = BZG.storage.getAchievements();
+    var list = BZG.achievements.all();
+    var got = list.filter(function (a) { return unlocked[a.id]; }).length;
+
+    var countEl = document.getElementById("achv-count");
+    if (countEl) countEl.textContent = got + "/" + list.length;
+
+    el.innerHTML = list.map(function (a) {
+      var isUnlocked = !!unlocked[a.id];
+      return '<div class="achv' + (isUnlocked ? " unlocked" : "") + '" title="' + a.desc + '">' +
+        '<span class="achv-icon">' + (isUnlocked ? a.icon : "🔒") + '</span>' +
+        '<div class="achv-info">' +
+          '<div class="achv-name">' + a.name + '</div>' +
+          '<div class="achv-desc">' + a.desc + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join("");
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var profile = BZG.storage.getProfile();
     selectedAvatar = profile.avatar;
@@ -100,6 +124,7 @@
     renderLevel();
     renderStats();
     renderRecentBets();
+    renderAchievements();
 
     document.getElementById("save-profile-btn").addEventListener("click", saveProfile);
   });

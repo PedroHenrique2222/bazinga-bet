@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roleta — Bazinga BET</title>
+  <title>Limbo — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/roulette.css" />
+  <link rel="stylesheet" href="css/games/limbo.css" />
 </head>
-<body data-page="roulette" data-title="Roleta" data-icon="🎯">
+<body data-page="limbo" data-title="Limbo" data-icon="📉">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -22,7 +22,7 @@
 
         <div class="game-layout">
           <section class="panel controls">
-            <label for="bet-amount">Valor da ficha (BZ$)</label>
+            <label for="bet-amount">Valor da aposta (BZ$)</label>
             <input type="number" id="bet-amount" min="1" step="1" value="100" />
             <div class="input-row" style="margin-top:8px;">
               <button class="btn btn--ghost" id="bet-half">½</button>
@@ -30,43 +30,33 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
-            <p style="color:var(--text-muted); font-size:12.5px; margin:14px 0 0;">
-              Clique nas casas da mesa para apostar (pode apostar em várias). Cada clique adiciona o valor da ficha.
-            </p>
+            <label for="target-input">Multiplicador alvo</label>
+            <input type="number" id="target-input" min="1.01" step="0.1" value="2.00" />
 
-            <div class="roulette-total">
-              <span>Total apostado</span>
-              <strong id="total-staked">BZ$ 0</strong>
+            <div class="limbo-info">
+              <div><span>Chance de ganhar</span><strong id="win-chance">49.50%</strong></div>
+              <div><span>Prêmio se ganhar</span><strong id="win-payout">BZ$ 200</strong></div>
             </div>
 
-            <button id="spin-btn" class="btn btn--primary" style="width:100%; margin-top:12px; padding:14px; font-size:16px;">
-              Girar roleta
-            </button>
-            <button id="clear-btn" class="btn btn--ghost" style="width:100%; margin-top:8px;">
-              Limpar apostas
+            <button id="roll-btn" class="btn btn--primary" style="width:100%; margin-top:18px; padding:14px; font-size:16px;">
+              Apostar
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Monte suas apostas e gire.
+              Se o multiplicador sorteado for maior ou igual ao seu alvo, você ganha.
             </p>
 
             <div class="history-list">
-              <h2 class="section-title" style="margin-top:20px;">Últimos giros</h2>
+              <h2 class="section-title" style="margin-top:20px;">Últimas rodadas</h2>
               <div id="history-list"></div>
             </div>
           </section>
 
-          <div>
-            <section class="panel stage" id="roulette-stage">
-              <div class="roulette-results" id="roulette-results"></div>
-              <canvas id="wheel-canvas" width="340" height="340"></canvas>
-            </section>
-
-            <section class="panel" style="margin-top:20px; overflow-x:auto;">
-              <h2 class="section-title">Mesa de apostas</h2>
-              <div class="roulette-board" id="roulette-board"></div>
-            </section>
-          </div>
+          <section class="panel stage" id="limbo-stage">
+            <div class="limbo-recent" id="limbo-recent"></div>
+            <div class="limbo-result" id="limbo-result">0.00x</div>
+            <div class="limbo-target-label" id="limbo-target-label">Alvo: 2.00x</div>
+          </section>
         </div>
 
       </main>
@@ -83,6 +73,6 @@
   <script src="js/core/particles.js"></script>
   <script src="js/core/effects.js"></script>
   <script src="js/core/achievements.js"></script>
-  <script src="js/games/roulette.js"></script>
+  <script src="js/games/limbo.js"></script>
 </body>
 </html>

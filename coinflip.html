@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roleta — Bazinga BET</title>
+  <title>Cara ou Coroa — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/roulette.css" />
+  <link rel="stylesheet" href="css/games/coinflip.css" />
 </head>
-<body data-page="roulette" data-title="Roleta" data-icon="🎯">
+<body data-page="coinflip" data-title="Cara ou Coroa" data-icon="🪙">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -22,7 +22,7 @@
 
         <div class="game-layout">
           <section class="panel controls">
-            <label for="bet-amount">Valor da ficha (BZ$)</label>
+            <label for="bet-amount">Valor da aposta (BZ$)</label>
             <input type="number" id="bet-amount" min="1" step="1" value="100" />
             <div class="input-row" style="margin-top:8px;">
               <button class="btn btn--ghost" id="bet-half">½</button>
@@ -30,24 +30,18 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
-            <p style="color:var(--text-muted); font-size:12.5px; margin:14px 0 0;">
-              Clique nas casas da mesa para apostar (pode apostar em várias). Cada clique adiciona o valor da ficha.
-            </p>
-
-            <div class="roulette-total">
-              <span>Total apostado</span>
-              <strong id="total-staked">BZ$ 0</strong>
+            <label>Escolha o lado</label>
+            <div class="coin-choices">
+              <button class="coin-choice" data-side="cara"><span class="face">⚡</span>Cara</button>
+              <button class="coin-choice" data-side="coroa"><span class="face">💰</span>Coroa</button>
             </div>
 
-            <button id="spin-btn" class="btn btn--primary" style="width:100%; margin-top:12px; padding:14px; font-size:16px;">
-              Girar roleta
-            </button>
-            <button id="clear-btn" class="btn btn--ghost" style="width:100%; margin-top:8px;">
-              Limpar apostas
+            <button id="flip-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+              Girar moeda
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Monte suas apostas e gire.
+              Escolha um lado e gire. Cada acerto paga 1.96x.
             </p>
 
             <div class="history-list">
@@ -56,17 +50,13 @@
             </div>
           </section>
 
-          <div>
-            <section class="panel stage" id="roulette-stage">
-              <div class="roulette-results" id="roulette-results"></div>
-              <canvas id="wheel-canvas" width="340" height="340"></canvas>
-            </section>
-
-            <section class="panel" style="margin-top:20px; overflow-x:auto;">
-              <h2 class="section-title">Mesa de apostas</h2>
-              <div class="roulette-board" id="roulette-board"></div>
-            </section>
-          </div>
+          <section class="panel stage" id="coin-stage">
+            <div class="coin" id="coin">
+              <div class="coin-face coin-front">⚡</div>
+              <div class="coin-face coin-back">💰</div>
+            </div>
+            <div class="coin-result" id="coin-result">Escolha Cara ou Coroa</div>
+          </section>
         </div>
 
       </main>
@@ -83,6 +73,6 @@
   <script src="js/core/particles.js"></script>
   <script src="js/core/effects.js"></script>
   <script src="js/core/achievements.js"></script>
-  <script src="js/games/roulette.js"></script>
+  <script src="js/games/coinflip.js"></script>
 </body>
 </html>

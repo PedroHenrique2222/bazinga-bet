@@ -362,6 +362,17 @@ a {
   animation: live-pulse 1.6s ease-in-out infinite;
 }
 
+.nav-hot {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #241a00;
+  background: linear-gradient(120deg, var(--yellow), #ff8a00);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
 @keyframes live-pulse {
   0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--red-glow); }
   50% { opacity: 0.65; box-shadow: 0 0 2px transparent; }
@@ -802,6 +813,21 @@ a {
 
 .game-card:hover::before {
   opacity: 1;
+}
+
+.card-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #241a00;
+  background: linear-gradient(120deg, var(--yellow), #ff8a00);
+  border-radius: 999px;
+  padding: 3px 9px;
+  box-shadow: 0 2px 8px rgba(255, 138, 0, 0.4);
 }
 
 .game-card .icon {
@@ -1255,6 +1281,214 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
 .pcard-back {
   font-size: 30px;
   filter: drop-shadow(0 0 6px rgba(255, 212, 0, 0.5));
+}
+
+/* ---------- Modais (bonus diario, etc.) ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 20px;
+}
+
+.modal-backdrop.show {
+  opacity: 1;
+}
+
+.modal-card {
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 26px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px) scale(0.96);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-backdrop.show .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+.modal-card h2 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.bonus-card {
+  border-color: rgba(255, 204, 0, 0.5);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(255, 204, 0, 0.2);
+}
+
+.bonus-gift {
+  font-size: 64px;
+  animation: bonus-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes bonus-bounce {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
+}
+
+.bonus-sub {
+  color: var(--text-muted);
+  margin: 2px 0 10px;
+  font-size: 14px;
+}
+
+.bonus-amount {
+  font-size: 38px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+  margin-bottom: 8px;
+}
+
+:root[data-theme="dark"] .bonus-amount {
+  color: var(--yellow);
+}
+
+.bonus-hint {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  margin: 0 0 18px;
+}
+
+/* ---------- Big Win overlay ---------- */
+
+.bigwin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  overflow: hidden;
+}
+
+.bigwin-overlay.show {
+  opacity: 1;
+}
+
+.bigwin-rays {
+  position: absolute;
+  width: 200vmax;
+  height: 200vmax;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 204, 0, 0.14) 0deg 8deg,
+    transparent 8deg 16deg
+  );
+  animation: bigwin-spin 9s linear infinite;
+}
+
+@keyframes bigwin-spin {
+  to { transform: rotate(360deg); }
+}
+
+.bigwin-content {
+  position: relative;
+  text-align: center;
+  transform: scale(0.5);
+  transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+.bigwin-overlay.show .bigwin-content {
+  transform: scale(1);
+}
+
+.bigwin-title {
+  font-size: clamp(40px, 9vw, 88px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: var(--yellow);
+  -webkit-text-stroke: 3px #14100a;
+  text-shadow: 0 6px 0 #14100a, 0 0 40px rgba(255, 204, 0, 0.7);
+  animation: bigwin-pump 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes bigwin-pump {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+.bigwin-amount {
+  font-size: clamp(24px, 5vw, 44px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
+  margin-top: 6px;
+}
+
+.bigwin-mult {
+  font-size: clamp(18px, 3.5vw, 28px);
+  font-weight: 800;
+  color: var(--red);
+  margin-top: 4px;
+  text-shadow: 0 0 18px rgba(255, 45, 58, 0.6);
+}
+
+/* ---------- Conquistas ---------- */
+
+.achv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.achv {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-alt);
+  opacity: 0.55;
+  filter: grayscale(0.7);
+  transition: opacity 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+}
+
+.achv.unlocked {
+  opacity: 1;
+  filter: none;
+  border-color: rgba(255, 204, 0, 0.45);
+}
+
+.achv-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.achv-info { min-width: 0; }
+
+.achv-name {
+  font-weight: 800;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.achv-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.25;
 }
 
 /* ---------- Toasts ---------- */

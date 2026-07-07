@@ -1,0 +1,62 @@
+/* Bazinga BET - Roda da Sorte */
+
+.stage {
+  background: radial-gradient(circle at 50% 45%, rgba(255, 204, 0, 0.1), transparent 60%);
+  gap: 22px;
+}
+
+.wheel-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 1 / 1;
+}
+
+#wheel-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.4));
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 26px solid var(--yellow);
+  z-index: 3;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.wheel-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22%;
+  height: 22%;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #b00814, #7c040d);
+  border: 3px solid var(--yellow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  z-index: 2;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
+}
+
+.wheel-result {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.wheel-result.win { color: var(--green); text-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }
+.wheel-result.lose { color: var(--red); }

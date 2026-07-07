@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurações — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <script src="js/core/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/pages/settings.css" />
+</head>
+<body data-page="settings" data-title="Configurações" data-icon="⚙️">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <div class="settings-wrap">
+          <section class="panel">
+            <h2 class="section-title">🔊 Som</h2>
+            <div class="setting-row">
+              <div class="setting-label"><strong>Música de fundo</strong><span>Trilha ambiente do cassino</span></div>
+              <button class="toggle" id="toggle-music" role="switch"><span class="toggle-knob"></span></button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><strong>Efeitos sonoros</strong><span>Sons de aposta, vitória e cliques</span></div>
+              <button class="toggle" id="toggle-sfx" role="switch"><span class="toggle-knob"></span></button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2 class="section-title">🎨 Aparência</h2>
+            <div class="setting-row">
+              <div class="setting-label"><strong>Tema escuro</strong><span>Desligue para o modo claro</span></div>
+              <button class="toggle" id="toggle-theme" role="switch"><span class="toggle-knob"></span></button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2 class="section-title">👤 Conta</h2>
+            <div class="setting-row">
+              <div class="setting-label"><strong>Perfil</strong><span id="profile-summary">—</span></div>
+              <a class="btn btn--ghost btn--sm" href="profile.html">Editar perfil</a>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label"><strong>Saldo atual</strong><span id="balance-summary">—</span></div>
+              <button class="btn btn--gold btn--sm" id="reload-btn">Recarregar</button>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2 class="section-title">⚠️ Zona de perigo</h2>
+            <div class="setting-row">
+              <div class="setting-label"><strong>Apagar todos os dados</strong><span>Zera saldo, perfil, histórico e conquistas. Não dá para desfazer.</span></div>
+              <button class="btn btn--sm" id="wipe-btn" style="background:var(--red); color:#fff;">Apagar tudo</button>
+            </div>
+          </section>
+
+          <p class="settings-version">Bazinga BET · versão 1.0 · só diversão, sem dinheiro real</p>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/sounds.js"></script>
+  <script src="js/core/ui.js"></script>
+  <script src="js/core/bots.js"></script>
+  <script src="js/core/layout.js"></script>
+  <script src="js/core/particles.js"></script>
+  <script src="js/core/effects.js"></script>
+  <script src="js/core/achievements.js"></script>
+  <script src="js/pages/settings.js"></script>
+</body>
+</html>

@@ -269,6 +269,71 @@ BZG.sounds = (function () {
     });
   }
 
+  function coin() {
+    tone(1200, 0.05, "square", 0, 0.08);
+    tone(1600, 0.08, "sine", 0.03, 0.08);
+  }
+
+  function scratch() {
+    // ruido curto simulando raspar
+    if (!sfxOn) return;
+    try {
+      var audioCtx = getContext();
+      var dur = 0.12;
+      var buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+      var src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      var g = audioCtx.createGain();
+      g.gain.value = 0.06;
+      var filt = audioCtx.createBiquadFilter();
+      filt.type = "highpass";
+      filt.frequency.value = 2000;
+      src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
+      src.start();
+    } catch (e) {}
+  }
+
+  function wheelTick() {
+    tone(1400, 0.03, "square", 0, 0.05);
+  }
+
+  function roar() {
+    // rugido grave descendente
+    if (!sfxOn) return;
+    try {
+      var audioCtx = getContext();
+      var osc = audioCtx.createOscillator();
+      var g = audioCtx.createGain();
+      osc.type = "sawtooth";
+      var now = audioCtx.currentTime;
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(70, now + 0.5);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.22, now + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+      var filt = audioCtx.createBiquadFilter();
+      filt.type = "lowpass";
+      filt.frequency.value = 600;
+      osc.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.6);
+    } catch (e) {}
+  }
+
+  function achievement() {
+    tone(659.25, 0.1, "sine", 0, 0.14);
+    tone(880, 0.14, "sine", 0.1, 0.16);
+  }
+
+  function bigWin() {
+    // fanfarra ascendente
+    [392, 523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function (f, i) {
+      tone(f, 0.28, "sine", i * 0.13, 0.17);
+      tone(f * 1.5, 0.2, "triangle", i * 0.13 + 0.02, 0.06);
+    });
+  }
+
   return {
     click: click,
     bet: bet,
@@ -281,6 +346,12 @@ BZG.sounds = (function () {
     countdownBeep: countdownBeep,
     cardFlip: cardFlip,
     jackpot: jackpot,
+    coin: coin,
+    scratch: scratch,
+    wheelTick: wheelTick,
+    roar: roar,
+    achievement: achievement,
+    bigWin: bigWin,
     isSfxEnabled: isSfxEnabled,
     setSfxEnabled: setSfxEnabled,
     toggleSfx: toggleSfx,

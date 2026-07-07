@@ -22,11 +22,18 @@ BZG.storage = (function () {
         crash: [],
         double: []
       },
+      bonus: {
+        lastClaim: "",
+        streak: 0
+      },
+      achievements: {},
       stats: {
         totalWagered: 0,
         totalWon: 0,
         totalLost: 0,
         bestMultiplier: 0,
+        maxBet: 0,
+        maxWin: 0,
         currentStreak: 0,
         bestWinStreak: 0,
         bestLossStreak: 0
@@ -41,7 +48,12 @@ BZG.storage = (function () {
         hilo: [],
         slots: [],
         roulette: [],
-        blackjack: []
+        blackjack: [],
+        bazinguinha: [],
+        raspadinha: [],
+        limbo: [],
+        wheel: [],
+        coinflip: []
       }
     };
   }
@@ -67,6 +79,8 @@ BZG.storage = (function () {
       parsed.profile = Object.assign({}, base.profile, parsed.profile);
       parsed.daily = Object.assign({}, base.daily, parsed.daily);
       parsed.recent = Object.assign({}, base.recent, parsed.recent);
+      parsed.bonus = Object.assign({}, base.bonus, parsed.bonus);
+      parsed.achievements = Object.assign({}, base.achievements, parsed.achievements);
       if (typeof parsed.balance !== "number" || isNaN(parsed.balance)) {
         parsed.balance = base.balance;
       }
@@ -139,6 +153,8 @@ BZG.storage = (function () {
       state.stats.bestLossStreak = Math.max(state.stats.bestLossStreak, -state.stats.currentStreak);
     }
     state.stats.bestMultiplier = Math.max(state.stats.bestMultiplier, entry.multiplier || 0);
+    state.stats.maxBet = Math.max(state.stats.maxBet || 0, entry.bet);
+    if (entry.won) state.stats.maxWin = Math.max(state.stats.maxWin || 0, entry.payout);
 
     // XP: 1 ponto a cada BZ$ 10 apostados
     state.profile.xp += entry.bet / 10;
@@ -210,6 +226,78 @@ BZG.storage = (function () {
     return state.recent[game] || [];
   }
 
+  /* ---------- Bonus diario ---------- */
+
+  // valor do bonus por dia de sequencia (dia 1 = 500, ..., dia 7+ = 5000)
+  var BONUS_BY_STREAK = [500, 1000, 1500, 2500, 3500, 4500, 5000];
+
+  function bonusAmountFor(streak) {
+    var idx = Math.min(streak, BONUS_BY_STREAK.length) - 1;
+    return BONUS_BY_STREAK[Math.max(0, idx)];
+  }
+
+  function yesterdayKey() {
+    var d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  }
+
+  function getBonusInfo() {
+    var state = getState();
+    var today = todayKey();
+    var available = state.bonus.lastClaim !== today;
+    // se a sequencia nao foi mantida (nao pegou ontem nem hoje), reinicia
+    var nextStreak;
+    if (state.bonus.lastClaim === yesterdayKey()) {
+      nextStreak = state.bonus.streak + 1;
+    } else if (state.bonus.lastClaim === today) {
+      nextStreak = state.bonus.streak;
+    } else {
+      nextStreak = 1;
+    }
+    return {
+      available: available,
+      streak: state.bonus.streak,
+      nextStreak: nextStreak,
+      amount: bonusAmountFor(nextStreak)
+    };
+  }
+
+  function claimBonus() {
+    var state = getState();
+    var today = todayKey();
+    if (state.bonus.lastClaim === today) return null; // ja pegou hoje
+
+    var newStreak = state.bonus.lastClaim === yesterdayKey() ? state.bonus.streak + 1 : 1;
+    var amount = bonusAmountFor(newStreak);
+    state.bonus.lastClaim = today;
+    state.bonus.streak = newStreak;
+    state.balance += amount;
+    saveState(state);
+    return { amount: amount, streak: newStreak };
+  }
+
+  /* ---------- Conquistas ---------- */
+
+  function getAchievements() {
+    return getState().achievements;
+  }
+
+  function unlockAchievement(id) {
+    var state = getState();
+    if (state.achievements[id]) return false;
+    state.achievements[id] = Date.now();
+    saveState(state);
+    return true;
+  }
+
+  function countGamesPlayed() {
+    var h = getState().history;
+    var n = 0;
+    Object.keys(h).forEach(function (g) { if (h[g] && h[g].length) n++; });
+    return n;
+  }
+
   return {
     STARTING_BALANCE: STARTING_BALANCE,
     getState: getState,
@@ -225,6 +313,11 @@ BZG.storage = (function () {
     getLevel: getLevel,
     getDailyWon: getDailyWon,
     pushRecent: pushRecent,
-    getRecent: getRecent
+    getRecent: getRecent,
+    getBonusInfo: getBonusInfo,
+    claimBonus: claimBonus,
+    getAchievements: getAchievements,
+    unlockAchievement: unlockAchievement,
+    countGamesPlayed: countGamesPlayed
   };
 })();

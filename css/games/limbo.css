@@ -1,0 +1,82 @@
+/* Bazinga BET - Limbo */
+
+.limbo-info {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.limbo-info > div {
+  flex: 1;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.limbo-info span {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.limbo-info strong { font-size: 15px; color: var(--yellow-dark); }
+:root[data-theme="dark"] .limbo-info strong { color: var(--yellow); }
+
+.stage {
+  background: radial-gradient(circle at 50% 40%, rgba(255, 45, 58, 0.08), transparent 60%);
+  gap: 12px;
+}
+
+.limbo-recent {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  gap: 6px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.limbo-chip {
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.limbo-chip--win { background: rgba(46, 204, 113, 0.85); }
+.limbo-chip--lose { background: rgba(255, 45, 58, 0.8); }
+
+.limbo-result {
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.limbo-result.win {
+  color: var(--green);
+  text-shadow: 0 0 30px rgba(46, 204, 113, 0.6);
+}
+
+.limbo-result.lose {
+  color: var(--red);
+  text-shadow: 0 0 30px rgba(255, 45, 58, 0.5);
+}
+
+.limbo-result.rolling { color: var(--yellow); }
+
+.limbo-target-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-muted);
+}

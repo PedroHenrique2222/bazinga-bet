@@ -1,6 +1,6 @@
-# 🎰 Bazinga BET
+# 🎰 Bazinga BET — v1.0
 
-Simulador de casa de apostas **sem dinheiro real** — só diversão! Você recebe BZ$ 10.000 fictícios e pode jogar 10 jogos clássicos de cassino, com bots apostando ao vivo, perfil com nível/XP, tema claro/escuro e efeitos sonoros.
+Simulador de casa de apostas **sem dinheiro real** — só diversão! Você recebe BZ$ 10.000 fictícios e pode jogar 15 jogos de cassino, com bots apostando ao vivo, bônus diário, conquistas, perfil com nível/XP, tema claro/escuro e efeitos sonoros.
 
 > ⚠️ Este projeto é 100% de brincadeira. Não envolve dinheiro real, apostas reais nem pagamentos de nenhum tipo.
 
@@ -8,6 +8,11 @@ Simulador de casa de apostas **sem dinheiro real** — só diversão! Você rece
 
 | Jogo | Descrição |
 |---|---|
+| 🐯 Bazinguinha | Estilo Tigrinho 3×3, curinga ⚡ com multiplicadores x2/x5/x10 |
+| 🎟️ Raspadinha | Raspe 9 campos e ache 3 iguais |
+| 📉 Limbo | Passou do seu alvo? Você ganha |
+| 🎡 Roda da Sorte | Gire a roda até 15x |
+| 🪙 Cara ou Coroa | Escolha um lado, quase 2x |
 | 🚀 Crash | Rodadas ao vivo: retire antes do multiplicador explodir |
 | 🎡 Double | Roleta vermelho/preto/branco (branco paga 14x) |
 | 💎 Mines | Revele células e fuja das bombas |
@@ -18,6 +23,14 @@ Simulador de casa de apostas **sem dinheiro real** — só diversão! Você rece
 | 🎰 Slots | Caça-níquel com jackpot ⚡ de 500x |
 | 🎯 Roleta | Roleta europeia com mesa de apostas completa |
 | 🎭 Blackjack | O 21 clássico contra o dealer |
+
+## ✨ Recursos
+
+- **Bônus diário** com sequência (quanto mais dias seguidos, maior o prêmio)
+- **Conquistas** desbloqueáveis, exibidas no perfil
+- **Animação de Big Win** para prêmios grandes
+- **Bots ao vivo**: feed de vitórias, contador de jogadores online, ranking do dia
+- **Tela de configurações**: som, tema, perfil e apagar dados
 
 ## ▶️ Como jogar localmente
 

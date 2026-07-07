@@ -1,11 +1,16 @@
 /* Bazinga BET - logica da pagina inicial (lobby) */
 (function () {
   var GAME_CARDS = [
+    { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: curinga ⚡ com multiplicadores!", badge: "NOVO" },
+    { id: "raspadinha", href: "raspadinha.html", icon: "🎟️", name: "Raspadinha", desc: "Raspe e ache 3 iguais para ganhar.", badge: "NOVO" },
+    { id: "limbo", href: "limbo.html", icon: "📉", name: "Limbo", desc: "Passou do seu alvo? Você ganha.", badge: "NOVO" },
+    { id: "wheel", href: "wheel.html", icon: "🎡", name: "Roda da Sorte", desc: "Gire a roda até 15x.", badge: "NOVO" },
+    { id: "coinflip", href: "coinflip.html", icon: "🪙", name: "Cara ou Coroa", desc: "Escolha um lado, quase 2x.", badge: "NOVO" },
     { id: "crash", href: "crash.html", icon: "🚀", name: "Crash", desc: "Retire antes que exploda.", live: "crash" },
     { id: "double", href: "double.html", icon: "🎡", name: "Double", desc: "Vermelho, preto ou branco (14x).", live: "double" },
     { id: "mines", href: "mines.html", icon: "💎", name: "Mines", desc: "Fuja das bombas, colha os diamantes." },
     { id: "tower", href: "tower.html", icon: "🗼", name: "Tower", desc: "Suba 8 andares sem cair." },
-    { id: "plinko", href: "plinko.html", icon: "🎱", name: "Plinko", desc: "Multiplicadores de até 33x." },
+    { id: "plinko", href: "plinko.html", icon: "🎱", name: "Plinko", desc: "Multiplicadores de até 220x." },
     { id: "dice", href: "dice.html", icon: "🎲", name: "Dice", desc: "Acima ou abaixo, você escolhe." },
     { id: "hilo", href: "hilo.html", icon: "🃏", name: "HiLo", desc: "A próxima carta vem maior?" },
     { id: "slots", href: "slots.html", icon: "🎰", name: "Slots", desc: "Jackpot BAZINGA de 500x!" },
@@ -103,7 +108,9 @@
         '<span class="players">' + playersNow(card.id) + ' jogando</span>' +
         '<span class="last-result">' + lastResultHTML(card) + '</span>' +
         '</div>';
+      var badge = card.badge ? '<span class="card-badge">' + card.badge + '</span>' : "";
       return '<a class="game-card" href="' + card.href + '">' +
+        badge +
         '<div class="icon">' + card.icon + '</div>' +
         '<h2>' + card.name + '</h2>' +
         '<p>' + card.desc + '</p>' +
