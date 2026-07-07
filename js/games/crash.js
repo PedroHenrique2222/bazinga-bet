@@ -237,7 +237,7 @@
     ctx.save();
     ctx.translate(tipXY[0], tipXY[1]);
     ctx.rotate(-0.5);
-    ctx.fillText("🚀", 0, 0);
+    ctx.fillText("🛶", 0, 0);
     ctx.restore();
   }
 
@@ -293,7 +293,7 @@
       autoCashoutInput.disabled = true;
       actionBtn.disabled = false;
       actionBtn.className = "btn btn--gold";
-      setStatus("Voando! Clique em retirar antes que exploda.");
+      setStatus("Remando! Retire antes da canoa afundar.");
     } else {
       // sem aposta nesta rodada: pode deixar uma na fila para a proxima
       betInput.disabled = false;
@@ -326,7 +326,7 @@
       });
       BZG.ui.refreshBalance();
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
-      BZG.ui.toast("Explodiu em " + formatMult(finalMult) + "! Você perdeu a aposta.", "error");
+      BZG.ui.toast("A canoa afundou em " + formatMult(finalMult) + "! Você perdeu a aposta.", "error");
       BZG.sounds.crashBoom();
       BZG.effects.shake(stageEl);
       BZG.effects.flash(stageEl, "red");
@@ -343,8 +343,8 @@
     multiplierEl.classList.remove("tier-low", "tier-mid", "tier-high");
     multiplierEl.classList.add("crashed");
     actionBtn.disabled = true;
-    actionBtn.textContent = "Explodiu!";
-    setStatus("Caiu em " + formatMult(finalMult) + ". Próxima rodada em instantes.");
+    actionBtn.textContent = "Afundou!";
+    setStatus("Afundou em " + formatMult(finalMult) + ". Próxima canoa em instantes.");
     renderRoundBets();
   }
 

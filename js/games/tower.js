@@ -124,7 +124,7 @@
     cashoutBtn.style.display = "none";
     multiplierEl.textContent = "1.00x";
     BZG.sounds.bet();
-    setStatus("Suba a torre escolhendo uma célula segura em cada nível. " + config().bombs + " armadilha por nível.");
+    setStatus("Suba a lixeira do Linden escolhendo uma célula segura em cada nível. " + config().bombs + " armadilha por nível.");
   }
 
   function onTileClick(tileEl) {
@@ -146,7 +146,7 @@
       endRound(false);
     } else {
       tileEl.classList.add("revealed", "safe");
-      tileEl.textContent = "💎";
+      tileEl.textContent = "♻️";
       BZG.sounds.click();
       currentLevel++;
 
@@ -178,7 +178,7 @@
         t.textContent = "💣";
       } else {
         t.classList.add("safe");
-        t.textContent = "💎";
+        t.textContent = "♻️";
       }
     });
   }

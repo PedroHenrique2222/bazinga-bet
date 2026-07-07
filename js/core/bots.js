@@ -21,21 +21,21 @@ BZG.bots = (function () {
   ];
   var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
   var GAMES = [
-    { id: "crash", name: "Crash", icon: "🚀" },
+    { id: "crash", name: "Canoa Furada", icon: "🛶" },
     { id: "double", name: "Double", icon: "🎡" },
-    { id: "mines", name: "Mines", icon: "💎" },
-    { id: "tower", name: "Tower", icon: "🗼" },
-    { id: "plinko", name: "Plinko", icon: "🎱" },
-    { id: "dice", name: "Dice", icon: "🎲" },
-    { id: "hilo", name: "HiLo", icon: "🃏" },
+    { id: "mines", name: "Mines do Picles", icon: "🥒" },
+    { id: "tower", name: "Lixeira do Linden", icon: "🗑️" },
+    { id: "plinko", name: "Plinko da Abóbora", icon: "🎃" },
+    { id: "dice", name: "Dado 616", icon: "🎲" },
+    { id: "hilo", name: "HiLo do PAnetone", icon: "🃏" },
     { id: "slots", name: "Slots", icon: "🎰" },
     { id: "roulette", name: "Roleta", icon: "🎯" },
-    { id: "blackjack", name: "Blackjack", icon: "🎭" },
+    { id: "blackjack", name: "21 do Bogão", icon: "🍑" },
     { id: "bazinguinha", name: "Bazinguinha", icon: "🐯" },
     { id: "raspadinha", name: "Raspadinha", icon: "🎟️" },
     { id: "limbo", name: "Limbo", icon: "📉" },
     { id: "wheel", name: "Roda da Sorte", icon: "🎡" },
-    { id: "coinflip", name: "Cara ou Coroa", icon: "🪙" }
+    { id: "coinflip", name: "Moeda da Pilha", icon: "🔋" }
   ];
 
   function rand(n) {
@@ -46,7 +46,21 @@ BZG.bots = (function () {
     return arr[rand(arr.length)];
   }
 
+  /* A equipe BZG: os lendarios da casa, com avatar proprio.
+     Aparecem com mais frequencia no feed e dominam o ranking. */
+  var CREW = [
+    { name: "BZG Abóbora", avatar: "🎃" },
+    { name: "BZG PAnetone", avatar: "🍰" },
+    { name: "BZG Canoa Furada", avatar: "🛶" },
+    { name: "BZG 616", avatar: "🪖" },       // o militar
+    { name: "BZG Picles Gamer", avatar: "🥒" },
+    { name: "BZG Pilha Avulsa", avatar: "🔋" },
+    { name: "BZG Linden", avatar: "🗑️" },    // a lata de lixo
+    { name: "BZG Bogão", avatar: "🍑" }       // a bunda
+  ];
+
   function randomBot() {
+    if (Math.random() < 0.3) return pick(CREW);
     return { name: pick(NAMES), avatar: pick(AVATARS) };
   }
 
@@ -154,20 +168,33 @@ BZG.bots = (function () {
 
     var entries = [];
     var usedIdx = {};
+    var usedCrew = {};
     var amount = 18000 + Math.floor(rnd() * 30000);
     for (var i = 0; i < 8; i++) {
-      var nameIdx = Math.floor(rnd() * NAMES.length);
-      while (usedIdx[nameIdx]) nameIdx = (nameIdx + 1) % NAMES.length;
-      usedIdx[nameIdx] = true;
+      // metade das vagas do dia vai para a equipe BZG (sorteio estavel pela data)
+      var member = null;
+      if (i < 4) {
+        var crewIdx = Math.floor(rnd() * CREW.length);
+        while (usedCrew[crewIdx]) crewIdx = (crewIdx + 1) % CREW.length;
+        usedCrew[crewIdx] = true;
+        member = CREW[crewIdx];
+      } else {
+        var nameIdx = Math.floor(rnd() * NAMES.length);
+        while (usedIdx[nameIdx]) nameIdx = (nameIdx + 1) % NAMES.length;
+        usedIdx[nameIdx] = true;
+        member = { name: NAMES[nameIdx], avatar: AVATARS[Math.floor(rnd() * AVATARS.length)] };
+      }
       entries.push({
-        name: NAMES[nameIdx],
-        avatar: AVATARS[Math.floor(rnd() * AVATARS.length)],
+        name: member.name,
+        avatar: member.avatar,
         game: GAMES[Math.floor(rnd() * GAMES.length)],
         amount: amount,
         isUser: false
       });
       amount = Math.floor(amount * (0.55 + rnd() * 0.3));
     }
+    // embaralha um pouco para a equipe nao ficar sempre em bloco no topo
+    entries.sort(function (a, b) { return b.amount - a.amount; });
 
     // insere o usuario se ele ganhou algo hoje
     var userWon = BZG.storage.getDailyWon();
@@ -189,6 +216,7 @@ BZG.bots = (function () {
 
   return {
     GAMES: GAMES,
+    CREW: CREW,
     randomBot: randomBot,
     randomWin: randomWin,
     randomBetAmount: randomBetAmount,

@@ -7,11 +7,11 @@
   var COL_DURATIONS = [1100, 1500, 1950];
 
   var SYMBOLS = [
-    { icon: "🍒", pay: 1, weight: 6 },
-    { icon: "🔔", pay: 1.5, weight: 5 },
-    { icon: "⭐", pay: 2.5, weight: 4 },
-    { icon: "7️⃣", pay: 5, weight: 3 },
-    { icon: "💎", pay: 12.5, weight: 2 }
+    { icon: "🎃", pay: 1, weight: 6 },
+    { icon: "🔋", pay: 1.5, weight: 5 },
+    { icon: "🥒", pay: 2.5, weight: 4 },
+    { icon: "🍰", pay: 5, weight: 3 },
+    { icon: "🍑", pay: 12.5, weight: 2 }
   ];
   var WILD = { icon: "⚡", pay: 50, weight: 1 };
   var ALL = SYMBOLS.concat([WILD]);

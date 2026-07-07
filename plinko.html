@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plinko — Bazinga BET</title>
+  <title>Plinko da Abóbora — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/games/plinko.css" />
 </head>
-<body data-page="plinko" data-title="Plinko" data-icon="🎱">
+<body data-page="plinko" data-title="Plinko da Abóbora" data-icon="🎃">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -22,7 +22,7 @@
 
         <div class="game-layout">
           <section class="panel controls">
-            <label for="bet-amount">Valor por bolinha (BZ$)</label>
+            <label for="bet-amount">Valor por abóbora (BZ$)</label>
             <input type="number" id="bet-amount" min="1" step="1" value="100" />
             <div class="input-row" style="margin-top:8px;">
               <button class="btn btn--ghost" id="bet-half">½</button>
@@ -45,7 +45,7 @@
             </div>
 
             <button id="drop-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
-              Soltar bolinha
+              Soltar abóbora
             </button>
 
             <label for="auto-count">Modo automático</label>
@@ -55,11 +55,11 @@
             </div>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Clique rápido para soltar várias bolinhas, ou use o modo automático.
+              Clique rápido para soltar várias abóboras, ou use o modo automático.
             </p>
 
             <div class="history-list">
-              <h2 class="section-title" style="margin-top:20px;">Últimas bolinhas</h2>
+              <h2 class="section-title" style="margin-top:20px;">Últimas abóboras</h2>
               <div id="history-list"></div>
             </div>
           </section>

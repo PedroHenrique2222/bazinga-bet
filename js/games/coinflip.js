@@ -69,7 +69,7 @@
   function finish(result, bet) {
     var won = result === selectedSide;
     var payout = won ? Math.round(bet * PAYOUT) : 0;
-    var label = result === "cara" ? "Cara ⚡" : "Coroa 💰";
+    var label = result === "cara" ? "Cara ⚡" : "Coroa 🔋";
 
     BZG.storage.recordBet("coinflip", {
       bet: bet, multiplier: won ? PAYOUT : 0, payout: payout, won: won, detail: label

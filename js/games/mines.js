@@ -121,7 +121,7 @@
     } else {
       revealedCount++;
       cell.classList.add("safe");
-      cell.textContent = "💎";
+      cell.textContent = "🥒";
       BZG.sounds.click();
 
       var mult = currentMultiplier(revealedCount);
@@ -130,7 +130,7 @@
       cashoutBtn.textContent = "Colher " + BZG.ui.formatMoney(currentBet * mult) + " (" + formatMult(mult) + ")";
       if (revealedCount < safeTotal) {
         var nextMult = currentMultiplier(revealedCount + 1);
-        setStatus(revealedCount + "/" + safeTotal + " diamantes · atual " + formatMult(mult) +
+        setStatus(revealedCount + "/" + safeTotal + " picles · atual " + formatMult(mult) +
           " · o próximo paga " + formatMult(nextMult));
       }
 
@@ -150,7 +150,7 @@
     var mult = won ? (multOverride || currentMultiplier(revealedCount)) : 0;
     var payout = won ? Math.round(currentBet * mult) : 0;
 
-    // revela todas as celulas restantes (efeito cascata) para mostrar bombas e diamantes
+    // revela todas as celulas restantes (efeito cascata) para mostrar bombas e picles
     var delay = 0;
     cellEls.forEach(function (cell, idx) {
       if (cell.classList.contains("revealed")) return;
@@ -161,7 +161,7 @@
           cell.textContent = "💣";
           cell.classList.add("bomb");
         } else {
-          cell.textContent = "💎";
+          cell.textContent = "🥒";
           cell.classList.add("safe");
         }
       }, delay);

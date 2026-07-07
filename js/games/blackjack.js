@@ -1,4 +1,4 @@
-/* Bazinga BET - Blackjack (21) contra o dealer: pedir, parar, dobrar */
+/* Bazinga BET - Blackjack (21) contra o Bogão: pedir, parar, dobrar */
 (function () {
   var SUITS = [
     { symbol: "♠", red: false },
@@ -201,7 +201,7 @@
     hitBtn.disabled = true;
     standBtn.disabled = true;
     doubleBtn.disabled = true;
-    setStatus("Dealer revelando...");
+    setStatus("Bogão revelando...");
     renderHands(false);
 
     // dealer compra ate 17 (para em todos os 17), com pausa entre cartas
@@ -244,7 +244,7 @@
     } else if (outcome === "bust") {
       mult = 0; won = false; label = "Estourou! Passou de 21."; msgCls = "lose";
     } else {
-      mult = 0; won = false; label = "Dealer venceu."; msgCls = "lose";
+      mult = 0; won = false; label = "Bogão venceu."; msgCls = "lose";
     }
 
     var payout = Math.round(currentBet * mult);

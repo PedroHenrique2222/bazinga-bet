@@ -1,21 +1,21 @@
 /* Bazinga BET - logica da pagina inicial (lobby) */
 (function () {
   var GAME_CARDS = [
-    { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: curinga ⚡ com multiplicadores!", badge: "NOVO" },
+    { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: 5 linhas e tela cheia ×10!", badge: "HOT" },
+    { id: "crash", href: "crash.html", icon: "🛶", name: "Canoa Furada", desc: "Retire antes da canoa do BZG afundar.", live: "crash" },
+    { id: "double", href: "double.html", icon: "🎡", name: "Double", desc: "Vermelho, preto ou branco (14x).", live: "double" },
+    { id: "mines", href: "mines.html", icon: "🥒", name: "Mines do Picles", desc: "A horta do BZG Picles Gamer: colha sem explodir." },
+    { id: "tower", href: "tower.html", icon: "🗑️", name: "Lixeira do Linden", desc: "Suba a torre de lixo do BZG Linden." },
+    { id: "plinko", href: "plinko.html", icon: "🎃", name: "Plinko da Abóbora", desc: "A chuva de abóboras do BZG Abóbora, até 220x." },
+    { id: "dice", href: "dice.html", icon: "🎲", name: "Dado 616", desc: "O dado militar do BZG 616. Acima ou abaixo?" },
+    { id: "hilo", href: "hilo.html", icon: "🃏", name: "HiLo do PAnetone", desc: "As cartas do BZG PAnetone: maior ou menor?" },
+    { id: "coinflip", href: "coinflip.html", icon: "🔋", name: "Moeda da Pilha", desc: "⚡ ou 🔋? A moeda do BZG Pilha Avulsa." },
+    { id: "blackjack", href: "blackjack.html", icon: "🍑", name: "21 do Bogão", desc: "Vença o Bogão no blackjack." },
     { id: "raspadinha", href: "raspadinha.html", icon: "🎟️", name: "Raspadinha", desc: "Raspe e ache 3 iguais para ganhar.", badge: "NOVO" },
     { id: "limbo", href: "limbo.html", icon: "📉", name: "Limbo", desc: "Passou do seu alvo? Você ganha.", badge: "NOVO" },
     { id: "wheel", href: "wheel.html", icon: "🎡", name: "Roda da Sorte", desc: "Gire a roda até 15x.", badge: "NOVO" },
-    { id: "coinflip", href: "coinflip.html", icon: "🪙", name: "Cara ou Coroa", desc: "Escolha um lado, quase 2x.", badge: "NOVO" },
-    { id: "crash", href: "crash.html", icon: "🚀", name: "Crash", desc: "Retire antes que exploda.", live: "crash" },
-    { id: "double", href: "double.html", icon: "🎡", name: "Double", desc: "Vermelho, preto ou branco (14x).", live: "double" },
-    { id: "mines", href: "mines.html", icon: "💎", name: "Mines", desc: "Fuja das bombas, colha os diamantes." },
-    { id: "tower", href: "tower.html", icon: "🗼", name: "Tower", desc: "Suba 8 andares sem cair." },
-    { id: "plinko", href: "plinko.html", icon: "🎱", name: "Plinko", desc: "Multiplicadores de até 220x." },
-    { id: "dice", href: "dice.html", icon: "🎲", name: "Dice", desc: "Acima ou abaixo, você escolhe." },
-    { id: "hilo", href: "hilo.html", icon: "🃏", name: "HiLo", desc: "A próxima carta vem maior?" },
     { id: "slots", href: "slots.html", icon: "🎰", name: "Slots", desc: "Jackpot BAZINGA de 500x!" },
-    { id: "roulette", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x." },
-    { id: "blackjack", href: "blackjack.html", icon: "🎭", name: "Blackjack", desc: "Vença o dealer no 21." }
+    { id: "roulette", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x." }
   ];
 
   /* ---------- Banner rotativo ---------- */

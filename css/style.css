@@ -200,6 +200,8 @@ a {
 .logo-card {
   position: relative;
   display: block;
+  /* a sidebar e flex-column com muitos itens: sem isto, a logo e espremida ate sumir */
+  flex-shrink: 0;
   background:
     radial-gradient(rgba(0, 0, 0, 0.14) 1.1px, transparent 1.4px),
     radial-gradient(circle at 50% 30%, #f01426, #b00815 70%);
@@ -220,6 +222,7 @@ a {
 .logo-svg {
   width: 100%;
   height: auto;
+  aspect-ratio: 200 / 132;
   display: block;
   overflow: visible;
 }
@@ -388,6 +391,7 @@ a {
 .sidebar-footer {
   border-top: 1px solid var(--border);
   padding-top: 10px;
+  flex-shrink: 0;
 }
 
 .online-count {

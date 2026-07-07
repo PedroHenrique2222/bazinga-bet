@@ -4,21 +4,21 @@ window.BZG = window.BZG || {};
 BZG.layout = (function () {
   var NAV_ITEMS = [
     { href: "index.html", icon: "🏠", label: "Lobby", page: "lobby" },
-    { href: "crash.html", icon: "🚀", label: "Crash", page: "crash", live: true },
+    { href: "crash.html", icon: "🛶", label: "Canoa Furada", page: "crash", live: true },
     { href: "double.html", icon: "🎡", label: "Double", page: "double", live: true },
-    { href: "mines.html", icon: "💎", label: "Mines", page: "mines" },
-    { href: "tower.html", icon: "🗼", label: "Tower", page: "tower" },
-    { href: "plinko.html", icon: "🎱", label: "Plinko", page: "plinko" },
-    { href: "dice.html", icon: "🎲", label: "Dice", page: "dice" },
-    { href: "hilo.html", icon: "🃏", label: "HiLo", page: "hilo" },
+    { href: "mines.html", icon: "🥒", label: "Mines do Picles", page: "mines" },
+    { href: "tower.html", icon: "🗑️", label: "Lixeira do Linden", page: "tower" },
+    { href: "plinko.html", icon: "🎃", label: "Plinko da Abóbora", page: "plinko" },
+    { href: "dice.html", icon: "🎲", label: "Dado 616", page: "dice" },
+    { href: "hilo.html", icon: "🃏", label: "HiLo do PAnetone", page: "hilo" },
     { href: "slots.html", icon: "🎰", label: "Slots", page: "slots" },
     { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette" },
-    { href: "blackjack.html", icon: "🎭", label: "Blackjack", page: "blackjack" },
+    { href: "blackjack.html", icon: "🍑", label: "21 do Bogão", page: "blackjack" },
     { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", hot: true },
     { href: "raspadinha.html", icon: "🎟️", label: "Raspadinha", page: "raspadinha" },
     { href: "limbo.html", icon: "📉", label: "Limbo", page: "limbo" },
     { href: "wheel.html", icon: "🎡", label: "Roda da Sorte", page: "wheel" },
-    { href: "coinflip.html", icon: "🪙", label: "Cara ou Coroa", page: "coinflip" }
+    { href: "coinflip.html", icon: "🔋", label: "Moeda da Pilha", page: "coinflip" }
   ];
 
   /* Starburst comic: estrela de pontas alternadas gerada por codigo (fica simetrica e limpa) */
@@ -204,12 +204,12 @@ BZG.layout = (function () {
     modal.className = "modal-backdrop";
     modal.innerHTML =
       '<div class="modal-card bonus-card">' +
-        '<div class="bonus-gift">🎁</div>' +
-        '<h2>Bônus diário</h2>' +
-        '<p class="bonus-sub">Dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
+        '<div class="bonus-gift">🍰</div>' +
+        '<h2>Panetone diário</h2>' +
+        '<p class="bonus-sub">Cortesia do <strong>BZG PAnetone</strong> · dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
         '<div class="bonus-amount">+' + BZG.ui.formatMoney(info.amount) + '</div>' +
-        '<p class="bonus-hint">Volte amanhã para aumentar sua sequência e ganhar mais!</p>' +
-        '<button class="btn btn--gold" id="claim-bonus-btn" style="width:100%; padding:13px; font-size:16px; margin-top:6px;">Coletar</button>' +
+        '<p class="bonus-hint">Volte amanhã para aumentar sua sequência e ganhar um panetone maior!</p>' +
+        '<button class="btn btn--gold" id="claim-bonus-btn" style="width:100%; padding:13px; font-size:16px; margin-top:6px;">Coletar 🍰</button>' +
       '</div>';
     document.body.appendChild(modal);
     requestAnimationFrame(function () { modal.classList.add("show"); });

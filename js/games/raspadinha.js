@@ -3,11 +3,11 @@
 (function () {
   /* premios: simbolo, multiplicador e probabilidade da cartela (RTP ~90%) */
   var PRIZES = [
-    { sym: "🍒", mult: 2, prob: 0.14 },
-    { sym: "🍀", mult: 3, prob: 0.07 },
-    { sym: "🔔", mult: 5, prob: 0.028 },
-    { sym: "⭐", mult: 10, prob: 0.010 },
-    { sym: "💎", mult: 20, prob: 0.0045 },
+    { sym: "🎃", mult: 2, prob: 0.14 },
+    { sym: "🥒", mult: 3, prob: 0.07 },
+    { sym: "🔋", mult: 5, prob: 0.028 },
+    { sym: "🍰", mult: 10, prob: 0.010 },
+    { sym: "🍑", mult: 20, prob: 0.0045 },
     { sym: "⚡", mult: 50, prob: 0.0016 }
   ];
   var ALL_SYMS = PRIZES.map(function (p) { return p.sym; });

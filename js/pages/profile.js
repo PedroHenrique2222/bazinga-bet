@@ -2,11 +2,11 @@
 (function () {
   var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
   var GAME_LABELS = {
-    crash: "🚀 Crash", mines: "💎 Mines", plinko: "🎱 Plinko",
-    double: "🎡 Double", tower: "🗼 Tower", dice: "🎲 Dice", hilo: "🃏 HiLo",
-    slots: "🎰 Slots", roulette: "🎯 Roleta", blackjack: "🎭 Blackjack",
+    crash: "🛶 Canoa Furada", mines: "🥒 Mines do Picles", plinko: "🎃 Plinko da Abóbora",
+    double: "🎡 Double", tower: "🗑️ Lixeira do Linden", dice: "🎲 Dado 616", hilo: "🃏 HiLo do PAnetone",
+    slots: "🎰 Slots", roulette: "🎯 Roleta", blackjack: "🍑 21 do Bogão",
     bazinguinha: "🐯 Bazinguinha", raspadinha: "🎟️ Raspadinha", limbo: "📉 Limbo",
-    wheel: "🎡 Roda da Sorte", coinflip: "🪙 Cara ou Coroa"
+    wheel: "🎡 Roda da Sorte", coinflip: "🔋 Moeda da Pilha"
   };
 
   var selectedAvatar = null;

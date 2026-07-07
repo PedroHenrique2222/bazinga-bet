@@ -7,13 +7,13 @@
   /* simbolos com peso (quanto maior, mais comum) e premio para 3 iguais */
   var SYMBOLS = [
     { icon: "⚡", weight: 1, pay: 500 },
-    { icon: "7️⃣", weight: 2, pay: 150 },
-    { icon: "💎", weight: 3, pay: 50 },
-    { icon: "⭐", weight: 4, pay: 20 },
-    { icon: "💥", weight: 5, pay: 10 },
-    { icon: "🃏", weight: 6, pay: 5 }
+    { icon: "🪖", weight: 2, pay: 150 },
+    { icon: "🍑", weight: 3, pay: 50 },
+    { icon: "🍰", weight: 4, pay: 20 },
+    { icon: "🥒", weight: 5, pay: 10 },
+    { icon: "🗑️", weight: 6, pay: 5 }
   ];
-  var PAIR_SYMBOLS = ["⚡", "7️⃣", "💎"]; // 2 iguais destes pagam 1.5x
+  var PAIR_SYMBOLS = ["⚡", "🪖", "🍑"]; // 2 iguais destes pagam 1.5x
   var PAIR_PAY = 1.5;
   var TOTAL_WEIGHT = SYMBOLS.reduce(function (s, x) { return s + x.weight; }, 0);
 

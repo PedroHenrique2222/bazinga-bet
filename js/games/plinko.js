@@ -181,8 +181,8 @@
     for (var b = 0; b < balls.length; b++) {
       var ball = balls[b];
       var grad = ctx.createRadialGradient(ball.x - 2, ball.y - 2, 1, ball.x, ball.y, L.ballR + 1);
-      grad.addColorStop(0, "#fff6cc");
-      grad.addColorStop(1, "#f5b400");
+      grad.addColorStop(0, "#ffcf8a");
+      grad.addColorStop(1, "#f57c0c");
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, L.ballR, 0, Math.PI * 2);
