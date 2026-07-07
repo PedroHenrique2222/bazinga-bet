@@ -36,18 +36,18 @@ BZG.layout = (function () {
     return '' +
       '<a class="logo-card" href="index.html" aria-label="Bazinga BET">' +
         '<svg class="logo-svg" viewBox="0 0 200 132" aria-hidden="true">' +
-          /* explosao comic em duas camadas simetricas */
-          '<polygon class="logo-burst" points="' + starPoints(100, 60, 12, 62, 44) + '"/>' +
-          '<polygon class="logo-burst-inner" points="' + starPoints(100, 60, 12, 52, 40) + '"/>' +
+          /* explosao comic em duas camadas simetricas (raios menores para nao cortar nas bordas) */
+          '<polygon class="logo-burst" points="' + starPoints(100, 62, 12, 58, 42) + '"/>' +
+          '<polygon class="logo-burst-inner" points="' + starPoints(100, 62, 12, 49, 38) + '"/>' +
           /* circulo branco central */
-          '<circle class="logo-white" cx="100" cy="60" r="44"/>' +
-          '<circle class="logo-white-edge" cx="100" cy="60" r="44"/>' +
+          '<circle class="logo-white" cx="100" cy="62" r="42"/>' +
+          '<circle class="logo-white-edge" cx="100" cy="62" r="42"/>' +
           /* raio classico (desenho limpo do favicon) deitado ATRAS do texto */
-          '<path class="logo-bolt" transform="translate(100 60) rotate(100) scale(2.5) translate(-32 -32)" d="M35 8 L17 37 L28 37 L24 56 L47 25 L35 25 Z"/>' +
-          /* texto BAZINGA! inclinado, com contorno grosso e sombra dura, por cima do raio */
-          '<g transform="rotate(-6 100 58)">' +
-            '<text class="logo-shadow" x="102.5" y="70.5" text-anchor="middle">BAZINGA!</text>' +
-            '<text class="logo-fill" x="100" y="68" text-anchor="middle">BAZINGA!</text>' +
+          '<path class="logo-bolt" transform="translate(100 62) rotate(100) scale(2.35) translate(-32 -32)" d="M35 8 L17 37 L28 37 L24 56 L47 25 L35 25 Z"/>' +
+          /* texto BAZINGA! com largura travada (textLength): nunca corta, mesmo sem a fonte carregada */
+          '<g transform="rotate(-6 100 60)">' +
+            '<text class="logo-shadow" x="102.5" y="72.5" text-anchor="middle" textLength="164" lengthAdjust="spacingAndGlyphs">BAZINGA!</text>' +
+            '<text class="logo-fill" x="100" y="70" text-anchor="middle" textLength="164" lengthAdjust="spacingAndGlyphs">BAZINGA!</text>' +
           '</g>' +
         '</svg>' +
         '<span class="logo-bet">B&nbsp;E&nbsp;T</span>' +

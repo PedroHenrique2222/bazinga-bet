@@ -5,6 +5,7 @@
 }
 
 .slots-machine {
+  --slotcell: 78px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -52,8 +53,8 @@
 }
 
 .reel {
-  width: 84px;
-  height: 234px; /* 3 celulas de 78px */
+  width: calc(var(--slotcell) + 6px);
+  height: calc(var(--slotcell) * 3);
   overflow: hidden;
   background: linear-gradient(180deg, #1a1a22, #23232d 50%, #1a1a22);
   border-radius: 8px;
@@ -87,11 +88,11 @@
 }
 
 .reel-cell {
-  height: 78px;
+  height: var(--slotcell);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 44px;
+  font-size: calc(var(--slotcell) * 0.56);
   flex-shrink: 0;
 }
 
@@ -157,4 +158,10 @@
   box-shadow: 0 0 10px rgba(255, 212, 0, 0.4);
   pointer-events: none;
   border-radius: 2px;
+}
+
+@media (max-width: 480px) {
+  .slots-machine { --slotcell: 56px; padding: 16px 12px 20px; }
+  .slots-header { font-size: 15px; }
+  .payline { font-size: 15px; }
 }

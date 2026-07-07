@@ -49,7 +49,9 @@
       return '<div class="reel-cell">' + icon + '</div>';
     }).join("");
     reelEl.style.transform = "translateY(0px)";
-    return (STRIP_LEN - 3) * CELL_H; // distancia ate a fita final ficar na janela
+    // mede a altura real da celula (o CSS encolhe os rolos no celular)
+    var cellH = reelEl.firstChild.getBoundingClientRect().height || CELL_H;
+    return (STRIP_LEN - 3) * cellH; // distancia ate a fita final ficar na janela
   }
 
   function easeOutQuart(t) {
@@ -128,7 +130,7 @@
         var eased = easeOutQuart(t);
         reelEls[i].style.transform = "translateY(-" + (distances[i] * eased).toFixed(1) + "px)";
 
-        var cellsCrossed = Math.floor((distances[i] * eased) / CELL_H);
+        var cellsCrossed = Math.floor((distances[i] * eased) / (distances[i] / (STRIP_LEN - 3)));
         if (cellsCrossed > lastTicks[i] && t < 1) {
           if (i === 0) BZG.sounds.tick();
           lastTicks[i] = cellsCrossed;
@@ -217,10 +219,10 @@
       document.getElementById("reel-2")
     ];
 
-    // estado inicial dos rolos
+    // estado inicial dos rolos (usa a distancia medida, que muda no celular)
     for (var i = 0; i < 3; i++) {
-      buildStrip(reelEls[i], randomIcon());
-      reelEls[i].style.transform = "translateY(-" + ((STRIP_LEN - 3) * CELL_H) + "px)";
+      var dist = buildStrip(reelEls[i], randomIcon());
+      reelEls[i].style.transform = "translateY(-" + dist + "px)";
     }
 
     BZG.ui.refreshBalance();

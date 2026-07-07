@@ -2,7 +2,8 @@
 
 .stage {
   background: radial-gradient(circle at 50% 30%, rgba(255, 138, 0, 0.14), transparent 60%);
-  padding: 18px 10px;
+  /* o mascote sobe 34px acima da maquina: o padding maior garante que ele nao seja cortado */
+  padding: 52px 10px 20px;
 }
 
 .ft-machine {

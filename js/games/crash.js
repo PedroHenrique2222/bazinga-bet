@@ -355,6 +355,16 @@
     else multiplierEl.classList.add("tier-low");
   }
 
+  /* ajusta a resolucao interna do canvas ao tamanho exibido (texto legivel no celular) */
+  function fitCanvas() {
+    var w = Math.min(720, Math.max(280, stageEl.clientWidth - 32));
+    if (Math.abs(canvas.width - w) < 4) return;
+    canvas.width = w;
+    // em telas estreitas o grafico fica mais alto para nao virar uma tirinha
+    canvas.height = w < 480 ? Math.round(w * 0.72) : Math.round(w * 380 / 720);
+    if (phase !== "running") drawCurve(0, 1);
+  }
+
   function loop(now) {
     if (phase === "betting") {
       var remaining = Math.max(0, BETTING_MS - (now - phaseStart));
@@ -540,6 +550,9 @@
     countdownFillEl = document.getElementById("countdown-fill");
     crashHistoryEl = document.getElementById("crash-history");
     roundIdEl = document.getElementById("round-id");
+
+    fitCanvas();
+    window.addEventListener("resize", fitCanvas);
 
     BZG.ui.refreshBalance();
     renderHistory();

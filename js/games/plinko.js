@@ -38,6 +38,7 @@
   var rows = 12;
   var layout = null;   // { pegs: [{x,y}], pegR, ballR, spacing, centerX, slotY, slotW }
   var balls = [];      // { x, y, vx, vy, bet }
+  var pendingFit = false;
   var pegFlashes = []; // { x, y, start }
   var slotFlashes = {}; // slotIndex -> timestamp
   var lastPegSound = 0;
@@ -56,6 +57,18 @@
 
   function currentTable() {
     return MULT_TABLES[rows][risk];
+  }
+
+  /* ajusta a resolucao do canvas ao tamanho exibido; so quando nao ha bolinhas no ar
+     (mudar o tabuleiro no meio do voo bagunçaria a fisica) */
+  function fitCanvas() {
+    if (balls.length > 0 || autoRemaining > 0) { pendingFit = true; return; }
+    pendingFit = false;
+    var w = Math.min(560, Math.max(280, stageEl.clientWidth - 24));
+    if (Math.abs(canvas.width - w) < 4) return;
+    canvas.width = w;
+    canvas.height = Math.round(w * 600 / 560);
+    computeLayout();
   }
 
   /* ---------- Layout do tabuleiro ---------- */
@@ -313,6 +326,9 @@
 
     updateStatus("Última: " + formatMult(mult) + " (" + BZG.ui.formatMoney(payout) + ")");
     updateControlsLock();
+
+    // aplica um redimensionamento que ficou pendente enquanto havia bolinhas no ar
+    if (pendingFit && balls.length === 0 && autoRemaining === 0) fitCanvas();
   }
 
   /* ---------- Loop principal ---------- */
@@ -481,6 +497,8 @@
     stageEl = document.getElementById("plinko-stage");
 
     computeLayout();
+    fitCanvas();
+    window.addEventListener("resize", fitCanvas);
     BZG.ui.refreshBalance();
     renderHistory();
 
