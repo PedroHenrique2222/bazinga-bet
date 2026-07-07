@@ -1577,3 +1577,77 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
 .bump {
   animation: bump 0.28s ease;
 }
+
+/* ==================== RESPONSIVIDADE (tablets e celulares) ==================== */
+
+/* qualquer canvas de jogo nunca estoura a tela */
+.stage canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* tablets estreitos e celulares grandes */
+@media (max-width: 700px) {
+  .topbar {
+    gap: 6px;
+    padding: 10px 10px;
+  }
+  .topbar-title { display: none; }
+  .balance-label { display: none; }
+  .balance-box { padding: 7px 12px; }
+  #balance-value { font-size: 14px; }
+  #reset-balance-btn { padding: 8px 10px; font-size: 12px; }
+  .icon-btn { width: 34px; height: 34px; font-size: 15px; }
+}
+
+/* celulares */
+@media (max-width: 640px) {
+  .container { padding: 14px 12px 48px; }
+  .panel { padding: 16px 14px; }
+  .stage { min-height: 300px; }
+
+  /* nos jogos, o palco vem antes dos controles */
+  .game-layout > :nth-child(2) { order: -1; }
+
+  .banner { height: 148px; margin-bottom: 18px; }
+  .banner-slide { padding: 0 20px; }
+  .banner-emoji { display: none; }
+  .banner-copy h2 { font-size: 20px; }
+  .banner-copy p { font-size: 13px; }
+
+  .ticker { margin-bottom: 18px; }
+  .ticker-item { font-size: 12px; }
+
+  .lobby-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .game-card { padding: 16px 12px 12px; }
+  .game-card .icon { width: 56px; height: 56px; font-size: 28px; }
+  .game-card h2 { font-size: 16px; }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .stat-box .stat-value { font-size: 16px; }
+
+  .ranking-row { font-size: 12.5px; gap: 8px; padding: 8px 4px; }
+  .ranking-row .game { display: none; }
+
+  /* inputs com 16px evitam o zoom automatico do iPhone ao focar */
+  input[type="number"], input[type="text"], select { font-size: 16px; }
+
+  .modal-card { padding: 22px 18px; }
+  .achv-grid { grid-template-columns: 1fr 1fr; }
+
+  #toast-container { left: 12px; right: 12px; bottom: 12px; }
+  .toast { font-size: 13px; padding: 11px 14px; }
+}
+
+/* celulares pequenos */
+@media (max-width: 380px) {
+  .lobby-grid { grid-template-columns: 1fr 1fr; }
+  .balance-box { padding: 6px 9px; }
+  #reset-balance-btn { display: none; } /* recarga continua nas Configurações */
+}

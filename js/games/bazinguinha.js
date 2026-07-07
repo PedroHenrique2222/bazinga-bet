@@ -1,24 +1,45 @@
-/* Bazinga BET - Bazinguinha (Fortune Tiger 3x3, curinga = raio ⚡) */
+/* Bazinga BET - Bazinguinha v2: regras estilo Fortune Tiger
+   3x3, 5 linhas fixas (3 horizontais + 2 diagonais), ⚡ WILD substitui tudo,
+   tela cheia do mesmo simbolo multiplica o ganho por 10.
+   Pagamentos por linha calibrados por Monte Carlo (3M giros): RTP ~90%, max 2500x. */
 (function () {
-  var CELL = 76;
   var STRIP_LEN = 21;
   var COL_DURATIONS = [1100, 1500, 1950];
-  var SCALE = 0.68; // calibrado por Monte Carlo (2M giros) para RTP ~0.95
 
   var SYMBOLS = [
-    { icon: "💎", pay: 12, weight: 2 },
-    { icon: "7️⃣", pay: 6, weight: 3 },
-    { icon: "⭐", pay: 3, weight: 4 },
-    { icon: "🔔", pay: 2, weight: 5 },
-    { icon: "🍒", pay: 1, weight: 7 }
+    { icon: "🍒", pay: 1, weight: 6 },
+    { icon: "🔔", pay: 1.5, weight: 5 },
+    { icon: "⭐", pay: 2.5, weight: 4 },
+    { icon: "7️⃣", pay: 5, weight: 3 },
+    { icon: "💎", pay: 12.5, weight: 2 }
   ];
-  var WILD = { icon: "⚡", pay: 25, weight: 1 };
+  var WILD = { icon: "⚡", pay: 50, weight: 1 };
   var ALL = SYMBOLS.concat([WILD]);
   var TOTALW = ALL.reduce(function (s, x) { return s + x.weight; }, 0);
   var PAY = {}; ALL.forEach(function (s) { PAY[s.icon] = s.pay; });
 
-  var betInput, spinBtn, statusEl, historyListEl, gridEl, resultEl, stageEl, stripEls;
+  /* linhas: 1=meio, 2=topo, 3=baixo, 4=diagonal ↘, 5=diagonal ↗ */
+  var LINES = [
+    [3, 4, 5],  // 1 - meio
+    [0, 1, 2],  // 2 - topo
+    [6, 7, 8],  // 3 - baixo
+    [0, 4, 8],  // 4 - diagonal TL-BR
+    [6, 4, 2]   // 5 - diagonal BL-TR
+  ];
+  /* coordenadas (viewBox 300x300) do centro de cada celula por linha */
+  var LINE_COORDS = [
+    [[8, 150], [292, 150]],
+    [[8, 50], [292, 50]],
+    [[8, 250], [292, 250]],
+    [[14, 22], [286, 278]],
+    [[14, 278], [286, 22]]
+  ];
+
+  var betInput, statusEl, historyListEl, gridEl, stageEl, stripEls,
+      bannerEl, barBalanceEl, barBetEl, barWinEl, spinBtn, minusBtn, plusBtn, winlinesEl, lineDots;
+
   var spinning = false;
+  var BET_STEPS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
 
   function setStatus(t) { statusEl.textContent = t; }
 
@@ -28,34 +49,45 @@
     return ALL[ALL.length - 1].icon;
   }
 
-  function wildBadge() {
-    if (Math.random() < 0.5) return 1;
-    var r = Math.random() * 100;
-    if (r < 70) return 2;
-    if (r < 95) return 5;
-    return 10;
+  function evalLine(a, b, c) {
+    var cells = [a, b, c];
+    var nonWild = cells.filter(function (x) { return x !== "⚡"; });
+    if (nonWild.length === 0) return PAY["⚡"];
+    var f = nonWild[0];
+    if (nonWild.every(function (x) { return x === f; })) return PAY[f];
+    return 0;
   }
 
-  function evalRow(row) {
-    var nonWild = row.filter(function (c) { return c !== "⚡"; });
-    if (nonWild.length === 0) return PAY["⚡"];
-    var first = nonWild[0];
-    if (nonWild.every(function (c) { return c === first; })) return PAY[first];
-    return 0;
+  function cellHTML(icon) {
+    if (icon === "⚡") {
+      return '<div class="ft-cell ft-cell-wild"><i>⚡</i><em>WILD</em></div>';
+    }
+    return '<div class="ft-cell">' + icon + '</div>';
   }
 
   function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
 
   function buildStrip(stripEl, colSymbols) {
-    // colSymbols = [linha0, linha1, linha2] desta coluna (aparecem no fim da fita)
     var cells = [];
     for (var i = 0; i < STRIP_LEN - 3; i++) cells.push(ALL[Math.floor(Math.random() * ALL.length)].icon);
     cells = cells.concat(colSymbols);
-    stripEl.innerHTML = cells.map(function (icon) {
-      return '<div class="tiger-cell">' + icon + '</div>';
-    }).join("");
+    stripEl.innerHTML = cells.map(cellHTML).join("");
     stripEl.style.transform = "translateY(0px)";
-    return (STRIP_LEN - 3) * CELL;
+    // altura real da celula (responsiva via CSS)
+    var cellH = stripEl.firstChild.getBoundingClientRect().height;
+    return (STRIP_LEN - 3) * cellH;
+  }
+
+  function updateBar() {
+    barBalanceEl.textContent = BZG.ui.formatMoney(BZG.storage.getBalance());
+    barBetEl.textContent = BZG.ui.formatMoney(Math.round(Number(betInput.value)) || 0);
+  }
+
+  function clearWinFx() {
+    winlinesEl.innerHTML = "";
+    lineDots.forEach(function (d) { d.classList.remove("hit"); });
+    bannerEl.className = "ft-banner";
+    bannerEl.textContent = "⚡ Ganhe até 2500x! ⚡";
   }
 
   function renderHistory() {
@@ -71,6 +103,20 @@
     }).join("") || '<p style="color:var(--text-muted); font-size:13px;">Nenhum giro ainda.</p>';
   }
 
+  function stepBet(dir) {
+    var current = Math.round(Number(betInput.value)) || 0;
+    var next;
+    if (dir > 0) {
+      next = BET_STEPS.find(function (v) { return v > current; }) || BET_STEPS[BET_STEPS.length - 1];
+    } else {
+      var lower = BET_STEPS.filter(function (v) { return v < current; });
+      next = lower.length ? lower[lower.length - 1] : BET_STEPS[0];
+    }
+    betInput.value = next;
+    updateBar();
+    BZG.sounds.click();
+  }
+
   function spin() {
     if (spinning) return;
     var bet = Math.round(Number(betInput.value));
@@ -81,40 +127,33 @@
     spinning = true;
     betInput.disabled = true;
     spinBtn.disabled = true;
-    resultEl.textContent = "";
+    minusBtn.disabled = true;
+    plusBtn.disabled = true;
+    spinBtn.classList.add("spinning");
+    clearWinFx();
+    barWinEl.textContent = "BZ$ 0";
+    bannerEl.textContent = "Girando...";
     setStatus("Girando...");
     BZG.sounds.bet();
 
-    // sorteia a grade 3x3 e os badges dos curingas
-    var grid = [];       // 9 icones, indice = row*3 + col
-    var badges = {};     // indice -> multiplicador do curinga (se >1)
-    var wildProduct = 1;
-    for (var i = 0; i < 9; i++) {
-      var s = pick();
-      grid.push(s);
-      if (s === "⚡") {
-        var b = wildBadge();
-        if (b > 1) { badges[i] = b; }
-        wildProduct *= b;
-      }
-    }
+    // sorteia a grade 3x3 (indice = linha*3 + coluna)
+    var grid = [];
+    for (var i = 0; i < 9; i++) grid.push(pick());
 
-    // restaura a visualizacao de colunas (caso venha de um resultado estatico)
-    gridEl.className = "tiger-grid";
+    // reconstroi as colunas com fitas
     gridEl.innerHTML =
-      '<div class="tiger-col"><div class="tiger-strip" id="tstrip-0"></div></div>' +
-      '<div class="tiger-col"><div class="tiger-strip" id="tstrip-1"></div></div>' +
-      '<div class="tiger-col"><div class="tiger-strip" id="tstrip-2"></div></div>';
+      '<div class="ft-col"><div class="ft-strip" id="fstrip-0"></div></div>' +
+      '<div class="ft-col"><div class="ft-strip" id="fstrip-1"></div></div>' +
+      '<div class="ft-col"><div class="ft-strip" id="fstrip-2"></div></div>';
     stripEls = [
-      document.getElementById("tstrip-0"),
-      document.getElementById("tstrip-1"),
-      document.getElementById("tstrip-2")
+      document.getElementById("fstrip-0"),
+      document.getElementById("fstrip-1"),
+      document.getElementById("fstrip-2")
     ];
 
     var distances = [];
     for (var c = 0; c < 3; c++) {
-      var colSyms = [grid[0 * 3 + c], grid[1 * 3 + c], grid[2 * 3 + c]];
-      distances.push(buildStrip(stripEls[c], colSyms));
+      distances.push(buildStrip(stripEls[c], [grid[c], grid[3 + c], grid[6 + c]]));
     }
 
     var start = performance.now();
@@ -127,64 +166,101 @@
         var t = Math.min(1, (now - start) / COL_DURATIONS[c2]);
         var eased = easeOutQuart(t);
         stripEls[c2].style.transform = "translateY(-" + (distances[c2] * eased).toFixed(1) + "px)";
-        var crossed = Math.floor((distances[c2] * eased) / CELL);
+        var cellH = distances[c2] / (STRIP_LEN - 3);
+        var crossed = Math.floor((distances[c2] * eased) / cellH);
         if (crossed > lastTicks[c2] && t < 1) { if (c2 === 0) BZG.sounds.tick(); lastTicks[c2] = crossed; }
         if (t >= 1 && !done[c2]) { done[c2] = true; BZG.sounds.click(); }
         if (t < 1) allDone = false;
       }
-      if (allDone) finish(grid, badges, wildProduct, bet);
+      if (allDone) finish(grid, bet);
       else requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
   }
 
-  function finish(grid, badges, wildProduct, bet) {
-    // avalia as 3 linhas
+  function finish(grid, bet) {
+    // avalia as 5 linhas
     var totalPay = 0;
+    var winLines = [];
     var winCells = {};
-    for (var r = 0; r < 3; r++) {
-      var row = [grid[r * 3], grid[r * 3 + 1], grid[r * 3 + 2]];
-      var p = evalRow(row);
+    for (var l = 0; l < LINES.length; l++) {
+      var ln = LINES[l];
+      var p = evalLine(grid[ln[0]], grid[ln[1]], grid[ln[2]]);
       if (p > 0) {
         totalPay += p;
-        winCells[r * 3] = winCells[r * 3 + 1] = winCells[r * 3 + 2] = true;
+        winLines.push(l);
+        winCells[ln[0]] = winCells[ln[1]] = winCells[ln[2]] = true;
       }
     }
-    var effMult = totalPay > 0 ? totalPay * wildProduct * SCALE : 0;
-    var payout = Math.round(bet * effMult);
+
+    // tela cheia: todos os 9 sao o mesmo simbolo (wild vale como qualquer)
+    var nonWild = grid.filter(function (x) { return x !== "⚡"; });
+    var fullScreen = totalPay > 0 && (nonWild.length === 0 ||
+      nonWild.every(function (x) { return x === nonWild[0]; }));
+    if (fullScreen) totalPay *= 10;
+
+    var payout = Math.round(bet * totalPay);
     var won = payout > 0;
 
-    // renderiza a grade final estatica com destaques e badges
-    gridEl.className = "tiger-grid-final";
-    gridEl.innerHTML = grid.map(function (icon, i) {
-      var cls = "tiger-fcell" + (winCells[i] ? " win" : "");
-      var badge = badges[i] ? '<span class="tiger-badge">x' + badges[i] + '</span>' : "";
-      return '<div class="' + cls + '">' + icon + badge + '</div>';
+    // grade final estatica com destaque nas celulas vencedoras
+    gridEl.innerHTML =
+      '<div class="ft-col-static c0"></div><div class="ft-col-static c1"></div><div class="ft-col-static c2"></div>';
+    // renderiza como colunas para manter o mesmo visual
+    for (var c = 0; c < 3; c++) {
+      var colEl = gridEl.children[c];
+      colEl.className = "ft-col";
+      var html = "";
+      for (var r = 0; r < 3; r++) {
+        var idx = r * 3 + c;
+        var cellHtml = cellHTML(grid[idx]);
+        if (winCells[idx]) cellHtml = cellHtml.replace('class="ft-cell', 'class="ft-cell hit');
+        html += cellHtml;
+      }
+      colEl.innerHTML = '<div class="ft-strip">' + html + '</div>';
+    }
+
+    // desenha as linhas vencedoras e acende os indicadores
+    winlinesEl.innerHTML = winLines.map(function (l) {
+      var co = LINE_COORDS[l];
+      return '<line x1="' + co[0][0] + '" y1="' + co[0][1] + '" x2="' + co[1][0] + '" y2="' + co[1][1] + '"/>';
     }).join("");
+    lineDots.forEach(function (d) {
+      if (winLines.indexOf(Number(d.dataset.line)) !== -1) d.classList.add("hit");
+    });
 
     BZG.storage.recordBet("bazinguinha", {
-      bet: bet, multiplier: effMult, payout: payout, won: won,
-      detail: won ? effMult.toFixed(2) + "x" + (wildProduct > 1 ? " ⚡x" + wildProduct : "") : "sem linha"
+      bet: bet, multiplier: totalPay, payout: payout, won: won,
+      detail: won ? (totalPay.toFixed(2) + "x" + (fullScreen ? " 💥 TELA CHEIA" : "")) : "sem linha"
     });
     BZG.ui.refreshBalance();
     document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     renderHistory();
+    updateBar();
 
     if (won) {
-      resultEl.textContent = "+" + BZG.ui.formatMoney(payout) + " (" + effMult.toFixed(2) + "x)" +
-        (wildProduct > 1 ? "  ⚡ curinga x" + wildProduct + "!" : "");
-      setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + "!");
-      BZG.ui.toast("🐯 +" + BZG.ui.formatMoney(payout) + " (" + effMult.toFixed(2) + "x)", "success");
+      barWinEl.textContent = BZG.ui.formatMoney(payout);
+      if (fullScreen) {
+        bannerEl.className = "ft-banner fullscreen";
+        bannerEl.textContent = "💥 TELA CHEIA! Ganho ×10 — " + BZG.ui.formatMoney(payout);
+        BZG.sounds.roar();
+        BZG.effects.bigWin(payout, totalPay);
+      } else {
+        bannerEl.className = "ft-banner win";
+        bannerEl.textContent = "Ganho " + BZG.ui.formatMoney(payout);
+        if (totalPay >= 15 || payout >= 25000) {
+          BZG.sounds.roar();
+          BZG.effects.bigWin(payout, totalPay);
+        }
+      }
+      setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)!");
+      BZG.ui.toast("🐯 +" + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)", "success");
       BZG.sounds.win();
       BZG.effects.flash(stageEl, "gold");
       var rect = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, effMult >= 10 ? 110 : 55);
-      if (effMult >= 15 || payout >= 25000) {
-        BZG.sounds.roar();
-        BZG.effects.bigWin(payout, effMult);
-      }
+      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, totalPay >= 10 ? 110 : 55);
     } else {
-      resultEl.textContent = "Sem linha... gire de novo!";
+      bannerEl.className = "ft-banner";
+      bannerEl.textContent = "Quase! Gire de novo 🐯";
       setStatus("Não formou linha. Tente outra vez!");
       BZG.sounds.lose();
     }
@@ -192,32 +268,50 @@
     spinning = false;
     betInput.disabled = false;
     spinBtn.disabled = false;
+    minusBtn.disabled = false;
+    plusBtn.disabled = false;
+    spinBtn.classList.remove("spinning");
   }
 
   function quickBet(fn) {
     var current = Number(betInput.value) || 0;
     betInput.value = Math.max(1, Math.round(fn(current, BZG.storage.getBalance())));
+    updateBar();
   }
 
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
-    spinBtn = document.getElementById("spin-btn");
     statusEl = document.getElementById("round-status");
     historyListEl = document.getElementById("history-list");
-    gridEl = document.getElementById("tiger-grid");
-    resultEl = document.getElementById("tiger-result");
+    gridEl = document.getElementById("ft-grid");
     stageEl = document.getElementById("tiger-stage");
+    bannerEl = document.getElementById("ft-banner");
+    barBalanceEl = document.getElementById("ft-balance");
+    barBetEl = document.getElementById("ft-bet");
+    barWinEl = document.getElementById("ft-win");
+    spinBtn = document.getElementById("ft-spin");
+    minusBtn = document.getElementById("ft-minus");
+    plusBtn = document.getElementById("ft-plus");
+    winlinesEl = document.getElementById("ft-winlines");
+    lineDots = Array.prototype.slice.call(document.querySelectorAll(".ft-line-dot"));
 
-    // grade inicial estatica aleatoria
-    gridEl.className = "tiger-grid-final";
-    var init = "";
-    for (var i = 0; i < 9; i++) init += '<div class="tiger-fcell">' + ALL[Math.floor(Math.random() * ALL.length)].icon + '</div>';
-    gridEl.innerHTML = init;
+    // grade inicial aleatoria
+    for (var c = 0; c < 3; c++) {
+      var html = "";
+      for (var r = 0; r < 3; r++) html += cellHTML(ALL[Math.floor(Math.random() * ALL.length)].icon);
+      document.getElementById("fstrip-" + c).innerHTML = html;
+    }
 
     BZG.ui.refreshBalance();
     renderHistory();
+    updateBar();
 
     spinBtn.addEventListener("click", spin);
+    minusBtn.addEventListener("click", function () { stepBet(-1); });
+    plusBtn.addEventListener("click", function () { stepBet(1); });
+    betInput.addEventListener("input", updateBar);
+    document.addEventListener("bzg:balance-changed", updateBar);
+
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
     document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });

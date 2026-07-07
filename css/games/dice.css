@@ -92,3 +92,7 @@
 .dice-marker--result.visible {
   opacity: 1;
 }
+
+@media (max-width: 640px) {
+  .dice-result { font-size: 46px; }
+}

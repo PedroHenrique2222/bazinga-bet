@@ -181,3 +181,8 @@
   box-shadow: 0 0 0 3px var(--yellow), 0 0 18px rgba(255, 204, 0, 0.6);
   animation: bump 0.4s ease;
 }
+
+@media (max-width: 700px) {
+  /* mesa mais larga que a tela: rola na horizontal dentro do palco */
+  #roulette-stage { overflow-x: auto; align-items: flex-start; }
+}

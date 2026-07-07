@@ -98,3 +98,10 @@
   padding: 12px 6px;
   font-size: 14px;
 }
+
+@media (max-width: 640px) {
+  .bj-card { width: 62px; height: 90px; }
+  .bj-card .pcard-pip { font-size: 22px; }
+  .bj-card--back { font-size: 24px; }
+  .bj-cards { gap: 7px; min-height: 92px; }
+}

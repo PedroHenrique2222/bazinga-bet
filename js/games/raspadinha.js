@@ -1,7 +1,7 @@
-/* Bazinga BET - Raspadinha: compre a cartela, raspe 9 campos, 3 iguais premiam */
+/* Bazinga BET - Raspadinha com raspagem REAL: cada campo tem uma camada de
+   "tinta" em canvas que voce raspa com o mouse ou o dedo (pointer events). */
 (function () {
-  /* cada premio: simbolo, multiplicador e a probabilidade da cartela ser desse premio.
-     RTP = soma(prob * mult) ~= 0.90 */
+  /* premios: simbolo, multiplicador e probabilidade da cartela (RTP ~90%) */
   var PRIZES = [
     { sym: "🍒", mult: 2, prob: 0.14 },
     { sym: "🍀", mult: 3, prob: 0.07 },
@@ -11,12 +11,16 @@
     { sym: "⚡", mult: 50, prob: 0.0016 }
   ];
   var ALL_SYMS = PRIZES.map(function (p) { return p.sym; });
+  var REVEAL_RATIO = 0.55;   // % raspado para revelar a celula
 
   var betInput, buyBtn, revealAllBtn, statusEl, historyListEl, cardEl, resultEl, stageEl;
-  var cells = [];       // 9 simbolos
-  var revealed = [];    // 9 bool
-  var current = null;   // { bet, prize|null }
+  var cells = [];
+  var revealed = [];
+  var canvases = [];         // { canvas, ctx, size, strokes }
+  var current = null;
   var resolved = true;
+  var scratching = false;
+  var lastScratchSound = 0;
 
   function setStatus(t) { statusEl.textContent = t; }
 
@@ -30,29 +34,20 @@
 
   function randSym() { return ALL_SYMS[Math.floor(Math.random() * ALL_SYMS.length)]; }
 
-  /* monta a cartela; se prize != null, coloca exatamente 3 do simbolo premiado */
   function buildCells(prize) {
     var arr = new Array(9);
     var counts = {};
     function add(idx, sym) { arr[idx] = sym; counts[sym] = (counts[sym] || 0) + 1; }
-
-    var order = shuffle([0,1,2,3,4,5,6,7,8]);
+    var order = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]);
     var pos = 0;
-
     if (prize) {
       for (var k = 0; k < 3; k++) add(order[pos++], prize.sym);
     }
-    // preenche o resto sem criar nenhum trio (cap de 2 por simbolo) e sem exceder o premio
     while (pos < 9) {
       var idx = order[pos];
       var sym, tries = 0;
-      do {
-        sym = randSym();
-        tries++;
-      } while (
-        tries < 30 &&
-        ((counts[sym] || 0) >= 2 || (prize && sym === prize.sym))
-      );
+      do { sym = randSym(); tries++; }
+      while (tries < 30 && ((counts[sym] || 0) >= 2 || (prize && sym === prize.sym)));
       add(idx, sym);
       pos++;
     }
@@ -60,32 +55,124 @@
   }
 
   function decidePrize() {
-    var r = Math.random();
-    var cum = 0;
+    var r = Math.random(), cum = 0;
     for (var i = 0; i < PRIZES.length; i++) {
       cum += PRIZES[i].prob;
       if (r < cum) return PRIZES[i];
     }
-    return null; // cartela sem premio
+    return null;
   }
+
+  /* ---------- camada de tinta raspavel ---------- */
+
+  function paintCover(ctx, size) {
+    // dourado com listras diagonais e um "?" no centro
+    var grad = ctx.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0, "#d9ab13");
+    grad.addColorStop(0.5, "#c69208");
+    grad.addColorStop(1, "#b8860b");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+
+    ctx.strokeStyle = "rgba(255, 230, 150, 0.35)";
+    ctx.lineWidth = 5;
+    for (var x = -size; x < size * 2; x += 16) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x + size, size);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = "rgba(90, 60, 0, 0.65)";
+    ctx.font = "bold " + Math.round(size * 0.4) + "px Inter, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("?", size / 2, size / 2 + 2);
+  }
+
+  function setupCanvases() {
+    canvases = [];
+    var cellEls = cardEl.querySelectorAll(".rasp-cell");
+    Array.prototype.forEach.call(cellEls, function (cellEl, i) {
+      var canvas = cellEl.querySelector(".rasp-canvas");
+      var size = Math.max(40, Math.round(cellEl.clientWidth));
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext("2d");
+      paintCover(ctx, size);
+      canvases[i] = { canvas: canvas, ctx: ctx, size: size, strokes: 0 };
+    });
+  }
+
+  function scratchAt(clientX, clientY) {
+    for (var i = 0; i < 9; i++) {
+      if (revealed[i] || !canvases[i]) continue;
+      var c = canvases[i];
+      var rect = c.canvas.getBoundingClientRect();
+      var pad = 18;
+      if (clientX < rect.left - pad || clientX > rect.right + pad ||
+          clientY < rect.top - pad || clientY > rect.bottom + pad) continue;
+
+      // coordenadas locais (canvas pode estar redimensionado pelo CSS)
+      var scaleX = c.size / rect.width;
+      var scaleY = c.size / rect.height;
+      var x = (clientX - rect.left) * scaleX;
+      var y = (clientY - rect.top) * scaleY;
+
+      c.ctx.globalCompositeOperation = "destination-out";
+      c.ctx.beginPath();
+      c.ctx.arc(x, y, c.size * 0.15, 0, Math.PI * 2);
+      c.ctx.fill();
+      c.strokes++;
+
+      var now = performance.now();
+      if (now - lastScratchSound > 90) { BZG.sounds.scratch(); lastScratchSound = now; }
+
+      // a cada poucas raspadas, mede quanto ja foi removido
+      if (c.strokes % 6 === 0 && scratchedRatio(c) > REVEAL_RATIO) {
+        revealCell(i);
+      }
+    }
+  }
+
+  function scratchedRatio(c) {
+    var step = Math.max(4, Math.floor(c.size / 16));
+    var data = c.ctx.getImageData(0, 0, c.size, c.size).data;
+    var clear = 0, total = 0;
+    for (var y = 0; y < c.size; y += step) {
+      for (var x = 0; x < c.size; x += step) {
+        total++;
+        if (data[(y * c.size + x) * 4 + 3] < 40) clear++;
+      }
+    }
+    return total ? clear / total : 0;
+  }
+
+  function revealCell(i) {
+    if (revealed[i]) return;
+    revealed[i] = true;
+    var cellEl = cardEl.querySelector('.rasp-cell[data-i="' + i + '"]');
+    if (cellEl) cellEl.classList.add("revealed");
+    if (revealed.every(Boolean)) resolve();
+  }
+
+  /* ---------- render ---------- */
 
   function renderCard() {
     cardEl.innerHTML = cells.map(function (sym, i) {
-      var isRev = revealed[i];
-      return '<div class="rasp-cell' + (isRev ? " revealed" : "") + '" data-i="' + i + '">' +
+      return '<div class="rasp-cell" data-i="' + i + '">' +
         '<span class="rasp-sym">' + sym + '</span>' +
-        '<span class="rasp-cover"></span>' +
+        '<canvas class="rasp-canvas"></canvas>' +
       '</div>';
     }).join("");
-    Array.prototype.forEach.call(cardEl.querySelectorAll(".rasp-cell"), function (cell) {
-      cell.addEventListener("click", function () { scratch(Number(cell.dataset.i)); });
-    });
+    // espera o layout para medir o tamanho real das celulas
+    requestAnimationFrame(setupCanvases);
   }
 
   function renderEmpty() {
     cardEl.innerHTML = "";
     for (var i = 0; i < 9; i++) {
-      cardEl.innerHTML += '<div class="rasp-cell rasp-empty"><span class="rasp-cover"></span></div>';
+      cardEl.innerHTML += '<div class="rasp-cell rasp-empty"><span class="rasp-sym">❔</span></div>';
     }
   }
 
@@ -102,21 +189,15 @@
     }).join("") || '<p style="color:var(--text-muted); font-size:13px;">Nenhuma cartela ainda.</p>';
   }
 
-  function scratch(i) {
-    if (resolved || revealed[i]) return;
-    revealed[i] = true;
-    var cell = cardEl.querySelector('.rasp-cell[data-i="' + i + '"]');
-    if (cell) cell.classList.add("revealed");
-    BZG.sounds.scratch();
-    if (revealed.every(Boolean)) resolve();
-  }
-
   function revealAll() {
     if (resolved) return;
-    for (var i = 0; i < 9; i++) revealed[i] = true;
-    Array.prototype.forEach.call(cardEl.querySelectorAll(".rasp-cell"), function (c) {
-      c.classList.add("revealed");
-    });
+    for (var i = 0; i < 9; i++) {
+      if (!revealed[i]) {
+        revealed[i] = true;
+        var cellEl = cardEl.querySelector('.rasp-cell[data-i="' + i + '"]');
+        if (cellEl) cellEl.classList.add("revealed");
+      }
+    }
     BZG.sounds.scratch();
     resolve();
   }
@@ -134,7 +215,6 @@
     var payout = Math.round(bet * mult);
     var won = mult > 0;
 
-    // destaca as celulas vencedoras
     if (prize) {
       cells.forEach(function (sym, i) {
         if (sym === prize.sym) {
@@ -178,7 +258,6 @@
     if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor válido.", "error"); return; }
     if (bet > balance) { BZG.ui.toast("Você não tem saldo suficiente.", "error"); return; }
 
-    // desconta a cartela na compra
     BZG.storage.adjustBalance(-bet);
     BZG.ui.refreshBalance();
     document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
@@ -192,8 +271,8 @@
 
     renderCard();
     resultEl.className = "rasp-result";
-    resultEl.textContent = "Raspe os campos!";
-    setStatus("Clique nos campos para raspar. Ache 3 iguais!");
+    resultEl.textContent = "Raspe com o dedo ou o mouse!";
+    setStatus("Segure e arraste sobre os campos para raspar a tinta dourada.");
     buyBtn.disabled = true;
     betInput.disabled = true;
     revealAllBtn.style.display = "block";
@@ -201,8 +280,8 @@
 
   function quickBet(fn) {
     if (!resolved) return;
-    var current2 = Number(betInput.value) || 0;
-    betInput.value = Math.max(1, Math.round(fn(current2, BZG.storage.getBalance())));
+    var v = Number(betInput.value) || 0;
+    betInput.value = Math.max(1, Math.round(fn(v, BZG.storage.getBalance())));
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -218,6 +297,21 @@
     BZG.ui.refreshBalance();
     renderHistory();
     renderEmpty();
+
+    /* raspagem: pointer events cobrem mouse, toque e caneta */
+    cardEl.addEventListener("pointerdown", function (e) {
+      if (resolved) return;
+      scratching = true;
+      scratchAt(e.clientX, e.clientY);
+      e.preventDefault();
+    });
+    document.addEventListener("pointermove", function (e) {
+      if (!scratching || resolved) return;
+      scratchAt(e.clientX, e.clientY);
+      e.preventDefault();
+    });
+    document.addEventListener("pointerup", function () { scratching = false; });
+    document.addEventListener("pointercancel", function () { scratching = false; });
 
     buyBtn.addEventListener("click", buy);
     revealAllBtn.addEventListener("click", revealAll);

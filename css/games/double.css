@@ -217,3 +217,7 @@
   z-index: 3;
   letter-spacing: 0.04em;
 }
+
+@media (max-width: 640px) {
+  .round-countdown .time { font-size: 34px; }
+}

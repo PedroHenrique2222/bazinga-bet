@@ -1,121 +1,331 @@
-/* Bazinga BET - Bazinguinha (Tigrinho 3x3) */
+/* Bazinga BET - Bazinguinha (maquina estilo Fortune Tiger) */
 
 .stage {
   background: radial-gradient(circle at 50% 30%, rgba(255, 138, 0, 0.14), transparent 60%);
+  padding: 18px 10px;
 }
 
-.tiger-machine {
+.ft-machine {
+  --ftcell: 84px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  background: linear-gradient(170deg, #c00d1b, #7c040d);
-  border-radius: 20px;
-  padding: 20px 22px 24px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 0 40px rgba(0, 0, 0, 0.22);
-  border: 2px solid rgba(255, 204, 0, 0.55);
+  gap: 10px;
+  background:
+    radial-gradient(rgba(0, 0, 0, 0.13) 1px, transparent 1.3px),
+    linear-gradient(170deg, #c00d1b, #8a0511);
+  background-size: 8px 8px, 100% 100%;
+  border-radius: 22px;
+  padding: 12px 16px 18px;
+  border: 3px solid #e8b53a;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.35),
+    inset 0 0 46px rgba(0, 0, 0, 0.3);
 }
 
-.tiger-header {
-  font-weight: 900;
-  font-size: 19px;
-  letter-spacing: 0.08em;
-  color: #ffd400;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  animation: slots-header-glow 1.8s ease-in-out infinite;
-}
-
-@keyframes slots-header-glow {
-  0%, 100% { text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); }
-  50% { text-shadow: 0 0 16px rgba(255, 212, 0, 0.9); }
-}
-
-.tiger-frame {
-  background: #0e0e13;
-  border-radius: 14px;
-  padding: 8px;
-  border: 2px solid rgba(255, 204, 0, 0.35);
-}
-
-.tiger-grid {
+/* topo: mascote + titulo em arco dourado */
+.ft-top {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: -34px;
 }
 
-.tiger-col {
-  width: 76px;
-  height: 228px; /* 3 celulas de 76px */
+.ft-mascot {
+  font-size: 44px;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe27a, #e8a20c);
+  border: 3px solid #e8b53a;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  animation: ft-mascot-bob 2.6s ease-in-out infinite;
+}
+
+@keyframes ft-mascot-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-4px) rotate(3deg); }
+}
+
+.ft-title {
+  font-weight: 900;
+  font-size: 17px;
+  letter-spacing: 0.12em;
+  color: #ffd400;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+/* corpo: indicadores de linha + janela dos rolos */
+.ft-body {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.ft-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-self: stretch;
+  padding: 12px 0;
+  gap: 6px;
+}
+
+.ft-line-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 212, 0, 0.4);
+  color: rgba(255, 212, 0, 0.75);
+  font-size: 11px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ft-line-dot.hit {
+  background: linear-gradient(120deg, #ffd400, #ff8a00);
+  color: #241a00;
+  box-shadow: 0 0 12px rgba(255, 212, 0, 0.8);
+  animation: live-pulse 0.9s ease-in-out infinite;
+}
+
+.ft-window {
+  position: relative;
+  background: #14100c;
+  border-radius: 14px;
+  padding: 7px;
+  border: 3px solid #e8b53a;
+  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.7);
+}
+
+.ft-grid {
+  display: flex;
+  gap: 6px;
+}
+
+.ft-col {
+  width: var(--ftcell);
+  aspect-ratio: 1 / 3;
   overflow: hidden;
-  background: linear-gradient(180deg, #1a1a22, #23232d 50%, #1a1a22);
   border-radius: 8px;
+  background: linear-gradient(180deg, #fdf3dc, #f6e2b4 50%, #fdf3dc);
   position: relative;
 }
 
-.tiger-strip {
+.ft-strip {
   display: flex;
   flex-direction: column;
   will-change: transform;
 }
 
-.tiger-cell {
-  width: 76px;
-  height: 76px;
+.ft-cell {
+  width: var(--ftcell);
+  height: var(--ftcell);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 38px;
-  position: relative;
+  font-size: calc(var(--ftcell) * 0.52);
   flex-shrink: 0;
+  position: relative;
 }
 
-/* grade final estatica (apos o giro) */
-.tiger-grid-final {
-  display: grid;
-  grid-template-columns: repeat(3, 76px);
-  grid-auto-rows: 76px;
-  gap: 8px;
+/* WILD estilo Fortune Tiger: simbolo + faixa "WILD" */
+.ft-cell-wild {
+  flex-direction: column;
+  gap: 0;
 }
 
-.tiger-fcell {
+.ft-cell-wild > i {
+  font-style: normal;
+  font-size: calc(var(--ftcell) * 0.42);
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(255, 170, 0, 0.8));
+}
+
+.ft-cell-wild > em {
+  font-style: italic;
+  font-weight: 900;
+  font-size: calc(var(--ftcell) * 0.22);
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #ffe27a, #ff8a00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1px #7a3c00;
+  line-height: 1;
+}
+
+.ft-cell.hit {
+  animation: ft-cell-hit 0.55s ease-in-out infinite alternate;
+  border-radius: 8px;
+}
+
+@keyframes ft-cell-hit {
+  from { box-shadow: inset 0 0 0 2px #ffd400, 0 0 8px rgba(255, 212, 0, 0.35); }
+  to { box-shadow: inset 0 0 0 3px #ff8a00, 0 0 20px rgba(255, 170, 0, 0.75); }
+}
+
+/* linhas de vitoria desenhadas por cima da grade */
+.ft-winlines {
+  position: absolute;
+  inset: 7px;
+  width: calc(100% - 14px);
+  height: calc(100% - 14px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.ft-winlines line {
+  stroke: #ffd400;
+  stroke-width: 7;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(255, 200, 0, 0.9));
+  stroke-dasharray: 12 8;
+  animation: ft-line-dash 0.7s linear infinite;
+}
+
+@keyframes ft-line-dash {
+  to { stroke-dashoffset: -20; }
+}
+
+/* banner de status/ganho */
+.ft-banner {
+  min-height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 38px;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #23232d, #1a1a22);
-  position: relative;
-  transition: box-shadow 0.2s ease, background 0.2s ease;
-}
-
-.tiger-fcell.win {
-  background: linear-gradient(160deg, rgba(255, 204, 0, 0.3), rgba(255, 138, 0, 0.12));
-  box-shadow: 0 0 16px rgba(255, 204, 0, 0.5), inset 0 0 0 2px var(--yellow);
-  animation: tiger-winpulse 0.6s ease-in-out infinite alternate;
-}
-
-@keyframes tiger-winpulse {
-  from { box-shadow: 0 0 12px rgba(255, 204, 0, 0.4), inset 0 0 0 2px var(--yellow); }
-  to { box-shadow: 0 0 26px rgba(255, 204, 0, 0.8), inset 0 0 0 2px var(--yellow); }
-}
-
-.tiger-badge {
-  position: absolute;
-  bottom: 2px;
-  right: 3px;
-  font-size: 12px;
-  font-weight: 900;
-  color: #241a00;
-  background: linear-gradient(120deg, var(--yellow), #ff8a00);
-  border-radius: 6px;
-  padding: 0 5px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-}
-
-.tiger-result {
-  font-size: 20px;
-  font-weight: 900;
+  padding: 5px 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7c040d, #560309);
+  border: 2px solid #e8b53a;
   color: #ffd400;
-  min-height: 26px;
+  font-weight: 900;
+  font-size: 15px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
   text-align: center;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.ft-banner.win {
+  background: linear-gradient(120deg, #ffd400, #ff8a00);
+  color: #4a2400;
+  text-shadow: none;
+  animation: ft-banner-pop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1);
+  font-size: 18px;
+}
+
+.ft-banner.fullscreen {
+  background: linear-gradient(120deg, #ff2d3a, #ff8a00, #ffd400);
+  color: #fff;
+  animation: ft-banner-pop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1), live-pulse 0.8s ease-in-out infinite;
+  font-size: 18px;
+}
+
+@keyframes ft-banner-pop {
+  from { transform: scale(0.6); }
+  to { transform: scale(1); }
+}
+
+/* barra inferior: saldo / aposta / ganho */
+.ft-bar {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.ft-bar-item {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 212, 0, 0.35);
+  border-radius: 10px;
+  padding: 6px 10px;
+  text-align: center;
+  min-width: 0;
+}
+
+.ft-bar-item span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 212, 0, 0.7);
+  font-weight: 700;
+}
+
+.ft-bar-item strong {
+  display: block;
+  font-size: 13px;
+  color: #ffd400;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* controles: - / girar / + */
+.ft-controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.ft-adj {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #e8b53a;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffd400;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+
+.ft-adj:hover:not(:disabled) { background: rgba(255, 212, 0, 0.18); transform: scale(1.06); }
+.ft-adj:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.ft-spin-btn {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 3px solid #ffe27a;
+  background: radial-gradient(circle at 35% 30%, #4fd97c, #128a43);
+  color: #fff;
+  font-size: 36px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 22px rgba(46, 204, 113, 0.35);
+  transition: transform 0.12s ease, filter 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ft-spin-btn:hover:not(:disabled) { filter: brightness(1.1); transform: scale(1.05); }
+.ft-spin-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ft-spin-btn span { display: block; line-height: 1; }
+
+.ft-spin-btn.spinning span {
+  animation: ft-spin-rot 0.7s linear infinite;
+}
+
+@keyframes ft-spin-rot {
+  to { transform: rotate(360deg); }
+}
+
+/* telas menores: celulas mais compactas */
+@media (max-width: 480px) {
+  .ft-machine { --ftcell: 64px; padding: 10px 10px 14px; }
+  .ft-title { font-size: 14px; }
+  .ft-mascot { width: 56px; height: 56px; font-size: 34px; }
+  .ft-spin-btn { width: 64px; height: 64px; font-size: 30px; }
+  .ft-controls { gap: 12px; }
 }
