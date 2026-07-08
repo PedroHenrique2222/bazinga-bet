@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lixeira do Linden — Bazinga BET</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <script src="js/core/theme.js"></script>
+  <title>Mines do Pikles — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <script src="../js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/tower.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/games/mines.css" />
 </head>
-<body data-page="tower" data-title="Lixeira do Linden" data-icon="🗑️">
+<body data-page="mines" data-title="Mines do Pikles" data-icon="🥒">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -30,22 +30,18 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
-            <label>Dificuldade</label>
-            <div class="risk-options">
-              <button class="btn btn--ghost active" data-risk="easy">Fácil</button>
-              <button class="btn btn--ghost" data-risk="medium">Médio</button>
-              <button class="btn btn--ghost" data-risk="hard">Difícil</button>
-            </div>
+            <label for="mines-count">Quantidade de bombas</label>
+            <select id="mines-count"></select>
 
             <button id="start-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
-              Subir na lixeira
+              Iniciar jogo
             </button>
             <button id="cashout-btn" class="btn btn--gold" style="width:100%; margin-top:10px; padding:14px; font-size:16px; display:none;">
               Colher
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Escolha a aposta e a dificuldade, depois inicie a torre.
+              Escolha o valor da aposta e o número de bombas, depois inicie o jogo.
             </p>
 
             <div class="history-list">
@@ -54,9 +50,9 @@
             </div>
           </section>
 
-          <section class="panel stage" id="tower-stage">
-            <div class="tower-multiplier" id="tower-multiplier">1.00x</div>
-            <div class="tower-levels" id="tower-levels"></div>
+          <section class="panel stage" id="mines-stage">
+            <div class="mines-multiplier" id="mines-multiplier">1.00x</div>
+            <div class="mines-grid" id="mines-grid"></div>
           </section>
         </div>
 
@@ -66,16 +62,16 @@
 
   <div id="toast-container"></div>
 
-  <script src="js/core/storage.js"></script>
-  <script src="js/core/sounds.js"></script>
-  <script src="js/core/ui.js"></script>
-  <script src="js/core/bots.js"></script>
-  <script src="js/core/layout.js"></script>
-  <script src="js/core/particles.js"></script>
-  <script src="js/core/effects.js"></script>
-  <script src="js/core/achievements.js"></script>
-  <script src="js/core/modes.js"></script>
-  <script src="js/core/battlepass.js"></script>
-  <script src="js/games/tower.js"></script>
+  <script src="../js/core/storage.js"></script>
+  <script src="../js/core/sounds.js"></script>
+  <script src="../js/core/ui.js"></script>
+  <script src="../js/core/bots.js"></script>
+  <script src="../js/core/layout.js"></script>
+  <script src="../js/core/particles.js"></script>
+  <script src="../js/core/effects.js"></script>
+  <script src="../js/core/achievements.js"></script>
+  <script src="../js/core/modes.js"></script>
+  <script src="../js/core/battlepass.js"></script>
+  <script src="../js/games/mines.js"></script>
 </body>
 </html>

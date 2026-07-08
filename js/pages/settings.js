@@ -10,8 +10,10 @@
     var lvl = BZG.storage.getLevel();
     var pEl = document.getElementById("profile-summary");
     var bEl = document.getElementById("balance-summary");
+    var rEl = document.getElementById("reload-summary");
     if (pEl) pEl.textContent = profile.avatar + " " + profile.nickname + " · Nível " + lvl.level;
     if (bEl) bEl.textContent = BZG.ui.formatMoney(BZG.storage.getBalance());
+    if (rEl) rEl.textContent = BZG.ui.formatMoney(BZG.storage.getReloadAmount());
   }
 
   function renderThemeGrid() {
@@ -84,10 +86,11 @@
 
     document.getElementById("reload-btn").addEventListener("click", function () {
       var current = BZG.storage.getBalance();
-      if (current > BZG.storage.STARTING_BALANCE) {
+      var reloadAmount = BZG.storage.getReloadAmount();
+      if (current > reloadAmount) {
         var ok = window.confirm(
           "Você tem " + BZG.ui.formatMoney(current) + ". Recarregar vai REDUZIR o saldo para " +
-          BZG.ui.formatMoney(BZG.storage.STARTING_BALANCE) + ". Continuar?"
+          BZG.ui.formatMoney(reloadAmount) + ". Continuar?"
         );
         if (!ok) return;
       }
@@ -97,6 +100,13 @@
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
       BZG.ui.toast("Saldo recarregado!", "success");
       BZG.sounds.click();
+    });
+
+    document.getElementById("logout-btn").addEventListener("click", function () {
+      var ok = window.confirm("Sair da conta? Seu saldo, histórico e perfil continuam salvos neste navegador - você só precisa entrar de novo.");
+      if (!ok) return;
+      BZG.storage.clearAccount();
+      window.location.href = "cadastro.html";
     });
 
     document.getElementById("wipe-btn").addEventListener("click", function () {

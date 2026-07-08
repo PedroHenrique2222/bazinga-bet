@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <script src="js/core/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/pages/cadastro.css" />
+</head>
+<body data-page="cadastro" data-title="Cadastro" data-icon="🎰">
+  <div class="cadastro-screen">
+    <div class="cadastro-card">
+      <div class="cadastro-logo">🎰 <strong>BAZINGA</strong> BET</div>
+      <p class="cadastro-sub">Crie sua conta para jogar. Tudo com fichas fictícias, sem dinheiro real.</p>
+
+      <form id="cadastro-form" novalidate>
+        <label for="nickname">Nome de jogador</label>
+        <input type="text" id="nickname" maxlength="20" placeholder="Como quer ser chamado?" required />
+
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="seu@email.com" required />
+
+        <label for="password">Senha</label>
+        <input type="password" id="password" minlength="4" placeholder="Mínimo 4 caracteres" required />
+
+        <label class="cadastro-check">
+          <input type="checkbox" id="agree" required />
+          <span>Sou maior de idade e entendo que a Bazinga BET é <strong>100% fictícia</strong>: fichas de brincadeira, sem dinheiro real.</span>
+        </label>
+
+        <button type="submit" class="btn btn--gold" id="submit-btn">Criar conta e jogar 🎉</button>
+        <p class="cadastro-note">⚠️ Cadastro guardado só neste navegador (sem servidor). Não use uma senha que você usa em outro lugar.</p>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/sounds.js"></script>
+  <script src="js/core/ui.js"></script>
+  <script src="js/pages/cadastro.js"></script>
+</body>
+</html>

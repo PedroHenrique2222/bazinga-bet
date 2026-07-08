@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mines do Pikles — Bazinga BET</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <script src="js/core/theme.js"></script>
+  <title>HiLo do Panetone — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <script src="../js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/mines.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/games/hilo.css" />
 </head>
-<body data-page="mines" data-title="Mines do Pikles" data-icon="🥒">
+<body data-page="hilo" data-title="HiLo do Panetone" data-icon="🃏">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -30,9 +30,6 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
-            <label for="mines-count">Quantidade de bombas</label>
-            <select id="mines-count"></select>
-
             <button id="start-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
               Iniciar jogo
             </button>
@@ -41,7 +38,7 @@
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Escolha o valor da aposta e o número de bombas, depois inicie o jogo.
+              Inicie o jogo e adivinhe se a próxima carta vem maior ou menor.
             </p>
 
             <div class="history-list">
@@ -50,9 +47,20 @@
             </div>
           </section>
 
-          <section class="panel stage" id="mines-stage">
-            <div class="mines-multiplier" id="mines-multiplier">1.00x</div>
-            <div class="mines-grid" id="mines-grid"></div>
+          <section class="panel stage" id="hilo-stage">
+            <div class="hilo-multiplier" id="hilo-multiplier">1.00x</div>
+            <div class="hilo-cards">
+              <div class="hilo-card pcard facedown" id="hilo-current-card">
+                <span class="pcard-back">⚡</span>
+              </div>
+              <div class="hilo-card pcard facedown hilo-card--next" id="hilo-next-card">
+                <span class="pcard-back">⚡</span>
+              </div>
+            </div>
+            <div class="hilo-actions">
+              <button class="btn btn--primary" id="guess-lower">▼ Menor</button>
+              <button class="btn btn--primary" id="guess-higher">▲ Maior</button>
+            </div>
           </section>
         </div>
 
@@ -62,16 +70,16 @@
 
   <div id="toast-container"></div>
 
-  <script src="js/core/storage.js"></script>
-  <script src="js/core/sounds.js"></script>
-  <script src="js/core/ui.js"></script>
-  <script src="js/core/bots.js"></script>
-  <script src="js/core/layout.js"></script>
-  <script src="js/core/particles.js"></script>
-  <script src="js/core/effects.js"></script>
-  <script src="js/core/achievements.js"></script>
-  <script src="js/core/modes.js"></script>
-  <script src="js/core/battlepass.js"></script>
-  <script src="js/games/mines.js"></script>
+  <script src="../js/core/storage.js"></script>
+  <script src="../js/core/sounds.js"></script>
+  <script src="../js/core/ui.js"></script>
+  <script src="../js/core/bots.js"></script>
+  <script src="../js/core/layout.js"></script>
+  <script src="../js/core/particles.js"></script>
+  <script src="../js/core/effects.js"></script>
+  <script src="../js/core/achievements.js"></script>
+  <script src="../js/core/modes.js"></script>
+  <script src="../js/core/battlepass.js"></script>
+  <script src="../js/games/hilo.js"></script>
 </body>
 </html>

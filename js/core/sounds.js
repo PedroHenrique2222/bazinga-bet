@@ -259,10 +259,6 @@ BZG.sounds = (function () {
     tone(660, 0.07, "square", 0, 0.07);
   }
 
-  function cardFlip() {
-    tone(520 + Math.random() * 120, 0.05, "triangle", 0, 0.07);
-  }
-
   function jackpot() {
     [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function (f, i) {
       tone(f, 0.22, "sine", i * 0.11, 0.16);
@@ -293,10 +289,6 @@ BZG.sounds = (function () {
       src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
       src.start();
     } catch (e) {}
-  }
-
-  function wheelTick() {
-    tone(1400, 0.03, "square", 0, 0.05);
   }
 
   function roar() {
@@ -344,11 +336,9 @@ BZG.sounds = (function () {
     tick: tick,
     pegHit: pegHit,
     countdownBeep: countdownBeep,
-    cardFlip: cardFlip,
     jackpot: jackpot,
     coin: coin,
     scratch: scratch,
-    wheelTick: wheelTick,
     roar: roar,
     achievement: achievement,
     bigWin: bigWin,

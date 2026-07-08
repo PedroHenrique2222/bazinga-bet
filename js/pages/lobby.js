@@ -1,8 +1,10 @@
 /* Bazinga BET - logica da pagina inicial (lobby) */
 (function () {
+  var GAMES_DIR = "games/";
+
   var GAME_CARDS = [
-    { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: 5 linhas e tela cheia ×10!", badge: "HOT" },
-    { id: "bonanza", href: "bonanza.html", icon: "💎", name: "Bazinga Bonanza", desc: "Cluster de gemas 8x8 com cascata e Febre do Ouro!", badge: "NOVO" },
+    { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: 5 linhas e tela cheia ×10!", dev: true },
+    { id: "bonanza", href: "bonanza.html", icon: "💎", name: "Bazinga Bonanza", desc: "Cluster de gemas 8x8 com cascata e Febre do Ouro!", dev: true },
     { id: "horse", href: "horse.html", icon: "🏇", name: "Corrida BZG", desc: "Aposte num corredor da equipe BZG. Se vencer, paga 2x!", badge: "NOVO" },
     { id: "crash", href: "crash.html", icon: "🛶", name: "Canoa Furada", desc: "Retire antes da canoa do BZG afundar.", live: "crash" },
     { id: "double", href: "double.html", icon: "🎡", name: "Double", desc: "Vermelho, preto ou branco (14x).", live: "double" },
@@ -53,34 +55,7 @@
     restart();
   }
 
-  /* ---------- Ticker de vitorias ---------- */
-
-  function tickerItemHTML(win) {
-    return '<span class="ticker-item">⚡ ' + win.avatar + ' <strong>' + win.name + '</strong> ganhou ' +
-      '<span class="amount">' + BZG.ui.formatMoney(win.amount) + '</span> no ' + win.game.icon + ' ' + win.game.name + '</span>';
-  }
-
-  function buildTicker() {
-    var track = document.getElementById("ticker-track");
-    if (!track) return;
-    var items = [];
-    for (var i = 0; i < 10; i++) {
-      items.push(tickerItemHTML(BZG.bots.randomWin()));
-    }
-    var half = items.join("");
-    track.innerHTML = half + half; // duplicado para loop continuo
-  }
-
-  /* ---------- Cards de jogos com info ao vivo ---------- */
-
-  function playersNow(gameId) {
-    // numero pseudo-aleatorio estavel por minuto, para parecer "gente jogando agora"
-    var minute = Math.floor(Date.now() / 60000);
-    var h = 0;
-    var s = gameId + minute;
-    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
-    return 40 + Math.abs(h) % 220;
-  }
+  /* ---------- Cards de jogos ---------- */
 
   function lastResultHTML(card) {
     if (card.live === "crash") {
@@ -104,36 +79,23 @@
     var grid = document.getElementById("games-grid");
     if (!grid) return;
     grid.innerHTML = GAME_CARDS.map(function (card) {
-      var liveInfo = '<div class="card-live">' +
-        '<span class="players">' + playersNow(card.id) + ' jogando</span>' +
-        '<span class="last-result">' + lastResultHTML(card) + '</span>' +
-        '</div>';
+      if (card.dev) {
+        return '<div class="game-card game-card--dev" title="Em desenvolvimento">' +
+          '<span class="card-badge card-badge--dev">EM DESENVOLVIMENTO</span>' +
+          '<div class="icon">' + card.icon + '</div>' +
+          '<h2>' + card.name + '</h2>' +
+          '<p>' + card.desc + '</p>' +
+          '</div>';
+      }
+      var liveInfo = card.live ? '<div class="card-live"><span class="last-result">' + lastResultHTML(card) + '</span></div>' : "";
       var badge = card.badge ? '<span class="card-badge">' + card.badge + '</span>' : "";
-      return '<a class="game-card" href="' + card.href + '">' +
+      return '<a class="game-card" href="' + GAMES_DIR + card.href + '">' +
         badge +
         '<div class="icon">' + card.icon + '</div>' +
         '<h2>' + card.name + '</h2>' +
         '<p>' + card.desc + '</p>' +
         liveInfo +
         '</a>';
-    }).join("");
-  }
-
-  /* ---------- Ranking ---------- */
-
-  function renderRanking() {
-    var list = document.getElementById("ranking-list");
-    if (!list) return;
-    var entries = BZG.bots.getDailyRanking();
-    list.innerHTML = entries.map(function (e, i) {
-      var gameLabel = e.game ? e.game.icon + " " + e.game.name : "";
-      return '<div class="ranking-row' + (e.isUser ? " is-user" : "") + '">' +
-        '<span class="pos">' + (i + 1) + 'º</span>' +
-        '<span class="avatar">' + e.avatar + '</span>' +
-        '<span class="name">' + e.name + '</span>' +
-        '<span class="game">' + gameLabel + '</span>' +
-        '<span class="amount">' + BZG.ui.formatMoney(e.amount) + '</span>' +
-        '</div>';
     }).join("");
   }
 
@@ -166,20 +128,21 @@
     }).join("");
   }
 
+  /* avisa se o jogador tentou abrir direto um jogo em desenvolvimento (ver layout.js) */
+  function showBlockedNotice() {
+    var blocked = null;
+    try { blocked = sessionStorage.getItem("bzgBlockedGame"); sessionStorage.removeItem("bzgBlockedGame"); } catch (e) {}
+    if (blocked) BZG.ui.toast("🚧 " + blocked + " está em desenvolvimento. Volte em breve!", "info");
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     initBanner();
-    buildTicker();
     renderGameCards();
-    renderRanking();
     renderStats();
+    showBlockedNotice();
 
     document.addEventListener("bzg:balance-changed", function () {
       renderStats();
-      renderRanking();
     });
-
-    // renova o ticker e os contadores de vez em quando
-    setInterval(buildTicker, 45000);
-    setInterval(renderGameCards, 30000);
   });
 })();

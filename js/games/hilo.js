@@ -16,6 +16,11 @@
   var currentValue = 0;
   var fairProduct = 1;
   var streak = 0;
+  var pendingCardTimeout = null; // agenda a troca visual da carta atual apos um acerto
+
+  function clearPendingCard() {
+    if (pendingCardTimeout) { clearTimeout(pendingCardTimeout); pendingCardTimeout = null; }
+  }
 
   function rankLabel(v) {
     if (v === 1) return "A";
@@ -93,6 +98,8 @@
   }
 
   function startGame() {
+    if (state !== "idle") return;
+    clearPendingCard();
     var bet = Math.round(Number(betInput.value));
     var balance = BZG.storage.getBalance();
 
@@ -156,7 +163,9 @@
       multiplierEl.classList.add("bump");
 
       currentValue = nextValue;
-      setTimeout(function () {
+      clearPendingCard();
+      pendingCardTimeout = setTimeout(function () {
+        pendingCardTimeout = null;
         renderCard(currentCardEl, currentValue, suit, true);
         nextCardEl.classList.remove("revealed");
         renderCard(nextCardEl, 0, null, false);
@@ -178,6 +187,7 @@
   }
 
   function endRound(won, multOverride) {
+    clearPendingCard();
     state = "idle";
     var mult = won ? (multOverride || currentMultiplier()) : 0;
     var payout = won ? Math.round(currentBet * mult) : 0;

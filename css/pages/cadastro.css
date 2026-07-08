@@ -1,0 +1,92 @@
+/* Bazinga BET - tela de cadastro/login (sem sidebar/topbar, tela cheia) */
+
+body[data-page="cadastro"] {
+  display: flex;
+  min-height: 100vh;
+}
+
+.cadastro-screen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 45, 58, 0.16), transparent 55%), var(--bg);
+}
+
+.cadastro-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px 26px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.cadastro-logo {
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 6px;
+}
+.cadastro-logo strong { color: var(--red); }
+
+.cadastro-sub {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  margin: 0 0 22px;
+}
+
+#cadastro-form label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin: 14px 0 6px;
+  color: var(--text-muted);
+}
+#cadastro-form label:first-of-type { margin-top: 0; }
+
+#cadastro-form input[type="text"],
+#cadastro-form input[type="email"],
+#cadastro-form input[type="password"] {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+}
+#cadastro-form input:focus { outline: 2px solid var(--yellow); outline-offset: -1px; }
+
+.cadastro-check {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 16px !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  color: var(--text-muted);
+  line-height: 1.4;
+  cursor: pointer;
+}
+.cadastro-check input { margin-top: 3px; flex-shrink: 0; }
+
+#cadastro-form button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  font-size: 15.5px;
+  margin-top: 20px;
+}
+
+.cadastro-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  margin: 12px 0 0;
+  line-height: 1.4;
+}

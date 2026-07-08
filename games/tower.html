@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HiLo do Panetone — Bazinga BET</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <script src="js/core/theme.js"></script>
+  <title>Lixeira do Linden — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <script src="../js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/hilo.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/games/tower.css" />
 </head>
-<body data-page="hilo" data-title="HiLo do Panetone" data-icon="🃏">
+<body data-page="tower" data-title="Lixeira do Linden" data-icon="🗑️">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -30,15 +30,22 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
+            <label>Dificuldade</label>
+            <div class="risk-options">
+              <button class="btn btn--ghost active" data-risk="easy">Fácil</button>
+              <button class="btn btn--ghost" data-risk="medium">Médio</button>
+              <button class="btn btn--ghost" data-risk="hard">Difícil</button>
+            </div>
+
             <button id="start-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
-              Iniciar jogo
+              Subir na lixeira
             </button>
             <button id="cashout-btn" class="btn btn--gold" style="width:100%; margin-top:10px; padding:14px; font-size:16px; display:none;">
               Colher
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Inicie o jogo e adivinhe se a próxima carta vem maior ou menor.
+              Escolha a aposta e a dificuldade, depois inicie a torre.
             </p>
 
             <div class="history-list">
@@ -47,20 +54,9 @@
             </div>
           </section>
 
-          <section class="panel stage" id="hilo-stage">
-            <div class="hilo-multiplier" id="hilo-multiplier">1.00x</div>
-            <div class="hilo-cards">
-              <div class="hilo-card pcard facedown" id="hilo-current-card">
-                <span class="pcard-back">⚡</span>
-              </div>
-              <div class="hilo-card pcard facedown hilo-card--next" id="hilo-next-card">
-                <span class="pcard-back">⚡</span>
-              </div>
-            </div>
-            <div class="hilo-actions">
-              <button class="btn btn--primary" id="guess-lower">▼ Menor</button>
-              <button class="btn btn--primary" id="guess-higher">▲ Maior</button>
-            </div>
+          <section class="panel stage" id="tower-stage">
+            <div class="tower-multiplier" id="tower-multiplier">1.00x</div>
+            <div class="tower-levels" id="tower-levels"></div>
           </section>
         </div>
 
@@ -70,16 +66,16 @@
 
   <div id="toast-container"></div>
 
-  <script src="js/core/storage.js"></script>
-  <script src="js/core/sounds.js"></script>
-  <script src="js/core/ui.js"></script>
-  <script src="js/core/bots.js"></script>
-  <script src="js/core/layout.js"></script>
-  <script src="js/core/particles.js"></script>
-  <script src="js/core/effects.js"></script>
-  <script src="js/core/achievements.js"></script>
-  <script src="js/core/modes.js"></script>
-  <script src="js/core/battlepass.js"></script>
-  <script src="js/games/hilo.js"></script>
+  <script src="../js/core/storage.js"></script>
+  <script src="../js/core/sounds.js"></script>
+  <script src="../js/core/ui.js"></script>
+  <script src="../js/core/bots.js"></script>
+  <script src="../js/core/layout.js"></script>
+  <script src="../js/core/particles.js"></script>
+  <script src="../js/core/effects.js"></script>
+  <script src="../js/core/achievements.js"></script>
+  <script src="../js/core/modes.js"></script>
+  <script src="../js/core/battlepass.js"></script>
+  <script src="../js/games/tower.js"></script>
 </body>
 </html>

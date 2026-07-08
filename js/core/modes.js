@@ -14,5 +14,5 @@ BZG.modes = (function () {
     return turboOn() ? TURBO_FACTOR : 1;
   }
 
-  return { turboOn: turboOn, speed: speed };
+  return { speed: speed };
 })();

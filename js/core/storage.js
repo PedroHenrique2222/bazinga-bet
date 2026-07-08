@@ -11,7 +11,9 @@ BZG.storage = (function () {
 
   function defaultState() {
     return {
+      account: null,        // { nickname, email, password, createdAt } - cadastro local, sem backend
       balance: STARTING_BALANCE,
+      reloadBonus: 0,        // aumenta o valor do botao "Recarregar", recompensa do Passe de Batalha
       profile: {
         nickname: "Jogador",
         avatar: "😎",
@@ -51,7 +53,8 @@ BZG.storage = (function () {
         maxWin: 0,
         currentStreak: 0,
         bestWinStreak: 0,
-        bestLossStreak: 0
+        bestLossStreak: 0,
+        autoReloads: 0
       },
       history: {
         crash: [],
@@ -103,6 +106,9 @@ BZG.storage = (function () {
       parsed.battlepass = Object.assign({}, base.battlepass, parsed.battlepass);
       if (!parsed.battlepass.claimed) parsed.battlepass.claimed = {};
       if (typeof parsed.turboOn !== "boolean") parsed.turboOn = false;
+      if (typeof parsed.account === "undefined") parsed.account = null;
+      if (typeof parsed.reloadBonus !== "number" || isNaN(parsed.reloadBonus)) parsed.reloadBonus = 0;
+      if (typeof parsed.stats.autoReloads !== "number") parsed.stats.autoReloads = 0;
       if (typeof parsed.balance !== "number" || isNaN(parsed.balance)) {
         parsed.balance = base.balance;
       }
@@ -143,9 +149,30 @@ BZG.storage = (function () {
     return state.balance;
   }
 
+  // valor atual de recarga: base + bonus ganho no Passe de Batalha (recompensa "reloadBoost")
+  function getReloadAmount() {
+    return STARTING_BALANCE + (getState().reloadBonus || 0);
+  }
+
+  function addReloadBonus(amount) {
+    var state = getState();
+    state.reloadBonus = (state.reloadBonus || 0) + amount;
+    saveState(state);
+    return state.reloadBonus;
+  }
+
   function resetBalance() {
     var state = getState();
-    state.balance = STARTING_BALANCE;
+    state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    saveState(state);
+    return state.balance;
+  }
+
+  // recarga automatica quando o saldo zera (conta separado do botao manual, para conquistas)
+  function autoReload() {
+    var state = getState();
+    state.stats.autoReloads = (state.stats.autoReloads || 0) + 1;
+    state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
     saveState(state);
     return state.balance;
   }
@@ -377,6 +404,31 @@ BZG.storage = (function () {
     saveState(state);
   }
 
+  /* ---------- Cadastro (conta local, sem backend/banco de dados) ---------- */
+
+  function hasAccount() { return !!getState().account; }
+  function getAccount() { return getState().account; }
+
+  function createAccount(data) {
+    var state = getState();
+    state.account = {
+      nickname: data.nickname,
+      email: data.email || "",
+      password: data.password || "",
+      createdAt: Date.now()
+    };
+    state.profile.nickname = data.nickname;
+    if (data.avatar) state.profile.avatar = data.avatar;
+    saveState(state);
+    return state.account;
+  }
+
+  function clearAccount() {
+    var state = getState();
+    state.account = null;
+    saveState(state);
+  }
+
   return {
     STARTING_BALANCE: STARTING_BALANCE,
     getState: getState,
@@ -407,6 +459,13 @@ BZG.storage = (function () {
     setTurboOn: setTurboOn,
     getBattlePass: getBattlePass,
     isTierClaimed: isTierClaimed,
-    markTierClaimed: markTierClaimed
+    markTierClaimed: markTierClaimed,
+    getReloadAmount: getReloadAmount,
+    addReloadBonus: addReloadBonus,
+    autoReload: autoReload,
+    hasAccount: hasAccount,
+    getAccount: getAccount,
+    createAccount: createAccount,
+    clearAccount: clearAccount
   };
 })();

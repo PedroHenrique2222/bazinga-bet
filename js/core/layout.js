@@ -2,8 +2,15 @@
 window.BZG = window.BZG || {};
 
 BZG.layout = (function () {
+  /* paginas de jogo vivem em games/, as demais (lobby, perfil, config, passe,
+     cadastro) ficam na raiz. Calcula os prefixos uma vez, na hora que o script
+     carrega, a partir da URL atual - assim o mesmo layout.js serve os dois casos. */
+  var IN_GAMES = /\/games\//.test(window.location.pathname);
+  var ROOT_PREFIX = IN_GAMES ? "../" : "";
+  var GAMES_PREFIX = IN_GAMES ? "" : "games/";
+
   var NAV_ITEMS = [
-    { href: "index.html", icon: "🏠", label: "Lobby", page: "lobby" },
+    { href: "index.html", root: true, icon: "🏠", label: "Lobby", page: "lobby" },
     { href: "crash.html", icon: "🛶", label: "Canoa Furada", page: "crash", live: true },
     { href: "double.html", icon: "🎡", label: "Double", page: "double", live: true },
     { href: "mines.html", icon: "🥒", label: "Mines do Pikles", page: "mines" },
@@ -13,13 +20,17 @@ BZG.layout = (function () {
     { href: "hilo.html", icon: "🃏", label: "HiLo do Panetone", page: "hilo" },
     { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette" },
     { href: "blackjack.html", icon: "🍑", label: "21 do Bogão", page: "blackjack" },
-    { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", hot: true },
-    { href: "bonanza.html", icon: "💎", label: "Bazinga Bonanza", page: "bonanza", hot: true },
+    { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", dev: true },
+    { href: "bonanza.html", icon: "💎", label: "Bazinga Bonanza", page: "bonanza", dev: true },
     { href: "horse.html", icon: "🏇", label: "Corrida BZG", page: "horse", hot: true },
     { href: "raspadinha.html", icon: "🎟️", label: "Raspadinha", page: "raspadinha" },
     { href: "limbo.html", icon: "📉", label: "Limbo", page: "limbo" },
     { href: "coinflip.html", icon: "🔋", label: "Moeda da Pilha", page: "coinflip" }
   ];
+
+  function navHref(item) {
+    return (item.root ? ROOT_PREFIX : GAMES_PREFIX) + item.href;
+  }
 
   /* Starburst comic: estrela de pontas alternadas gerada por codigo (fica simetrica e limpa) */
   function starPoints(cx, cy, spikes, outerR, innerR) {
@@ -34,7 +45,7 @@ BZG.layout = (function () {
 
   function logoHTML() {
     return '' +
-      '<a class="logo-card" href="index.html" aria-label="Bazinga BET">' +
+      '<a class="logo-card" href="' + ROOT_PREFIX + 'index.html" aria-label="Bazinga BET">' +
         '<svg class="logo-svg" viewBox="0 0 200 132" aria-hidden="true">' +
           /* explosao comic em duas camadas simetricas (raios menores para nao cortar nas bordas) */
           '<polygon class="logo-burst" points="' + starPoints(100, 62, 12, 58, 42) + '"/>' +
@@ -59,10 +70,17 @@ BZG.layout = (function () {
     if (!el) return;
 
     var nav = NAV_ITEMS.map(function (item) {
+      if (item.dev) {
+        return '<span class="nav-item nav-item--dev" title="Em desenvolvimento">' +
+          '<span class="nav-icon">' + item.icon + '</span>' +
+          '<span class="nav-label">' + item.label + '</span>' +
+          '<span class="nav-dev">EM BREVE</span>' +
+          '</span>';
+      }
       var cls = "nav-item" + (item.page === activePage ? " active" : "");
       var badge = item.live ? '<span class="nav-live">AO VIVO</span>'
         : (item.hot ? '<span class="nav-hot">HOT</span>' : "");
-      return '<a class="' + cls + '" href="' + item.href + '">' +
+      return '<a class="' + cls + '" href="' + navHref(item) + '">' +
         '<span class="nav-icon">' + item.icon + '</span>' +
         '<span class="nav-label">' + item.label + '</span>' +
         badge +
@@ -76,17 +94,17 @@ BZG.layout = (function () {
       '</nav>' +
       '<div class="sidebar-footer">' +
         '<div class="online-count"><span class="online-dot"></span><span id="online-count-value">—</span> online</div>' +
-        '<a class="nav-item' + (activePage === "passe" ? " active" : "") + '" href="passe.html">' +
+        '<a class="nav-item' + (activePage === "passe" ? " active" : "") + '" href="' + ROOT_PREFIX + 'passe.html">' +
           '<span class="nav-icon">🎫</span>' +
           '<span class="nav-label">Passe de Batalha</span>' +
           '<span class="nav-bp-dot" id="bp-dot" style="display:none;"></span>' +
         '</a>' +
-        '<a class="nav-item' + (activePage === "profile" ? " active" : "") + '" href="profile.html">' +
+        '<a class="nav-item' + (activePage === "profile" ? " active" : "") + '" href="' + ROOT_PREFIX + 'profile.html">' +
           '<span class="nav-icon" id="sidebar-avatar">😎</span>' +
           '<span class="nav-label" id="sidebar-nick">Perfil</span>' +
           '<span class="nav-lvl" id="sidebar-lvl"></span>' +
         '</a>' +
-        '<a class="nav-item' + (activePage === "settings" ? " active" : "") + '" href="settings.html">' +
+        '<a class="nav-item' + (activePage === "settings" ? " active" : "") + '" href="' + ROOT_PREFIX + 'settings.html">' +
           '<span class="nav-icon">⚙️</span>' +
           '<span class="nav-label">Configurações</span>' +
         '</a>' +
@@ -121,7 +139,7 @@ BZG.layout = (function () {
         '<span class="balance-label">Saldo</span>' +
         '<span id="balance-value">BZ$ 0</span>' +
       '</div>' +
-      '<button id="reset-balance-btn" class="btn btn--gold btn--sm" title="Recarrega o saldo para BZ$ 10.000">Recarregar</button>' +
+      '<button id="reset-balance-btn" class="btn btn--gold btn--sm" title="Recarrega o saldo para ' + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + '">Recarregar</button>' +
       '<button class="icon-btn" id="music-btn" title="Música ligada/desligada">🎵</button>' +
       '<button class="icon-btn" id="sfx-btn" title="Efeitos sonoros ligados/desligados">🔊</button>' +
       '<button class="icon-btn" id="theme-btn" title="Tema claro/escuro"></button>';
@@ -130,13 +148,14 @@ BZG.layout = (function () {
 
     document.getElementById("reset-balance-btn").addEventListener("click", function () {
       var current = BZG.storage.getBalance();
+      var reloadAmount = BZG.storage.getReloadAmount();
 
-      // recarregar com saldo acima do inicial REDUZIRIA o saldo - avisa antes
-      if (current > BZG.storage.STARTING_BALANCE) {
+      // recarregar com saldo acima do valor de recarga REDUZIRIA o saldo - avisa antes
+      if (current > reloadAmount) {
         var ok = window.confirm(
           "Atenção: você tem " + BZG.ui.formatMoney(current) + ".\n\n" +
           "Recarregar vai REDUZIR seu saldo para " +
-          BZG.ui.formatMoney(BZG.storage.STARTING_BALANCE) + ". Deseja continuar?"
+          BZG.ui.formatMoney(reloadAmount) + ". Deseja continuar?"
         );
         if (!ok) return;
       }
@@ -144,7 +163,7 @@ BZG.layout = (function () {
       BZG.storage.resetBalance();
       BZG.ui.refreshBalance();
       BZG.sounds.click();
-      BZG.ui.toast("Saldo recarregado para " + BZG.ui.formatMoney(BZG.storage.STARTING_BALANCE) + "!", "success");
+      BZG.ui.toast("Saldo recarregado para " + BZG.ui.formatMoney(reloadAmount) + "!", "success");
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     });
 
@@ -250,27 +269,24 @@ BZG.layout = (function () {
     });
   }
 
-  /* Notificacoes globais: de vez em quando um bot "ganha" e aparece um aviso discreto */
-  function startWinFeed() {
-    function schedule() {
-      var delay = 22000 + Math.random() * 28000;
-      setTimeout(function () {
-        if (!document.hidden) {
-          var win = BZG.bots.randomWin();
-          BZG.ui.toast("🎉 " + win.avatar + " " + win.name + " ganhou " +
-            BZG.ui.formatMoney(win.amount) + " no " + win.game.icon + " " + win.game.name, "success");
-        }
-        schedule();
-      }, delay);
-    }
-    schedule();
-  }
-
   function init() {
     var body = document.body;
     var page = body.dataset.page || "";
     var title = body.dataset.title || "";
     var icon = body.dataset.icon || "";
+
+    // sem cadastro, nao entra: manda pra tela de cadastro/login antes de tudo
+    if (!BZG.storage.hasAccount()) {
+      window.location.replace(ROOT_PREFIX + "cadastro.html");
+      return;
+    }
+
+    // jogo marcado como "em desenvolvimento": nao deixa acessar direto pela URL
+    if (body.dataset.dev === "true") {
+      try { sessionStorage.setItem("bzgBlockedGame", title || page); } catch (e) {}
+      window.location.replace(ROOT_PREFIX + "index.html");
+      return;
+    }
 
     renderSidebar(page);
     renderTopbar(title, icon);
@@ -278,14 +294,16 @@ BZG.layout = (function () {
 
     updateOnlineCount();
     setInterval(updateOnlineCount, 5000);
-    startWinFeed();
 
-    // verifica conquistas sempre que o saldo muda (apos apostas, bonus etc.)
-    if (BZG.achievements) {
-      document.addEventListener("bzg:balance-changed", function () {
-        BZG.achievements.check();
-      });
-    }
+    // sempre que o saldo muda (apos apostas, bonus etc.): recarrega sozinho se zerou, e checa conquistas
+    document.addEventListener("bzg:balance-changed", function () {
+      if (BZG.storage.getBalance() <= 0) {
+        var amount = BZG.storage.autoReload();
+        BZG.ui.refreshBalance();
+        BZG.ui.toast("💳 Seu saldo zerou! Recarregamos automaticamente: " + BZG.ui.formatMoney(amount), "info");
+      }
+      if (BZG.achievements) BZG.achievements.check();
+    });
 
     // bonus diario aparece pouco depois de carregar
     setTimeout(showDailyBonus, 700);

@@ -60,25 +60,16 @@ BZG.battlepass = (function () {
     100:{ r: "title",  v: "chefe",     icon: "👑", label: "Título: Chefão BZG" }
   };
 
-  function chipsFor(tier) {
-    var v = Math.round((500 + tier * 250) / 50) * 50;
-    return v;
-  }
+  // recompensa padrao dos niveis sem marco cosmetico: aumenta o valor do botao
+  // "Recarregar" em BZ$ 5.000 por nivel (nao da dinheiro direto).
+  var RELOAD_STEP = 5000;
+  var RELOAD_REWARD = { r: "reloadBoost", v: RELOAD_STEP, icon: "💳", label: "Recarga +BZ$ " + RELOAD_STEP.toLocaleString("pt-BR") };
 
-  /* 100 niveis: marcos cosmeticos + fichas crescentes no resto */
+  /* 100 niveis: marcos cosmeticos fixos + aumento de recarga no resto */
   var TIERS = (function () {
     var arr = [];
     for (var t = 1; t <= 100; t++) {
-      if (SPECIALS[t]) {
-        arr.push(SPECIALS[t]);
-      } else {
-        var v = chipsFor(t);
-        arr.push({
-          r: "chips", v: v,
-          icon: v >= 10000 ? "💰" : "🪙",
-          label: "BZ$ " + v.toLocaleString("pt-BR")
-        });
-      }
+      arr.push(SPECIALS[t] || RELOAD_REWARD);
     }
     return arr;
   })();
@@ -114,8 +105,7 @@ BZG.battlepass = (function () {
 
   function applyReward(t) {
     switch (t.r) {
-      case "chips": BZG.storage.adjustBalance(t.v); BZG.ui.refreshBalance();
-        document.dispatchEvent(new CustomEvent("bzg:balance-changed")); break;
+      case "reloadBoost": BZG.storage.addReloadBonus(t.v); break;
       case "avatar": BZG.storage.unlockCosmetic("avatars", t.v); break;
       case "color": BZG.storage.unlockCosmetic("nameColors", t.v); break;
       case "theme": BZG.storage.unlockCosmetic("themes", t.v); break;

@@ -1,4 +1,7 @@
-/* Bazinga BET - jogadores falsos (bots): feed de vitorias, apostas nas rodadas, ranking */
+/* Bazinga BET - bots do painel de apostas ao vivo (Crash e Double).
+   So mostram "outros jogadores" simulados durante a rodada em si; nao ha mais
+   ticker de vitorias, ranking diario ou contador de "jogando agora" no lobby -
+   isso foi removido para nao passar falsa prova social antes do lancamento real. */
 window.BZG = window.BZG || {};
 
 BZG.bots = (function () {
@@ -20,23 +23,6 @@ BZG.bots = (function () {
     "VitinDoGrau", "PrincesaBet", "ImperadorBet", "Bilionario2030"
   ];
   var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
-  var GAMES = [
-    { id: "crash", name: "Canoa Furada", icon: "🛶" },
-    { id: "double", name: "Double", icon: "🎡" },
-    { id: "mines", name: "Mines do Pikles", icon: "🥒" },
-    { id: "tower", name: "Lixeira do Linden", icon: "🗑️" },
-    { id: "plinko", name: "Plinko da Abóbora", icon: "🎃" },
-    { id: "dice", name: "Dado 616", icon: "🎲" },
-    { id: "hilo", name: "HiLo do Panetone", icon: "🃏" },
-    { id: "roulette", name: "Roleta", icon: "🎯" },
-    { id: "blackjack", name: "21 do Bogão", icon: "🍑" },
-    { id: "bazinguinha", name: "Bazinguinha", icon: "🐯" },
-    { id: "raspadinha", name: "Raspadinha", icon: "🎟️" },
-    { id: "limbo", name: "Limbo", icon: "📉" },
-    { id: "coinflip", name: "Moeda da Pilha", icon: "🔋" },
-    { id: "bonanza", name: "Bazinga Bonanza", icon: "💎" },
-    { id: "horse", name: "Corrida BZG", icon: "🏇" }
-  ];
 
   function rand(n) {
     return Math.floor(Math.random() * n);
@@ -62,27 +48,6 @@ BZG.bots = (function () {
   function randomBot() {
     if (Math.random() < 0.3) return pick(CREW);
     return { name: pick(NAMES), avatar: pick(AVATARS) };
-  }
-
-  /* Valor de ganho com distribuicao realista: muitos pequenos, poucos grandes */
-  function randomWinAmount() {
-    var r = Math.random();
-    if (r < 0.6) return 10 + rand(290);
-    if (r < 0.9) return 300 + rand(1700);
-    if (r < 0.985) return 2000 + rand(8000);
-    return 10000 + rand(40000);
-  }
-
-  function randomWin() {
-    var bot = randomBot();
-    var game = pick(GAMES);
-    return {
-      name: bot.name,
-      avatar: bot.avatar,
-      game: game,
-      amount: randomWinAmount(),
-      mult: (1.1 + Math.random() * Math.random() * 20)
-    };
   }
 
   /* Multiplicador-alvo de um bot no Crash (distribuicao parecida com jogadores reais) */
@@ -142,87 +107,8 @@ BZG.bots = (function () {
     return bots;
   }
 
-  /* ---------- Ranking diario (estavel durante o dia via seed da data) ---------- */
-
-  function seededRandom(seed) {
-    var s = seed % 2147483647;
-    if (s <= 0) s += 2147483646;
-    return function () {
-      s = (s * 16807) % 2147483647;
-      return (s - 1) / 2147483646;
-    };
-  }
-
-  function hashString(str) {
-    var h = 0;
-    for (var i = 0; i < str.length; i++) {
-      h = (h * 31 + str.charCodeAt(i)) | 0;
-    }
-    return Math.abs(h);
-  }
-
-  function getDailyRanking() {
-    var d = new Date();
-    var dateKey = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-    var rnd = seededRandom(hashString(dateKey));
-
-    var entries = [];
-    var usedIdx = {};
-    var usedCrew = {};
-    var amount = 18000 + Math.floor(rnd() * 30000);
-    for (var i = 0; i < 8; i++) {
-      // metade das vagas do dia vai para a equipe BZG (sorteio estavel pela data)
-      var member = null;
-      if (i < 4) {
-        var crewIdx = Math.floor(rnd() * CREW.length);
-        while (usedCrew[crewIdx]) crewIdx = (crewIdx + 1) % CREW.length;
-        usedCrew[crewIdx] = true;
-        member = CREW[crewIdx];
-      } else {
-        var nameIdx = Math.floor(rnd() * NAMES.length);
-        while (usedIdx[nameIdx]) nameIdx = (nameIdx + 1) % NAMES.length;
-        usedIdx[nameIdx] = true;
-        member = { name: NAMES[nameIdx], avatar: AVATARS[Math.floor(rnd() * AVATARS.length)] };
-      }
-      entries.push({
-        name: member.name,
-        avatar: member.avatar,
-        game: GAMES[Math.floor(rnd() * GAMES.length)],
-        amount: amount,
-        isUser: false
-      });
-      amount = Math.floor(amount * (0.55 + rnd() * 0.3));
-    }
-    // embaralha um pouco para a equipe nao ficar sempre em bloco no topo
-    entries.sort(function (a, b) { return b.amount - a.amount; });
-
-    // insere o usuario se ele ganhou algo hoje
-    var userWon = BZG.storage.getDailyWon();
-    if (userWon > 0) {
-      var profile = BZG.storage.getProfile();
-      entries.push({
-        name: profile.nickname + " (você)",
-        avatar: profile.avatar,
-        game: null,
-        amount: userWon,
-        isUser: true
-      });
-      entries.sort(function (a, b) { return b.amount - a.amount; });
-      entries = entries.slice(0, 8);
-    }
-
-    return entries;
-  }
-
   return {
-    GAMES: GAMES,
-    CREW: CREW,
-    randomBot: randomBot,
-    randomWin: randomWin,
-    randomBetAmount: randomBetAmount,
-    randomCrashTarget: randomCrashTarget,
     crashRoundBots: crashRoundBots,
-    doubleRoundBots: doubleRoundBots,
-    getDailyRanking: getDailyRanking
+    doubleRoundBots: doubleRoundBots
   };
 })();

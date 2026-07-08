@@ -101,6 +101,7 @@
   }
 
   function startGame() {
+    if (state !== "idle") return;
     var bet = Math.round(Number(betInput.value));
     var balance = BZG.storage.getBalance();
 

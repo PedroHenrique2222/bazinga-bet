@@ -235,7 +235,6 @@
     BZG.ui.refreshBalance();
     document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     renderHistory();
-    updateBar();
 
     if (won) {
       barWinEl.textContent = BZG.ui.formatMoney(payout);

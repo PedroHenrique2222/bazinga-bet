@@ -48,10 +48,6 @@
       var i = list.indexOf(cur);
       var next = list[(i + 1) % list.length];
       return this.set(next);
-    },
-    // compat: alterna dark<->light
-    toggle: function () {
-      return this.set(this.getMode() === "dark" ? "light" : "dark");
     }
   };
 })();

@@ -376,6 +376,24 @@ a {
   padding: 2px 7px;
 }
 
+.nav-item--dev {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-dev {
+  margin-left: auto;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
 @keyframes live-pulse {
   0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--red-glow); }
   50% { opacity: 0.65; box-shadow: 0 0 2px transparent; }
@@ -692,82 +710,7 @@ a {
   transform: scale(1.25);
 }
 
-/* ---------- Ticker de vitorias ---------- */
-
-.ticker {
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--panel-solid);
-  margin-bottom: 26px;
-  padding: 8px 0;
-  position: relative;
-  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
-}
-
-.ticker-track {
-  display: inline-flex;
-  gap: 34px;
-  white-space: nowrap;
-  animation: ticker-scroll 40s linear infinite;
-  will-change: transform;
-  padding-left: 20px;
-}
-
-.ticker:hover .ticker-track {
-  animation-play-state: paused;
-}
-
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-.ticker-item {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.ticker-item strong {
-  color: var(--text);
-}
-
-.ticker-item .amount {
-  color: var(--green);
-  font-weight: 800;
-}
-
 /* ---------- Cards de jogos (lobby) ---------- */
-
-.hero {
-  text-align: center;
-  margin-bottom: 26px;
-  padding: 6px 0;
-}
-
-.hero h1 {
-  font-size: 36px;
-  margin: 0 0 8px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  text-transform: uppercase;
-}
-
-.hero h1 .accent {
-  background: linear-gradient(120deg, var(--red), var(--yellow));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 18px rgba(255, 45, 58, 0.35));
-}
-
-.hero p {
-  color: var(--text-muted);
-  margin: 0;
-  font-size: 15px;
-}
 
 .lobby-section {
   margin-bottom: 32px;
@@ -834,6 +777,20 @@ a {
   box-shadow: 0 2px 8px rgba(255, 138, 0, 0.4);
 }
 
+.game-card--dev {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: grayscale(0.5);
+}
+.game-card--dev:hover { transform: none; box-shadow: var(--shadow); }
+
+.card-badge--dev {
+  color: var(--text-muted);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
 .game-card .icon {
   font-size: 36px;
   width: 72px;
@@ -880,21 +837,8 @@ a {
   padding-top: 9px;
 }
 
-.card-live .players {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: 700;
-}
-
-.card-live .players::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green);
-  animation: live-pulse 1.8s ease-in-out infinite;
+.card-live {
+  justify-content: flex-end;
 }
 
 .card-live .last-result {
@@ -904,59 +848,6 @@ a {
 
 :root[data-theme="dark"] .card-live .last-result {
   color: var(--yellow);
-}
-
-/* ---------- Ranking ---------- */
-
-.ranking-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 8px;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-
-.ranking-row:last-child {
-  border-bottom: none;
-}
-
-.ranking-row .pos {
-  width: 26px;
-  font-weight: 900;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.ranking-row:nth-child(1) .pos { color: var(--yellow); }
-.ranking-row:nth-child(2) .pos { color: #c0c0c0; }
-.ranking-row:nth-child(3) .pos { color: #cd7f32; }
-
-.ranking-row .avatar {
-  font-size: 20px;
-}
-
-.ranking-row .name {
-  font-weight: 700;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ranking-row .game {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.ranking-row .amount {
-  font-weight: 800;
-  color: var(--green);
-}
-
-.ranking-row.is-user {
-  background: rgba(255, 204, 0, 0.08);
-  border-radius: var(--radius-sm);
 }
 
 /* ---------- Estatisticas ---------- */
@@ -1000,13 +891,6 @@ a {
   align-items: start;
 }
 
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: stretch;
-}
-
 .profile-layout {
   display: grid;
   grid-template-columns: 360px 1fr;
@@ -1015,7 +899,7 @@ a {
 }
 
 @media (max-width: 980px) {
-  .game-layout, .two-col, .profile-layout {
+  .game-layout, .profile-layout {
     grid-template-columns: 1fr;
   }
 }
@@ -1619,9 +1503,6 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   .banner-copy h2 { font-size: 20px; }
   .banner-copy p { font-size: 13px; }
 
-  .ticker { margin-bottom: 18px; }
-  .ticker-item { font-size: 12px; }
-
   .lobby-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 12px;
@@ -1635,9 +1516,6 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
     gap: 10px;
   }
   .stat-box .stat-value { font-size: 16px; }
-
-  .ranking-row { font-size: 12.5px; gap: 8px; padding: 8px 4px; }
-  .ranking-row .game { display: none; }
 
   /* inputs com 16px evitam o zoom automatico do iPhone ao focar */
   input[type="number"], input[type="text"], select { font-size: 16px; }

@@ -41,6 +41,7 @@
           BZG.effects.confetti(r.left + r.width / 2, r.top, 40);
           if (reward.r === "theme") BZG.ui.toast("Novo tema disponível nas Configurações! 🎨", "success");
           if (reward.r === "turbo") BZG.ui.toast("⚡ Modo Turbo liberado nas Configurações!", "success");
+          if (reward.r === "reloadBoost") BZG.ui.toast("💳 Recarregue mais: " + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + " agora!", "success");
           render();
         }
       });
