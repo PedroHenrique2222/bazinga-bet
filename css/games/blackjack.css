@@ -1,47 +1,97 @@
-/* Bazinga BET - estilos especificos do Blackjack */
+/* Bazinga BET - estilos especificos do Blackjack (mesa de feltro verde) */
 
 .stage {
-  background: radial-gradient(circle at 50% 40%, rgba(46, 204, 113, 0.07), transparent 60%);
+  padding: 16px 8px;
 }
 
-.bj-table {
+/* mesa de feltro: verde com vinheta e curva superior dourada */
+.bj-felt {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  border-radius: 180px 180px 22px 22px;
+  padding: 26px 22px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
-  width: 100%;
+  gap: 12px;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 8%, #1c8a4e, transparent 70%),
+    linear-gradient(180deg, #14743f, #0c4f2b 70%, #093c21);
+  background-color: #0f6236;
+  border: 3px solid #b98a2a;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 6px rgba(0, 0, 0, 0.18),
+    0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.bj-dealer-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(120deg, #b00814, #7c040d);
+  border: 2px solid var(--yellow);
+  color: #ffd400;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 4px 16px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  z-index: 4;
+}
+
+/* curva "BLACKJACK PAGA 2.5x" no meio da mesa */
+.bj-arc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: rgba(255, 236, 179, 0.85);
+  text-align: center;
+}
+.bj-arc span {
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.bj-arc small {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 2px 12px;
+  border: 1px solid rgba(255, 236, 179, 0.5);
+  border-radius: 999px;
 }
 
 .bj-hand-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  min-height: 150px;
+  gap: 8px;
+  min-height: 128px;
+  z-index: 2;
 }
 
 .bj-hand-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .bj-total {
-  background: var(--panel-alt);
-  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 236, 179, 0.4);
   border-radius: 999px;
   padding: 2px 10px;
   font-size: 12px;
-  color: var(--yellow-dark);
-}
-
-:root[data-theme="dark"] .bj-total {
-  color: var(--yellow);
+  color: #ffe27a;
 }
 
 .bj-cards {

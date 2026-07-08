@@ -1655,3 +1655,105 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   .balance-box { padding: 6px 9px; }
   #reset-balance-btn { display: none; } /* recarga continua nas Configurações */
 }
+
+/* ==================== TEMAS (Passe de Batalha) ==================== */
+/* cada skin sobrescreve a paleta; vem depois dos blocos dark/light para vencer no cascade */
+
+:root[data-skin="neon"] {
+  --bg: #0b0713; --bg-alt: #120b1f;
+  --panel: rgba(176, 38, 255, 0.05); --panel-solid: #170f26; --panel-alt: #1d1430;
+  --border: rgba(176, 38, 255, 0.18); --text: #f3ecff; --text-muted: #a596c4;
+  --topbar-bg: rgba(11, 7, 19, 0.82); --sidebar-bg: #0e0819;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5); --glow-soft: rgba(176, 38, 255, 0.22);
+  --red: #b026ff; --red-dark: #7a1fb5; --red-glow: rgba(176, 38, 255, 0.55);
+  --yellow: #00e5ff; --yellow-dark: #00b8cc; --yellow-glow: rgba(0, 229, 255, 0.5);
+}
+
+:root[data-skin="ouro"] {
+  --bg: #0d0a03; --bg-alt: #14100a;
+  --panel: rgba(255, 215, 0, 0.05); --panel-solid: #1a1408; --panel-alt: #22190b;
+  --border: rgba(255, 215, 0, 0.2); --text: #fff6dd; --text-muted: #c4ad74;
+  --topbar-bg: rgba(13, 10, 3, 0.82); --sidebar-bg: #100c04;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5); --glow-soft: rgba(255, 179, 0, 0.2);
+  --red: #ff9500; --red-dark: #c26f00; --red-glow: rgba(255, 149, 0, 0.5);
+  --yellow: #ffd700; --yellow-dark: #caa400; --yellow-glow: rgba(255, 215, 0, 0.55);
+}
+
+:root[data-skin="matrix"] {
+  --bg: #030a04; --bg-alt: #071207;
+  --panel: rgba(0, 255, 102, 0.05); --panel-solid: #0a140a; --panel-alt: #0f1c0f;
+  --border: rgba(0, 255, 102, 0.18); --text: #d6ffd6; --text-muted: #7bb488;
+  --topbar-bg: rgba(3, 10, 4, 0.82); --sidebar-bg: #060f06;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5); --glow-soft: rgba(0, 255, 102, 0.2);
+  --red: #00e676; --red-dark: #00a152; --red-glow: rgba(0, 230, 118, 0.5);
+  --yellow: #b6ff00; --yellow-dark: #8ec900; --yellow-glow: rgba(182, 255, 0, 0.5);
+}
+
+:root[data-skin="rubi"] {
+  --bg: #0e0406; --bg-alt: #17070b;
+  --panel: rgba(255, 23, 68, 0.05); --panel-solid: #1a0a0e; --panel-alt: #230d13;
+  --border: rgba(255, 90, 120, 0.2); --text: #ffe9ec; --text-muted: #c48f98;
+  --topbar-bg: rgba(14, 4, 6, 0.82); --sidebar-bg: #120508;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5); --glow-soft: rgba(255, 23, 68, 0.22);
+  --red: #ff1744; --red-dark: #c4001d; --red-glow: rgba(255, 23, 68, 0.55);
+  --yellow: #ffb347; --yellow-dark: #d18e1f; --yellow-glow: rgba(255, 179, 71, 0.5);
+}
+
+:root[data-skin="rosa"] {
+  --bg: #fff0f6; --bg-alt: #ffffff;
+  --panel: rgba(255, 45, 126, 0.06); --panel-solid: #ffffff; --panel-alt: #ffe6f1;
+  --border: rgba(200, 20, 90, 0.15); --text: #3a0d22; --text-muted: #9c5c78;
+  --topbar-bg: rgba(255, 240, 246, 0.9); --sidebar-bg: #ffffff;
+  --shadow: 0 8px 24px rgba(200, 20, 90, 0.12); --glow-soft: rgba(255, 45, 126, 0.12);
+  --red: #ff2d7e; --red-dark: #d1005e; --red-glow: rgba(255, 45, 126, 0.4);
+  --yellow: #ff9500; --yellow-dark: #cc7600; --yellow-glow: rgba(255, 149, 0, 0.4);
+}
+
+:root[data-skin="gelo"] {
+  --bg: #eef6fb; --bg-alt: #ffffff;
+  --panel: rgba(0, 145, 234, 0.05); --panel-solid: #ffffff; --panel-alt: #e3eff7;
+  --border: rgba(10, 70, 100, 0.13); --text: #0e2733; --text-muted: #5a7d8c;
+  --topbar-bg: rgba(238, 246, 251, 0.9); --sidebar-bg: #ffffff;
+  --shadow: 0 8px 24px rgba(10, 70, 100, 0.12); --glow-soft: rgba(0, 145, 234, 0.12);
+  --red: #0091ea; --red-dark: #0067b0; --red-glow: rgba(0, 145, 234, 0.4);
+  --yellow: #00bcd4; --yellow-dark: #0097a7; --yellow-glow: rgba(0, 188, 212, 0.4);
+}
+
+/* ==================== CORES DE NOME (Passe de Batalha) ==================== */
+
+.bzg-name { font-weight: inherit; }
+.bzg-name.color-gold { color: #ffcc00; text-shadow: 0 0 6px rgba(255, 204, 0, 0.4); }
+.bzg-name.color-fire {
+  background: linear-gradient(90deg, #ff2d3a, #ff8a00);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-neon {
+  background: linear-gradient(90deg, #b026ff, #00e5ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-ice { color: #4fc3f7; text-shadow: 0 0 6px rgba(79, 195, 247, 0.4); }
+.bzg-name.color-matrix { color: #39ff14; text-shadow: 0 0 6px rgba(57, 255, 20, 0.4); }
+.bzg-name.color-rose {
+  background: linear-gradient(90deg, #ff2d7e, #ffb3d9);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-rainbow {
+  background: linear-gradient(90deg, #ff2d3a, #ffcc00, #2ecc71, #00e5ff, #b026ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  background-size: 200% 100%;
+  animation: name-rainbow 4s linear infinite;
+}
+@keyframes name-rainbow { to { background-position: 200% 0; } }
+
+.bzg-title {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #241a00;
+  background: linear-gradient(120deg, var(--yellow), #ff8a00);
+  border-radius: 999px;
+  padding: 1px 7px;
+  margin-left: 6px;
+  vertical-align: middle;
+}

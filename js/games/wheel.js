@@ -116,7 +116,7 @@
     var lastTick = 0;
 
     function frame(now) {
-      var t = Math.min(1, (now - start) / SPIN_MS);
+      var t = Math.min(1, (now - start) / (SPIN_MS * BZG.modes.speed()));
       var eased = easeOutCubic(t);
       rotation = startRotation + (finalRotation - startRotation) * eased;
       drawWheel();

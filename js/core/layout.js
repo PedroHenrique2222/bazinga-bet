@@ -6,15 +6,18 @@ BZG.layout = (function () {
     { href: "index.html", icon: "🏠", label: "Lobby", page: "lobby" },
     { href: "crash.html", icon: "🛶", label: "Canoa Furada", page: "crash", live: true },
     { href: "double.html", icon: "🎡", label: "Double", page: "double", live: true },
-    { href: "mines.html", icon: "🥒", label: "Mines do Picles", page: "mines" },
+    { href: "mines.html", icon: "🥒", label: "Mines do Pikles", page: "mines" },
     { href: "tower.html", icon: "🗑️", label: "Lixeira do Linden", page: "tower" },
     { href: "plinko.html", icon: "🎃", label: "Plinko da Abóbora", page: "plinko" },
     { href: "dice.html", icon: "🎲", label: "Dado 616", page: "dice" },
-    { href: "hilo.html", icon: "🃏", label: "HiLo do PAnetone", page: "hilo" },
+    { href: "hilo.html", icon: "🃏", label: "HiLo do Panetone", page: "hilo" },
     { href: "slots.html", icon: "🎰", label: "Slots", page: "slots" },
     { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette" },
     { href: "blackjack.html", icon: "🍑", label: "21 do Bogão", page: "blackjack" },
     { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", hot: true },
+    { href: "bonanza.html", icon: "💎", label: "Bazinga Bonanza", page: "bonanza", hot: true },
+    { href: "horse.html", icon: "🏇", label: "Corrida BZG", page: "horse", hot: true },
+    { href: "stack.html", icon: "🏗️", label: "Torre BZG", page: "stack", hot: true },
     { href: "raspadinha.html", icon: "🎟️", label: "Raspadinha", page: "raspadinha" },
     { href: "limbo.html", icon: "📉", label: "Limbo", page: "limbo" },
     { href: "wheel.html", icon: "🎡", label: "Roda da Sorte", page: "wheel" },
@@ -76,6 +79,11 @@ BZG.layout = (function () {
       '</nav>' +
       '<div class="sidebar-footer">' +
         '<div class="online-count"><span class="online-dot"></span><span id="online-count-value">—</span> online</div>' +
+        '<a class="nav-item' + (activePage === "passe" ? " active" : "") + '" href="passe.html">' +
+          '<span class="nav-icon">🎫</span>' +
+          '<span class="nav-label">Passe de Batalha</span>' +
+          '<span class="nav-bp-dot" id="bp-dot" style="display:none;"></span>' +
+        '</a>' +
         '<a class="nav-item' + (activePage === "profile" ? " active" : "") + '" href="profile.html">' +
           '<span class="nav-icon" id="sidebar-avatar">😎</span>' +
           '<span class="nav-label" id="sidebar-nick">Perfil</span>' +
@@ -93,8 +101,15 @@ BZG.layout = (function () {
     var nickEl = document.getElementById("sidebar-nick");
     var lvlEl = document.getElementById("sidebar-lvl");
     if (avatarEl) avatarEl.textContent = profile.avatar;
-    if (nickEl) nickEl.textContent = profile.nickname;
+    if (nickEl) nickEl.innerHTML = BZG.ui.nameHTML(profile.nickname);
     if (lvlEl) lvlEl.textContent = "Lv " + lvl.level;
+
+    // aviso de recompensas do passe a resgatar
+    var bpDot = document.getElementById("bp-dot");
+    if (bpDot && BZG.battlepass) {
+      var n = BZG.battlepass.unclaimedCount();
+      if (n > 0) { bpDot.style.display = "flex"; bpDot.textContent = n > 9 ? "9+" : n; }
+    }
   }
 
   function renderTopbar(title, icon) {
@@ -156,12 +171,20 @@ BZG.layout = (function () {
     });
 
     var themeBtn = document.getElementById("theme-btn");
+    function unlockedThemes() {
+      var list = ["dark", "light"];
+      var cos = BZG.storage.getCosmetics ? BZG.storage.getCosmetics() : { themes: [] };
+      (cos.themes || []).forEach(function (id) { if (list.indexOf(id) === -1) list.push(id); });
+      return list;
+    }
     function syncThemeIcon() {
-      themeBtn.textContent = BZG.theme.get() === "dark" ? "🌙" : "☀️";
+      var meta = BZG.theme.THEMES[BZG.theme.get()] || BZG.theme.THEMES.dark;
+      themeBtn.textContent = meta.icon;
+      themeBtn.title = "Tema: " + meta.name + " (clique para trocar)";
     }
     syncThemeIcon();
     themeBtn.addEventListener("click", function () {
-      BZG.theme.toggle();
+      BZG.theme.cycle(unlockedThemes());
       syncThemeIcon();
       BZG.sounds.click();
     });
@@ -206,7 +229,7 @@ BZG.layout = (function () {
       '<div class="modal-card bonus-card">' +
         '<div class="bonus-gift">🍰</div>' +
         '<h2>Panetone diário</h2>' +
-        '<p class="bonus-sub">Cortesia do <strong>BZG PAnetone</strong> · dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
+        '<p class="bonus-sub">Cortesia do <strong>BZG Panetone</strong> · dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
         '<div class="bonus-amount">+' + BZG.ui.formatMoney(info.amount) + '</div>' +
         '<p class="bonus-hint">Volte amanhã para aumentar sua sequência e ganhar um panetone maior!</p>' +
         '<button class="btn btn--gold" id="claim-bonus-btn" style="width:100%; padding:13px; font-size:16px; margin-top:6px;">Coletar 🍰</button>' +

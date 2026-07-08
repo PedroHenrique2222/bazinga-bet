@@ -2,13 +2,16 @@
 (function () {
   var GAME_CARDS = [
     { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: 5 linhas e tela cheia ×10!", badge: "HOT" },
+    { id: "bonanza", href: "bonanza.html", icon: "💎", name: "Bazinga Bonanza", desc: "Cascata de gemas com multiplicador NUCLEAR!", badge: "NOVO" },
+    { id: "horse", href: "horse.html", icon: "🏇", name: "Corrida BZG", desc: "Aposte no corredor da equipe BZG.", badge: "NOVO" },
+    { id: "stack", href: "stack.html", icon: "🏗️", name: "Torre BZG", desc: "Empilhe blocos e colha antes de cair.", badge: "NOVO" },
     { id: "crash", href: "crash.html", icon: "🛶", name: "Canoa Furada", desc: "Retire antes da canoa do BZG afundar.", live: "crash" },
     { id: "double", href: "double.html", icon: "🎡", name: "Double", desc: "Vermelho, preto ou branco (14x).", live: "double" },
-    { id: "mines", href: "mines.html", icon: "🥒", name: "Mines do Picles", desc: "A horta do BZG Picles Gamer: colha sem explodir." },
+    { id: "mines", href: "mines.html", icon: "🥒", name: "Mines do Pikles", desc: "A horta do BZG Pikles Gamer: colha sem explodir." },
     { id: "tower", href: "tower.html", icon: "🗑️", name: "Lixeira do Linden", desc: "Suba a torre de lixo do BZG Linden." },
     { id: "plinko", href: "plinko.html", icon: "🎃", name: "Plinko da Abóbora", desc: "A chuva de abóboras do BZG Abóbora, até 220x." },
     { id: "dice", href: "dice.html", icon: "🎲", name: "Dado 616", desc: "O dado militar do BZG 616. Acima ou abaixo?" },
-    { id: "hilo", href: "hilo.html", icon: "🃏", name: "HiLo do PAnetone", desc: "As cartas do BZG PAnetone: maior ou menor?" },
+    { id: "hilo", href: "hilo.html", icon: "🃏", name: "HiLo do Panetone", desc: "As cartas do BZG Panetone: maior ou menor?" },
     { id: "coinflip", href: "coinflip.html", icon: "🔋", name: "Moeda da Pilha", desc: "⚡ ou 🔋? A moeda do BZG Pilha Avulsa." },
     { id: "blackjack", href: "blackjack.html", icon: "🍑", name: "21 do Bogão", desc: "Vença o Bogão no blackjack." },
     { id: "raspadinha", href: "raspadinha.html", icon: "🎟️", name: "Raspadinha", desc: "Raspe e ache 3 iguais para ganhar.", badge: "NOVO" },

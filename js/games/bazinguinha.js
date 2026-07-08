@@ -163,7 +163,7 @@
     function frame(now) {
       var allDone = true;
       for (var c2 = 0; c2 < 3; c2++) {
-        var t = Math.min(1, (now - start) / COL_DURATIONS[c2]);
+        var t = Math.min(1, (now - start) / (COL_DURATIONS[c2] * BZG.modes.speed()));
         var eased = easeOutQuart(t);
         stripEls[c2].style.transform = "translateY(-" + (distances[c2] * eased).toFixed(1) + "px)";
         var cellH = distances[c2] / (STRIP_LEN - 3);

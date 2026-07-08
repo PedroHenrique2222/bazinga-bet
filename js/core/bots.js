@@ -23,11 +23,11 @@ BZG.bots = (function () {
   var GAMES = [
     { id: "crash", name: "Canoa Furada", icon: "🛶" },
     { id: "double", name: "Double", icon: "🎡" },
-    { id: "mines", name: "Mines do Picles", icon: "🥒" },
+    { id: "mines", name: "Mines do Pikles", icon: "🥒" },
     { id: "tower", name: "Lixeira do Linden", icon: "🗑️" },
     { id: "plinko", name: "Plinko da Abóbora", icon: "🎃" },
     { id: "dice", name: "Dado 616", icon: "🎲" },
-    { id: "hilo", name: "HiLo do PAnetone", icon: "🃏" },
+    { id: "hilo", name: "HiLo do Panetone", icon: "🃏" },
     { id: "slots", name: "Slots", icon: "🎰" },
     { id: "roulette", name: "Roleta", icon: "🎯" },
     { id: "blackjack", name: "21 do Bogão", icon: "🍑" },
@@ -35,7 +35,10 @@ BZG.bots = (function () {
     { id: "raspadinha", name: "Raspadinha", icon: "🎟️" },
     { id: "limbo", name: "Limbo", icon: "📉" },
     { id: "wheel", name: "Roda da Sorte", icon: "🎡" },
-    { id: "coinflip", name: "Moeda da Pilha", icon: "🔋" }
+    { id: "coinflip", name: "Moeda da Pilha", icon: "🔋" },
+    { id: "bonanza", name: "Bazinga Bonanza", icon: "💎" },
+    { id: "horse", name: "Corrida BZG", icon: "🏇" },
+    { id: "stack", name: "Torre BZG", icon: "🏗️" }
   ];
 
   function rand(n) {
@@ -50,10 +53,10 @@ BZG.bots = (function () {
      Aparecem com mais frequencia no feed e dominam o ranking. */
   var CREW = [
     { name: "BZG Abóbora", avatar: "🎃" },
-    { name: "BZG PAnetone", avatar: "🍰" },
+    { name: "BZG Panetone", avatar: "🍰" },
     { name: "BZG Canoa Furada", avatar: "🛶" },
     { name: "BZG 616", avatar: "🪖" },       // o militar
-    { name: "BZG Picles Gamer", avatar: "🥒" },
+    { name: "BZG Pikles Gamer", avatar: "🥒" },
     { name: "BZG Pilha Avulsa", avatar: "🔋" },
     { name: "BZG Linden", avatar: "🗑️" },    // a lata de lixo
     { name: "BZG Bogão", avatar: "🍑" }       // a bunda

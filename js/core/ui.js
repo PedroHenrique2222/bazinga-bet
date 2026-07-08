@@ -39,11 +39,32 @@ BZG.ui = (function () {
     refreshBalance();
   }
 
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  // envolve o apelido do jogador com a cor desbloqueada e (opcional) titulo
+  function nameHTML(nick, opts) {
+    opts = opts || {};
+    var cos = BZG.storage.getCosmetics ? BZG.storage.getCosmetics() : { nameColor: "default", title: "" };
+    var colorCls = cos.nameColor && cos.nameColor !== "default" ? " color-" + cos.nameColor : "";
+    var html = '<span class="bzg-name' + colorCls + '">' + escapeHtml(nick) + '</span>';
+    if (opts.title !== false && cos.title && BZG.battlepass) {
+      var t = BZG.battlepass.titleLabel(cos.title);
+      if (t) html += '<span class="bzg-title">' + escapeHtml(t) + '</span>';
+    }
+    return html;
+  }
+
   return {
     formatChips: formatChips,
     formatMoney: formatMoney,
     refreshBalance: refreshBalance,
     toast: toast,
-    initHeader: initHeader
+    initHeader: initHeader,
+    nameHTML: nameHTML,
+    escapeHtml: escapeHtml
   };
 })();

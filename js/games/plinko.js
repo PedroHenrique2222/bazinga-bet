@@ -123,7 +123,7 @@
     var w = canvas.width, h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    var isDark = BZG.theme.get() === "dark";
+    var isDark = BZG.theme.getMode() === "dark";
     var pegColor = isDark ? "rgba(255,255,255,0.55)" : "rgba(30,20,0,0.45)";
 
     // pinos

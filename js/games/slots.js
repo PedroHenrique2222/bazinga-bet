@@ -126,7 +126,7 @@
     function frame(now) {
       var allDone = true;
       for (var i = 0; i < 3; i++) {
-        var t = Math.min(1, (now - start) / REEL_DURATIONS[i]);
+        var t = Math.min(1, (now - start) / (REEL_DURATIONS[i] * BZG.modes.speed()));
         var eased = easeOutQuart(t);
         reelEls[i].style.transform = "translateY(-" + (distances[i] * eased).toFixed(1) + "px)";
 

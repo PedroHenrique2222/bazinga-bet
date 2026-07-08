@@ -101,3 +101,29 @@
   background: linear-gradient(90deg, var(--red), var(--yellow));
   transition: width 0.4s ease;
 }
+
+/* seletores de cor de nome e titulo (Passe de Batalha) */
+.namecolor-picker, .title-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+.color-option, .title-option {
+  font: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.color-option.selected, .title-option.selected {
+  border-color: var(--yellow);
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.35);
+}

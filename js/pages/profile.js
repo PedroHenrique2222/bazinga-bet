@@ -2,18 +2,21 @@
 (function () {
   var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
   var GAME_LABELS = {
-    crash: "🛶 Canoa Furada", mines: "🥒 Mines do Picles", plinko: "🎃 Plinko da Abóbora",
-    double: "🎡 Double", tower: "🗑️ Lixeira do Linden", dice: "🎲 Dado 616", hilo: "🃏 HiLo do PAnetone",
+    crash: "🛶 Canoa Furada", mines: "🥒 Mines do Pikles", plinko: "🎃 Plinko da Abóbora",
+    double: "🎡 Double", tower: "🗑️ Lixeira do Linden", dice: "🎲 Dado 616", hilo: "🃏 HiLo do Panetone",
     slots: "🎰 Slots", roulette: "🎯 Roleta", blackjack: "🍑 21 do Bogão",
     bazinguinha: "🐯 Bazinguinha", raspadinha: "🎟️ Raspadinha", limbo: "📉 Limbo",
-    wheel: "🎡 Roda da Sorte", coinflip: "🔋 Moeda da Pilha"
+    wheel: "🎡 Roda da Sorte", coinflip: "🔋 Moeda da Pilha",
+    bonanza: "💎 Bazinga Bonanza", horse: "🏇 Corrida BZG", stack: "🏗️ Torre BZG"
   };
 
   var selectedAvatar = null;
 
   function renderAvatarPicker() {
     var picker = document.getElementById("avatar-picker");
-    picker.innerHTML = AVATARS.map(function (a) {
+    var cos = BZG.storage.getCosmetics();
+    var list = AVATARS.concat(cos.avatars || []);
+    picker.innerHTML = list.map(function (a) {
       return '<button class="avatar-option' + (a === selectedAvatar ? " selected" : "") + '" data-avatar="' + a + '">' + a + '</button>';
     }).join("");
     Array.prototype.forEach.call(picker.children, function (btn) {
@@ -21,6 +24,55 @@
         selectedAvatar = btn.dataset.avatar;
         document.getElementById("profile-avatar").textContent = selectedAvatar;
         renderAvatarPicker();
+        BZG.sounds.click();
+      });
+    });
+  }
+
+  /* seletor de cor do nome (desbloqueadas no Passe) */
+  function renderNameColorPicker() {
+    var wrap = document.getElementById("namecolor-picker");
+    if (!wrap) return;
+    var cos = BZG.storage.getCosmetics();
+    var options = ["default"].concat(cos.nameColors || []);
+    var nick = document.getElementById("nickname-input").value.trim() || "Você";
+    wrap.innerHTML = options.map(function (id) {
+      var cls = id === "default" ? "" : " color-" + id;
+      var sel = cos.nameColor === id ? " selected" : "";
+      var label = id === "default" ? "Padrão" : BZG.battlepass.colorLabel(id);
+      return '<button class="color-option' + sel + '" data-color="' + id + '">' +
+        '<span class="bzg-name' + cls + '">' + BZG.ui.escapeHtml(label) + '</span></button>';
+    }).join("");
+    Array.prototype.forEach.call(wrap.children, function (btn) {
+      btn.addEventListener("click", function () {
+        BZG.storage.setCosmetic("nameColor", btn.dataset.color);
+        renderNameColorPicker();
+        var sn = document.getElementById("sidebar-nick");
+        if (sn) sn.innerHTML = BZG.ui.nameHTML(nick);
+        BZG.sounds.click();
+      });
+    });
+  }
+
+  /* seletor de titulo */
+  function renderTitlePicker() {
+    var wrap = document.getElementById("title-picker");
+    if (!wrap) return;
+    var cos = BZG.storage.getCosmetics();
+    var options = [""].concat(cos.titles || []);
+    if (options.length <= 1) {
+      wrap.innerHTML = '<p style="color:var(--text-muted); font-size:12.5px; margin:0;">Desbloqueie títulos no Passe de Batalha.</p>';
+      return;
+    }
+    wrap.innerHTML = options.map(function (id) {
+      var sel = cos.title === id ? " selected" : "";
+      var label = id === "" ? "Nenhum" : BZG.battlepass.titleLabel(id);
+      return '<button class="title-option' + sel + '" data-title="' + id + '">' + BZG.ui.escapeHtml(label) + '</button>';
+    }).join("");
+    Array.prototype.forEach.call(wrap.children, function (btn) {
+      btn.addEventListener("click", function () {
+        BZG.storage.setCosmetic("title", btn.dataset.title);
+        renderTitlePicker();
         BZG.sounds.click();
       });
     });
@@ -121,6 +173,8 @@
     document.getElementById("nickname-input").value = profile.nickname;
 
     renderAvatarPicker();
+    renderNameColorPicker();
+    renderTitlePicker();
     renderLevel();
     renderStats();
     renderRecentBets();

@@ -27,6 +27,17 @@ BZG.storage = (function () {
         streak: 0
       },
       achievements: {},
+      cosmetics: {
+        avatars: [],        // avatares premium desbloqueados
+        nameColors: [],     // ids de cores de nome desbloqueadas
+        nameColor: "default",
+        titles: [],         // ids de titulos desbloqueados
+        title: "",          // titulo selecionado ("" = nenhum)
+        themes: [],         // ids de temas desbloqueados (alem de dark/light)
+        turbo: false        // modo turbo desbloqueado
+      },
+      turboOn: false,       // modo turbo ligado
+      battlepass: { claimed: {} },
       stats: {
         totalWagered: 0,
         totalWon: 0,
@@ -53,7 +64,10 @@ BZG.storage = (function () {
         raspadinha: [],
         limbo: [],
         wheel: [],
-        coinflip: []
+        coinflip: [],
+        bonanza: [],
+        horse: [],
+        stack: []
       }
     };
   }
@@ -81,6 +95,10 @@ BZG.storage = (function () {
       parsed.recent = Object.assign({}, base.recent, parsed.recent);
       parsed.bonus = Object.assign({}, base.bonus, parsed.bonus);
       parsed.achievements = Object.assign({}, base.achievements, parsed.achievements);
+      parsed.cosmetics = Object.assign({}, base.cosmetics, parsed.cosmetics);
+      parsed.battlepass = Object.assign({}, base.battlepass, parsed.battlepass);
+      if (!parsed.battlepass.claimed) parsed.battlepass.claimed = {};
+      if (typeof parsed.turboOn !== "boolean") parsed.turboOn = false;
       if (typeof parsed.balance !== "number" || isNaN(parsed.balance)) {
         parsed.balance = base.balance;
       }
@@ -298,6 +316,56 @@ BZG.storage = (function () {
     return n;
   }
 
+  /* ---------- Cosmeticos (Passe de Batalha) ---------- */
+
+  function getCosmetics() {
+    return getState().cosmetics;
+  }
+
+  // adiciona um item desbloqueado a uma lista (avatars/nameColors/titles/themes)
+  function unlockCosmetic(listKey, value) {
+    var state = getState();
+    var arr = state.cosmetics[listKey] || (state.cosmetics[listKey] = []);
+    if (arr.indexOf(value) === -1) { arr.push(value); saveState(state); return true; }
+    return false;
+  }
+
+  function unlockTurbo() {
+    var state = getState();
+    if (state.cosmetics.turbo) return false;
+    state.cosmetics.turbo = true;
+    saveState(state);
+    return true;
+  }
+
+  function setCosmetic(key, value) {
+    var state = getState();
+    state.cosmetics[key] = value;
+    saveState(state);
+    return value;
+  }
+
+  function isTurboUnlocked() { return !!getState().cosmetics.turbo; }
+  function isTurboOn() { var s = getState(); return !!s.cosmetics.turbo && !!s.turboOn; }
+  function setTurboOn(on) {
+    var state = getState();
+    state.turboOn = !!on;
+    saveState(state);
+    return state.turboOn;
+  }
+
+  /* ---------- Passe de Batalha ---------- */
+
+  function getBattlePass() { return getState().battlepass; }
+
+  function isTierClaimed(index) { return !!getState().battlepass.claimed[index]; }
+
+  function markTierClaimed(index) {
+    var state = getState();
+    state.battlepass.claimed[index] = Date.now();
+    saveState(state);
+  }
+
   return {
     STARTING_BALANCE: STARTING_BALANCE,
     getState: getState,
@@ -318,6 +386,16 @@ BZG.storage = (function () {
     claimBonus: claimBonus,
     getAchievements: getAchievements,
     unlockAchievement: unlockAchievement,
-    countGamesPlayed: countGamesPlayed
+    countGamesPlayed: countGamesPlayed,
+    getCosmetics: getCosmetics,
+    unlockCosmetic: unlockCosmetic,
+    unlockTurbo: unlockTurbo,
+    setCosmetic: setCosmetic,
+    isTurboUnlocked: isTurboUnlocked,
+    isTurboOn: isTurboOn,
+    setTurboOn: setTurboOn,
+    getBattlePass: getBattlePass,
+    isTierClaimed: isTierClaimed,
+    markTierClaimed: markTierClaimed
   };
 })();

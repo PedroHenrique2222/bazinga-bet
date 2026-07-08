@@ -1,0 +1,90 @@
+/* Bazinga BET - Bazinga Bonanza (cascata de gemas) */
+
+.stage {
+  background: radial-gradient(circle at 50% 25%, rgba(255, 138, 0, 0.14), transparent 60%);
+  gap: 16px;
+}
+
+.bonanza-frame {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  background: linear-gradient(170deg, #5a3410, #3a2109);
+  border: 3px solid #b98a2a;
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5), 0 14px 34px rgba(0, 0, 0, 0.45);
+}
+
+.bonanza-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.gem {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(20px, 6vw, 34px);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.gem.drop { animation: gem-drop 0.32s cubic-bezier(0.3, 1.2, 0.5, 1); }
+@keyframes gem-drop {
+  from { transform: translateY(-40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.gem.win {
+  background: radial-gradient(circle, rgba(255, 204, 0, 0.5), rgba(255, 138, 0, 0.15));
+  box-shadow: inset 0 0 0 2px var(--yellow), 0 0 16px rgba(255, 204, 0, 0.6);
+  animation: gem-win 0.45s ease-in-out infinite alternate;
+}
+@keyframes gem-win {
+  from { transform: scale(1); }
+  to { transform: scale(1.12); }
+}
+
+/* banner NUCLEAR / multiplicador */
+.bonanza-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.4);
+  font-weight: 900;
+  font-style: italic;
+  font-size: clamp(34px, 11vw, 72px);
+  color: #ffd400;
+  -webkit-text-stroke: 3px #7a3c00;
+  text-shadow: 0 4px 0 #7a3c00, 0 0 30px rgba(255, 200, 0, 0.8);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 5;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.bonanza-banner.show {
+  animation: bonanza-banner-pop 1.4s ease forwards;
+}
+@keyframes bonanza-banner-pop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-6deg); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(-6deg); }
+  80% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-6deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1) rotate(-6deg); }
+}
+
+.bonanza-win {
+  font-size: 22px;
+  font-weight: 900;
+  min-height: 28px;
+  color: var(--yellow-dark);
+}
+:root[data-theme="dark"] .bonanza-win { color: var(--yellow); }
+.bonanza-win.big { color: var(--green); text-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }

@@ -14,15 +14,61 @@
     if (bEl) bEl.textContent = BZG.ui.formatMoney(BZG.storage.getBalance());
   }
 
+  function renderThemeGrid() {
+    var grid = document.getElementById("theme-grid");
+    if (!grid) return;
+    var cos = BZG.storage.getCosmetics();
+    var unlockedExtra = cos.themes || [];
+    var current = BZG.theme.get();
+    grid.innerHTML = Object.keys(BZG.theme.THEMES).map(function (id) {
+      var meta = BZG.theme.THEMES[id];
+      var unlocked = meta.free || unlockedExtra.indexOf(id) !== -1;
+      var cls = "theme-card" + (id === current ? " active" : "") + (unlocked ? "" : " locked");
+      return '<button class="' + cls + '" data-theme-id="' + id + '"' + (unlocked ? "" : " disabled") + '>' +
+        '<span class="theme-swatch theme-swatch--' + id + '"></span>' +
+        '<span class="theme-name">' + meta.icon + ' ' + meta.name + '</span>' +
+        (unlocked ? "" : '<span class="theme-lock">🔒 Passe</span>') +
+        '</button>';
+    }).join("");
+    Array.prototype.forEach.call(grid.querySelectorAll(".theme-card:not(.locked)"), function (btn) {
+      btn.addEventListener("click", function () {
+        BZG.theme.set(btn.dataset.themeId);
+        renderThemeGrid();
+        BZG.sounds.click();
+      });
+    });
+  }
+
+  function renderTurbo() {
+    var toggle = document.getElementById("toggle-turbo");
+    var desc = document.getElementById("turbo-desc");
+    if (!toggle) return;
+    var unlocked = BZG.storage.isTurboUnlocked();
+    if (!unlocked) {
+      desc.textContent = "🔒 Desbloqueie no Passe de Batalha (nível 14)";
+      toggle.classList.add("disabled");
+      syncToggle(toggle, false);
+      return;
+    }
+    toggle.classList.remove("disabled");
+    desc.textContent = "Animações mais rápidas nos jogos";
+    syncToggle(toggle, BZG.storage.isTurboOn());
+    toggle.onclick = function () {
+      var on = BZG.storage.setTurboOn(!BZG.storage.isTurboOn());
+      syncToggle(toggle, on);
+      BZG.sounds.click();
+    };
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var musicToggle = document.getElementById("toggle-music");
     var sfxToggle = document.getElementById("toggle-sfx");
-    var themeToggle = document.getElementById("toggle-theme");
 
     syncToggle(musicToggle, BZG.sounds.isMusicEnabled());
     syncToggle(sfxToggle, BZG.sounds.isSfxEnabled());
-    syncToggle(themeToggle, BZG.theme.get() === "dark");
     refreshSummaries();
+    renderThemeGrid();
+    renderTurbo();
 
     musicToggle.addEventListener("click", function () {
       var on = BZG.sounds.toggleMusic();
@@ -33,12 +79,6 @@
     sfxToggle.addEventListener("click", function () {
       var on = BZG.sounds.toggleSfx();
       syncToggle(sfxToggle, on);
-      BZG.sounds.click();
-    });
-
-    themeToggle.addEventListener("click", function () {
-      var next = BZG.theme.toggle();
-      syncToggle(themeToggle, next === "dark");
       BZG.sounds.click();
     });
 

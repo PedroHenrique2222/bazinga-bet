@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lixeira do Linden — Bazinga BET</title>
+  <title>Torre BZG — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/games/tower.css" />
+  <link rel="stylesheet" href="css/games/stack.css" />
 </head>
-<body data-page="tower" data-title="Lixeira do Linden" data-icon="🗑️">
+<body data-page="stack" data-title="Torre BZG" data-icon="🏗️">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -30,33 +30,32 @@
               <button class="btn btn--ghost" id="bet-max">Máx</button>
             </div>
 
-            <label>Dificuldade</label>
-            <div class="risk-options">
-              <button class="btn btn--ghost active" data-risk="easy">Fácil</button>
-              <button class="btn btn--ghost" data-risk="medium">Médio</button>
-              <button class="btn btn--ghost" data-risk="hard">Difícil</button>
-            </div>
-
             <button id="start-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
-              Subir na lixeira
+              Iniciar torre
+            </button>
+            <button id="drop-btn" class="btn btn--primary" style="width:100%; margin-top:10px; padding:14px; font-size:16px; display:none;">
+              Soltar bloco
             </button>
             <button id="cashout-btn" class="btn btn--gold" style="width:100%; margin-top:10px; padding:14px; font-size:16px; display:none;">
               Colher
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Escolha a aposta e a dificuldade, depois inicie a torre.
+              Solte cada bloco alinhado com o de baixo. O que passar é cortado — errou tudo, perdeu!
             </p>
 
             <div class="history-list">
-              <h2 class="section-title" style="margin-top:20px;">Últimas rodadas</h2>
+              <h2 class="section-title" style="margin-top:20px;">Últimas torres</h2>
               <div id="history-list"></div>
             </div>
           </section>
 
-          <section class="panel stage" id="tower-stage">
-            <div class="tower-multiplier" id="tower-multiplier">1.00x</div>
-            <div class="tower-levels" id="tower-levels"></div>
+          <section class="panel stage" id="stack-stage">
+            <div class="stack-mult" id="stack-mult">1.00x</div>
+            <div class="stack-area" id="stack-area">
+              <div class="stack-world" id="stack-world"></div>
+            </div>
+            <div class="stack-hint" id="stack-hint">Toque em "Soltar bloco" ou aperte espaço</div>
           </section>
         </div>
 
@@ -76,6 +75,6 @@
   <script src="js/core/achievements.js"></script>
   <script src="js/core/modes.js"></script>
   <script src="js/core/battlepass.js"></script>
-  <script src="js/games/tower.js"></script>
+  <script src="js/games/stack.js"></script>
 </body>
 </html>

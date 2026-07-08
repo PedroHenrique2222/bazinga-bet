@@ -77,13 +77,13 @@
     // centro
     ctx.beginPath();
     ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
-    ctx.fillStyle = BZG.theme.get() === "dark" ? "#0e0e13" : "#f2f0ec";
+    ctx.fillStyle = BZG.theme.getMode() === "dark" ? "#0e0e13" : "#f2f0ec";
     ctx.fill();
     ctx.strokeStyle = "#d1a300";
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    ctx.fillStyle = BZG.theme.get() === "dark" ? "#ffcc00" : "#b5121f";
+    ctx.fillStyle = BZG.theme.getMode() === "dark" ? "#ffcc00" : "#b5121f";
     ctx.font = "900 22px Segoe UI, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";

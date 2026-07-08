@@ -79,3 +79,59 @@
   font-size: 12px;
   margin: 4px 0 0;
 }
+
+/* grade de temas */
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.theme-card {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.theme-card:hover:not(.locked) { transform: translateY(-2px); border-color: var(--yellow); }
+.theme-card.active { border-color: var(--yellow); box-shadow: 0 0 12px rgba(255, 204, 0, 0.35); }
+.theme-card.locked { opacity: 0.55; cursor: not-allowed; }
+
+.theme-swatch {
+  width: 100%;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+.theme-swatch--dark { background: linear-gradient(120deg, #0a0a0e 40%, #ff2d3a, #ffcc00); }
+.theme-swatch--light { background: linear-gradient(120deg, #f2f0ec 40%, #ff2d3a, #ffcc00); }
+.theme-swatch--neon { background: linear-gradient(120deg, #0b0713 40%, #b026ff, #00e5ff); }
+.theme-swatch--ouro { background: linear-gradient(120deg, #0d0a03 40%, #ff9500, #ffd700); }
+.theme-swatch--matrix { background: linear-gradient(120deg, #030a04 40%, #00e676, #b6ff00); }
+.theme-swatch--rubi { background: linear-gradient(120deg, #0e0406 40%, #ff1744, #ffb347); }
+.theme-swatch--rosa { background: linear-gradient(120deg, #fff0f6 40%, #ff2d7e, #ff9500); }
+.theme-swatch--gelo { background: linear-gradient(120deg, #eef6fb 40%, #0091ea, #00bcd4); }
+
+.theme-name { font-size: 12px; font-weight: 700; }
+
+.theme-lock {
+  position: absolute;
+  top: 6px; right: 6px;
+  font-size: 9px;
+  font-weight: 900;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.toggle.disabled { opacity: 0.4; pointer-events: none; }

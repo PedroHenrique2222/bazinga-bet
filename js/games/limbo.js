@@ -79,7 +79,7 @@
     var lastTick = 0;
 
     function frame(now) {
-      var t = Math.min(1, (now - start) / ROLL_MS);
+      var t = Math.min(1, (now - start) / (ROLL_MS * BZG.modes.speed()));
       if (t < 1) {
         // numeros subindo rapidamente durante a animacao
         var fake = 1 + Math.pow(now % 1000 / 1000, 2) * 8 * Math.random();

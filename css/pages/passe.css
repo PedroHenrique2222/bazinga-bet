@@ -1,0 +1,135 @@
+/* Bazinga BET - Passe de Batalha */
+
+.bp-hero {
+  background: linear-gradient(135deg, rgba(255, 45, 58, 0.12), rgba(255, 204, 0, 0.08));
+  border-color: rgba(255, 204, 0, 0.3);
+}
+
+.bp-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.bp-hero h1 { margin: 0 0 6px; font-size: 26px; font-weight: 900; }
+.bp-hero p { margin: 0; color: var(--text-muted); font-size: 14px; max-width: 640px; }
+
+.bp-progress { margin-top: 18px; }
+
+.bp-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.bp-progress-info span:first-child { font-size: 18px; font-weight: 900; color: var(--yellow-dark); }
+:root[data-theme="dark"] .bp-progress-info span:first-child { color: var(--yellow); }
+
+.bp-bar {
+  height: 14px;
+  border-radius: 999px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.bp-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--red), var(--yellow));
+  transition: width 0.5s ease;
+}
+
+/* trilha de recompensas em cards */
+.bp-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+  gap: 12px;
+}
+
+.bp-tier {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-alt);
+  padding: 14px 10px 12px;
+  text-align: center;
+  position: relative;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bp-tier .bp-lvl {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 900;
+  color: var(--text-muted);
+}
+
+.bp-tier .bp-icon {
+  font-size: 34px;
+  margin: 6px 0 6px;
+  filter: grayscale(0.6);
+  opacity: 0.6;
+}
+
+.bp-tier .bp-reward {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  min-height: 30px;
+}
+
+/* estados */
+.bp-tier.locked { opacity: 0.8; }
+
+.bp-tier.reachable {
+  border-color: rgba(255, 204, 0, 0.5);
+  box-shadow: 0 0 16px rgba(255, 204, 0, 0.18);
+}
+.bp-tier.reachable .bp-icon { filter: none; opacity: 1; }
+
+.bp-tier.claimed .bp-icon { filter: none; opacity: 1; }
+.bp-tier.claimed { border-color: rgba(46, 204, 113, 0.4); }
+
+.bp-claim-btn {
+  margin-top: 8px;
+  width: 100%;
+  font: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 4px;
+  cursor: pointer;
+  background: linear-gradient(120deg, var(--yellow), var(--yellow-dark));
+  color: #241a00;
+}
+
+.bp-claim-btn:disabled { opacity: 0.5; cursor: default; }
+
+.bp-status {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.bp-status.locked { color: var(--text-muted); }
+.bp-status.claimed { color: var(--green); }
+
+.nav-bp-dot {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px var(--red-glow);
+}
