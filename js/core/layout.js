@@ -16,7 +16,6 @@ BZG.layout = (function () {
     { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", hot: true },
     { href: "bonanza.html", icon: "💎", label: "Bazinga Bonanza", page: "bonanza", hot: true },
     { href: "horse.html", icon: "🏇", label: "Corrida BZG", page: "horse", hot: true },
-    { href: "stack.html", icon: "🏗️", label: "Torre BZG", page: "stack", hot: true },
     { href: "raspadinha.html", icon: "🎟️", label: "Raspadinha", page: "raspadinha" },
     { href: "limbo.html", icon: "📉", label: "Limbo", page: "limbo" },
     { href: "coinflip.html", icon: "🔋", label: "Moeda da Pilha", page: "coinflip" }

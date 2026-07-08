@@ -7,7 +7,7 @@
     roulette: "🎯 Roleta", blackjack: "🍑 21 do Bogão",
     bazinguinha: "🐯 Bazinguinha", raspadinha: "🎟️ Raspadinha", limbo: "📉 Limbo",
     coinflip: "🔋 Moeda da Pilha",
-    bonanza: "💎 Bazinga Bonanza", horse: "🏇 Corrida BZG", stack: "🏗️ Torre BZG"
+    bonanza: "💎 Bazinga Bonanza", horse: "🏇 Corrida BZG"
   };
 
   var selectedAvatar = null;

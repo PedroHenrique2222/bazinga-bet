@@ -5,6 +5,9 @@ BZG.storage = (function () {
   var STORAGE_KEY = "bazingaBetState";
   var STARTING_BALANCE = 10000;
   var MAX_HISTORY_ENTRIES = 25;
+  // Marca de reset: ao mudar este valor, TODO jogador tem os niveis/XP zerados
+  // uma unica vez ao abrir o site (o Passe de Batalha tambem reinicia).
+  var RESET_TOKEN = "levels-reset-2026-07";
 
   function defaultState() {
     return {
@@ -38,6 +41,7 @@ BZG.storage = (function () {
       },
       turboOn: false,       // modo turbo ligado
       battlepass: { claimed: {} },
+      resetToken: RESET_TOKEN,
       stats: {
         totalWagered: 0,
         totalWon: 0,
@@ -101,6 +105,13 @@ BZG.storage = (function () {
       if (typeof parsed.turboOn !== "boolean") parsed.turboOn = false;
       if (typeof parsed.balance !== "number" || isNaN(parsed.balance)) {
         parsed.balance = base.balance;
+      }
+      // Reset unico de niveis/XP e do Passe de Batalha (roda uma vez por navegador)
+      if (parsed.resetToken !== RESET_TOKEN) {
+        parsed.profile.xp = 0;
+        parsed.battlepass.claimed = {};
+        parsed.resetToken = RESET_TOKEN;
+        saveState(parsed);
       }
       return parsed;
     } catch (e) {

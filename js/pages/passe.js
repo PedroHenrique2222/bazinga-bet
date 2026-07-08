@@ -21,7 +21,7 @@
       } else if (reached) {
         action = '<button class="bp-claim-btn" data-tier="' + i + '">Resgatar</button>';
       } else {
-        action = '<div class="bp-status locked">🔒 ' + ((i + 1) * 400) + ' XP</div>';
+        action = '<div class="bp-status locked">🔒 ' + BZG.battlepass.xpForTier(i + 1).toLocaleString("pt-BR") + ' XP</div>';
       }
       return '<div class="' + cls + '">' +
         '<span class="bp-lvl">Lv ' + (i + 1) + '</span>' +

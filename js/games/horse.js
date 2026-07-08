@@ -1,18 +1,19 @@
 /* Bazinga BET - Corrida de Cavalos da equipe BZG.
-   Odds derivadas da probabilidade de vitoria: payout*P = 0.94 -> RTP 94% em qualquer pick. */
+   Simples: aposte num corredor. Se ele vencer, o premio e 2x a aposta (sem odds
+   diferentes por corredor). O seu corredor vence com P_WIN -> RTP = 2*P_WIN. */
 (function () {
-  var EDGE = 0.94;
+  var PAYOUT = 2;        // premio = 2x a aposta quando o seu corredor vence
+  var P_WIN = 0.48;      // chance do seu corredor vencer (RTP ~96%, casa fica com ~4%)
 
-  /* cada corredor: nome, emoji e probabilidade de vitoria (soma = 1) */
+  /* corredores da equipe BZG (todos com a mesma chance para o jogador) */
   var HORSES = [
-    { name: "BZG Abóbora", emoji: "🎃", p: 0.30 },
-    { name: "BZG Pikles", emoji: "🥒", p: 0.24 },
-    { name: "BZG 616", emoji: "🔢", p: 0.18 },
-    { name: "BZG Panetone", emoji: "🍞", p: 0.13 },
-    { name: "BZG Pilha", emoji: "🔋", p: 0.09 },
-    { name: "BZG Bogão", emoji: "🍑", p: 0.06 }
+    { name: "BZG Abóbora", emoji: "🎃" },
+    { name: "BZG Pikles", emoji: "🥒" },
+    { name: "BZG 616", emoji: "🔢" },
+    { name: "BZG Panetone", emoji: "🍞" },
+    { name: "BZG Pilha", emoji: "🔋" },
+    { name: "BZG Bogão", emoji: "🍑" }
   ];
-  HORSES.forEach(function (h) { h.odds = Math.round((EDGE / h.p) * 100) / 100; });
 
   var betInput, raceBtn, statusEl, historyListEl, picksEl, trackEl, stageEl;
   var selected = -1;
@@ -27,7 +28,7 @@
       return '<button class="horse-pick' + (i === selected ? " selected" : "") + '" data-i="' + i + '">' +
         '<span class="emoji">' + h.emoji + '</span>' +
         '<span class="name">' + h.name + '</span>' +
-        '<span class="odds">' + h.odds.toFixed(2) + 'x</span>' +
+        '<span class="odds">2x</span>' +
       '</button>';
     }).join("");
     Array.prototype.forEach.call(picksEl.children, function (btn) {
@@ -82,10 +83,10 @@
     }).join("") || '<p style="color:var(--text-muted); font-size:13px;">Nenhuma corrida ainda.</p>';
   }
 
-  function weightedWinner() {
-    var r = Math.random(), cum = 0;
-    for (var i = 0; i < HORSES.length; i++) { cum += HORSES[i].p; if (r < cum) return i; }
-    return HORSES.length - 1;
+  function randomOther(exclude) {
+    var i;
+    do { i = Math.floor(Math.random() * HORSES.length); } while (i === exclude);
+    return i;
   }
 
   function easeOut(t) { return 1 - Math.pow(1 - t, 2.2); }
@@ -105,7 +106,9 @@
     setStatus("E lá vão eles!");
     BZG.sounds.bet();
 
-    var winner = weightedWinner();
+    // o seu corredor vence com P_WIN; senao vence um outro qualquer
+    var won = Math.random() < P_WIN;
+    var winner = won ? selected : randomOther(selected);
     // duracoes: o vencedor termina primeiro; os demais um pouco depois
     var winDur = spd(3400);
     var durs = HORSES.map(function (_, i) {
@@ -141,11 +144,10 @@
   function finish(winner, bet) {
     laneEls[winner].classList.add("winner");
     var won = winner === selected;
-    var odds = HORSES[selected].odds;
-    var payout = won ? Math.round(bet * odds) : 0;
+    var payout = won ? bet * PAYOUT : 0;
 
     BZG.storage.recordBet("horse", {
-      bet: bet, multiplier: won ? odds : 0, payout: payout, won: won,
+      bet: bet, multiplier: won ? PAYOUT : 0, payout: payout, won: won,
       detail: "🏆 " + HORSES[winner].emoji + " " + HORSES[winner].name
     });
     BZG.ui.refreshBalance();
@@ -158,8 +160,8 @@
       BZG.sounds.win();
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, odds >= 10 ? 90 : 55);
-      if (payout >= 25000) BZG.effects.bigWin(payout, odds);
+      BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, 60);
+      if (payout >= 25000) BZG.effects.bigWin(payout, PAYOUT);
     } else {
       setStatus("Venceu " + HORSES[winner].name + ". Não foi dessa vez.");
       BZG.sounds.lose();

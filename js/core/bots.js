@@ -35,8 +35,7 @@ BZG.bots = (function () {
     { id: "limbo", name: "Limbo", icon: "📉" },
     { id: "coinflip", name: "Moeda da Pilha", icon: "🔋" },
     { id: "bonanza", name: "Bazinga Bonanza", icon: "💎" },
-    { id: "horse", name: "Corrida BZG", icon: "🏇" },
-    { id: "stack", name: "Torre BZG", icon: "🏗️" }
+    { id: "horse", name: "Corrida BZG", icon: "🏇" }
   ];
 
   function rand(n) {
