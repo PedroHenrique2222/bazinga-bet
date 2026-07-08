@@ -1,0 +1,86 @@
+/* Bazinga BET - minigame Torre da Turma (sem aposta) */
+
+.torre-hero {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(255, 45, 58, 0.1), rgba(255, 204, 0, 0.07));
+  border-color: rgba(255, 204, 0, 0.28);
+}
+
+.torre-hero h1 { margin: 0 0 6px; font-size: 24px; font-weight: 900; }
+.torre-hero p { margin: 0; color: var(--text-muted); font-size: 13.5px; max-width: 680px; }
+
+.torre-floor-count {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+  line-height: 1;
+}
+
+:root[data-theme="dark"] .torre-floor-count { color: var(--yellow); }
+
+.torre-best {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.torre-stage {
+  min-height: 500px;
+  padding: 10px;
+}
+
+#torre-canvas {
+  border-radius: var(--radius-sm);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  display: block;
+  max-width: 100%;
+  height: auto;
+  cursor: pointer;
+}
+
+.torre-gameover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius: var(--radius);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.torre-gameover.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.torre-gameover-title {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.torre-gameover-floors {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+}
+
+:root[data-theme="dark"] .torre-gameover-floors { color: var(--yellow); }
+
+.torre-gameover-sub {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  min-height: 18px;
+  margin-bottom: 6px;
+}

@@ -43,6 +43,8 @@ BZG.storage = (function () {
       },
       turboOn: false,       // modo turbo ligado
       battlepass: { claimed: {} },
+      collectibles: { owned: {} },   // colecionaveis tematicos dos Bazingas: owned[itemId] = timestamp
+      minigames: { torre: { bestFloor: 0 } }, // recordes pessoais dos minigames sem aposta
       resetToken: RESET_TOKEN,
       stats: {
         totalWagered: 0,
@@ -51,6 +53,7 @@ BZG.storage = (function () {
         bestMultiplier: 0,
         maxBet: 0,
         maxWin: 0,
+        peakBalance: STARTING_BALANCE, // maior saldo que o jogador ja teve
         currentStreak: 0,
         bestWinStreak: 0,
         bestLossStreak: 0,
@@ -105,12 +108,20 @@ BZG.storage = (function () {
       parsed.cosmetics = Object.assign({}, base.cosmetics, parsed.cosmetics);
       parsed.battlepass = Object.assign({}, base.battlepass, parsed.battlepass);
       if (!parsed.battlepass.claimed) parsed.battlepass.claimed = {};
+      parsed.collectibles = Object.assign({}, base.collectibles, parsed.collectibles);
+      if (!parsed.collectibles.owned) parsed.collectibles.owned = {};
+      parsed.minigames = Object.assign({}, base.minigames, parsed.minigames);
+      if (!parsed.minigames.torre) parsed.minigames.torre = { bestFloor: 0 };
       if (typeof parsed.turboOn !== "boolean") parsed.turboOn = false;
       if (typeof parsed.account === "undefined") parsed.account = null;
       if (typeof parsed.reloadBonus !== "number" || isNaN(parsed.reloadBonus)) parsed.reloadBonus = 0;
       if (typeof parsed.stats.autoReloads !== "number") parsed.stats.autoReloads = 0;
       if (typeof parsed.balance !== "number" || isNaN(parsed.balance)) {
         parsed.balance = base.balance;
+      }
+      // quem ja jogava antes desse campo existir: usa o saldo atual como piso do recorde
+      if (typeof parsed.stats.peakBalance !== "number" || isNaN(parsed.stats.peakBalance)) {
+        parsed.stats.peakBalance = parsed.balance;
       }
       // Reset unico de niveis/XP e do Passe de Batalha (roda uma vez por navegador)
       if (parsed.resetToken !== RESET_TOKEN) {
@@ -135,9 +146,14 @@ BZG.storage = (function () {
     return getState().balance;
   }
 
+  function trackPeak(state) {
+    state.stats.peakBalance = Math.max(state.stats.peakBalance || 0, state.balance);
+  }
+
   function setBalance(value) {
     var state = getState();
     state.balance = Math.max(0, Math.round(value));
+    trackPeak(state);
     saveState(state);
     return state.balance;
   }
@@ -145,6 +161,7 @@ BZG.storage = (function () {
   function adjustBalance(delta) {
     var state = getState();
     state.balance = Math.max(0, Math.round(state.balance + delta));
+    trackPeak(state);
     saveState(state);
     return state.balance;
   }
@@ -164,6 +181,7 @@ BZG.storage = (function () {
   function resetBalance() {
     var state = getState();
     state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    trackPeak(state);
     saveState(state);
     return state.balance;
   }
@@ -173,6 +191,7 @@ BZG.storage = (function () {
     var state = getState();
     state.stats.autoReloads = (state.stats.autoReloads || 0) + 1;
     state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    trackPeak(state);
     saveState(state);
     return state.balance;
   }
@@ -197,6 +216,7 @@ BZG.storage = (function () {
 
     var debit = entry.alreadyDebited ? 0 : entry.bet;
     state.balance = Math.max(0, Math.round(state.balance - debit + entry.payout));
+    trackPeak(state);
 
     state.stats.totalWagered += entry.bet;
     if (entry.won) {
@@ -237,7 +257,18 @@ BZG.storage = (function () {
     state.history[game] = state.history[game].slice(0, MAX_HISTORY_ENTRIES);
 
     saveState(state);
+    // avisa quem quiser reagir a uma aposta especifica (ex.: drop de colecionavel),
+    // separado do bzg:balance-changed generico (que tambem dispara em recarga/bonus)
+    document.dispatchEvent(new CustomEvent("bzg:bet-recorded", { detail: { game: game } }));
     return state;
+  }
+
+  // XP direto, fora do fluxo de aposta (ex.: recompensa de minigame sem aposta)
+  function addXp(amount) {
+    var state = getState();
+    state.profile.xp += amount;
+    saveState(state);
+    return state.profile.xp;
   }
 
   function getProfile() {
@@ -329,6 +360,7 @@ BZG.storage = (function () {
     state.bonus.lastClaim = today;
     state.bonus.streak = newStreak;
     state.balance += amount;
+    trackPeak(state);
     saveState(state);
     return { amount: amount, streak: newStreak };
   }
@@ -404,6 +436,38 @@ BZG.storage = (function () {
     saveState(state);
   }
 
+  /* ---------- Colecionaveis tematicos dos Bazingas ---------- */
+
+  function getCollectibles() { return getState().collectibles; }
+
+  function ownsCollectible(id) { return !!getState().collectibles.owned[id]; }
+
+  // marca um colecionavel como obtido. Retorna true se era novo (false se ja tinha).
+  function grantCollectible(id) {
+    var state = getState();
+    if (state.collectibles.owned[id]) return false;
+    state.collectibles.owned[id] = Date.now();
+    saveState(state);
+    return true;
+  }
+
+  /* ---------- Minigames sem aposta ---------- */
+
+  function getMinigameBest(game) {
+    var state = getState();
+    return (state.minigames[game] && state.minigames[game].bestFloor) || 0;
+  }
+
+  // registra o resultado de uma rodada de minigame; so atualiza o recorde se for melhor
+  function reportMinigameScore(game, value) {
+    var state = getState();
+    if (!state.minigames[game]) state.minigames[game] = { bestFloor: 0 };
+    var isNewBest = value > state.minigames[game].bestFloor;
+    if (isNewBest) state.minigames[game].bestFloor = value;
+    saveState(state);
+    return { isNewBest: isNewBest, best: state.minigames[game].bestFloor };
+  }
+
   /* ---------- Cadastro (conta local, sem backend/banco de dados) ---------- */
 
   function hasAccount() { return !!getState().account; }
@@ -463,6 +527,12 @@ BZG.storage = (function () {
     getReloadAmount: getReloadAmount,
     addReloadBonus: addReloadBonus,
     autoReload: autoReload,
+    addXp: addXp,
+    getCollectibles: getCollectibles,
+    ownsCollectible: ownsCollectible,
+    grantCollectible: grantCollectible,
+    getMinigameBest: getMinigameBest,
+    reportMinigameScore: reportMinigameScore,
     hasAccount: hasAccount,
     getAccount: getAccount,
     createAccount: createAccount,

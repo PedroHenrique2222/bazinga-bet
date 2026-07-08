@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Passe de Batalha — Bazinga BET</title>
+  <title>Coleção — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <script src="js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/pages/passe.css" />
+  <link rel="stylesheet" href="css/pages/colecao.css" />
 </head>
-<body data-page="passe" data-title="Passe de Batalha" data-icon="🎫">
+<body data-page="colecao" data-title="Coleção" data-icon="🎴">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -20,25 +20,23 @@
       <header class="topbar" id="topbar"></header>
       <main class="container">
 
-        <section class="panel bp-hero">
-          <div class="bp-hero-top">
+        <section class="panel col-hero">
+          <div class="col-hero-top">
             <div>
-              <h1>🎫 Passe de Batalha BZG</h1>
-              <p>Aposte em qualquer jogo para ganhar XP e subir de nível. Cada nível libera uma recompensa!</p>
+              <h1>🎴 Coleção BZG</h1>
+              <p>Um álbum de figurinhas de cada lenda da equipe. Toda aposta tem uma chance de soltar uma figurinha nova — complete o álbum de um personagem para desbloquear o avatar dele!</p>
             </div>
-            <button class="btn btn--gold" id="claim-all-btn">Resgatar tudo</button>
+            <div class="col-total" id="col-total">0 / 80</div>
           </div>
-          <div class="bp-progress">
-            <div class="bp-progress-info">
-              <span id="bp-tier-label">Nível 0</span>
-              <span id="bp-xp-label" style="color:var(--text-muted);"></span>
-            </div>
-            <div class="bp-bar"><div class="bp-fill" id="bp-fill"></div></div>
+          <div class="col-tabs">
+            <button class="col-tab active" id="tab-album">Álbum</button>
+            <button class="col-tab col-tab--dev" id="tab-loja" title="Em desenvolvimento">Loja <span class="nav-dev">EM BREVE</span></button>
           </div>
-          <div class="bp-chapter-nav" id="bp-chapter-nav"></div>
         </section>
 
-        <div id="bp-chapters"></div>
+        <div id="album-view">
+          <div id="characters-list"></div>
+        </div>
 
       </main>
     </div>
@@ -57,6 +55,6 @@
   <script src="js/core/modes.js"></script>
   <script src="js/core/battlepass.js"></script>
   <script src="js/core/collectibles.js"></script>
-  <script src="js/pages/passe.js"></script>
+  <script src="js/pages/colecao.js"></script>
 </body>
 </html>

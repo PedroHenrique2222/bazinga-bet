@@ -1,0 +1,163 @@
+/* Bazinga BET - Colecao (album de figurinhas dos Bazingas) */
+
+.col-hero {
+  background: linear-gradient(135deg, rgba(255, 45, 58, 0.12), rgba(255, 204, 0, 0.08));
+  border-color: rgba(255, 204, 0, 0.3);
+  margin-bottom: 20px;
+}
+
+.col-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.col-hero h1 { margin: 0 0 6px; font-size: 26px; font-weight: 900; }
+.col-hero p { margin: 0; color: var(--text-muted); font-size: 14px; max-width: 640px; }
+
+.col-total {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+  white-space: nowrap;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 18px;
+}
+
+:root[data-theme="dark"] .col-total { color: var(--yellow); }
+
+.col-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.col-tab {
+  font: inherit;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.col-tab.active {
+  border-color: var(--yellow);
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.3);
+  background: linear-gradient(120deg, var(--yellow), var(--yellow-dark));
+  color: #241a00;
+}
+
+.col-tab--dev {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.col-char {
+  margin-bottom: 18px;
+}
+
+.col-char-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.col-char-avatar {
+  font-size: 34px;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--panel-alt);
+  border: 2px solid var(--border);
+}
+
+.col-char--complete .col-char-avatar {
+  border-color: var(--yellow);
+  box-shadow: 0 0 16px rgba(255, 204, 0, 0.35);
+}
+
+.col-char-info { flex: 1; min-width: 0; }
+.col-char-info h2 { margin: 0; font-size: 17px; font-weight: 800; }
+.col-char-info p { margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted); }
+
+.col-char-progress {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.col-complete-badge {
+  font-size: 11px;
+  font-weight: 900;
+  color: #241a00;
+  background: linear-gradient(120deg, var(--yellow), #ff8a00);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+
+.col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+}
+
+.col-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  text-align: center;
+}
+
+.col-slot-icon { font-size: 26px; }
+
+.col-slot-name {
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-muted);
+}
+
+.col-slot--owned {
+  border-color: rgba(255, 204, 0, 0.4);
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.12);
+}
+
+.col-slot--owned .col-slot-name { color: var(--text); }
+
+.col-slot--locked {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+@media (max-width: 640px) {
+  .col-hero h1 { font-size: 21px; }
+  .col-total { font-size: 17px; padding: 6px 12px; }
+  .col-grid { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+  .col-slot-icon { font-size: 21px; }
+}

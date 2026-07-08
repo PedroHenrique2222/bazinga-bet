@@ -43,6 +43,77 @@
   transition: width 0.5s ease;
 }
 
+/* ---------- Navegacao rapida entre capitulos ---------- */
+
+.bp-chapter-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.bp-chapter-pill {
+  font: inherit;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 6px 12px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.bp-chapter-pill:hover { border-color: var(--yellow); color: var(--text); }
+
+.bp-chapter-pill.current {
+  border-color: var(--yellow);
+  color: var(--text);
+  background: linear-gradient(120deg, rgba(255, 45, 58, 0.16), rgba(255, 204, 0, 0.14));
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+}
+
+.bp-chapter-pill.done { color: var(--green); }
+
+/* ---------- Capitulos (blocos de 10 niveis) ---------- */
+
+.bp-chapter {
+  margin-top: 20px;
+  scroll-margin-top: 84px;
+}
+
+.bp-chapter-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.bp-chapter-icon {
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--panel-alt);
+  border: 2px solid var(--border);
+}
+
+.bp-chapter-info { flex: 1; min-width: 0; }
+.bp-chapter-info h2 { margin: 0; font-size: 17px; font-weight: 800; }
+.bp-chapter-info p { margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted); }
+
+.bp-chapter-progress {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
 /* trilha de recompensas em cards */
 .bp-track {
   display: grid;

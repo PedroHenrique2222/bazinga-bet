@@ -1,5 +1,39 @@
-/* Bazinga BET - pagina do Passe de Batalha */
+/* Bazinga BET - pagina do Passe de Batalha, organizada em capitulos de 10 niveis */
 (function () {
+  var CHAPTERS = [
+    { name: "Mesa de Iniciante", icon: "🎲" },
+    { name: "Rodada Quente", icon: "🔥" },
+    { name: "Turno da Sorte", icon: "🍀" },
+    { name: "Fichas Altas", icon: "💰" },
+    { name: "Meio da Noite", icon: "🌙" },
+    { name: "Salão VIP", icon: "🥂" },
+    { name: "Mesa dos Tubarões", icon: "🦈" },
+    { name: "Cofre da Casa", icon: "🔐" },
+    { name: "Lenda em Ascensão", icon: "⭐" },
+    { name: "Trono BZG", icon: "👑" }
+  ];
+  var TIERS_PER_CHAPTER = 10;
+
+  function tierCardHTML(t, i, prog) {
+    var reached = i < prog.reached;
+    var claimed = BZG.storage.isTierClaimed(i);
+    var cls = "bp-tier " + (claimed ? "claimed" : (reached ? "reachable" : "locked"));
+    var action;
+    if (claimed) {
+      action = '<div class="bp-status claimed">✓ Resgatado</div>';
+    } else if (reached) {
+      action = '<button class="bp-claim-btn" data-tier="' + i + '">Resgatar</button>';
+    } else {
+      action = '<div class="bp-status locked">🔒 ' + BZG.battlepass.xpForTier(i + 1).toLocaleString("pt-BR") + ' XP</div>';
+    }
+    return '<div class="' + cls + '">' +
+      '<span class="bp-lvl">Lv ' + (i + 1) + '</span>' +
+      '<div class="bp-icon">' + t.icon + '</div>' +
+      '<div class="bp-reward">' + t.label + '</div>' +
+      action +
+      '</div>';
+  }
+
   function render() {
     var prog = BZG.battlepass.progress();
     var tiers = BZG.battlepass.tiers();
@@ -10,28 +44,41 @@
       : Math.round(prog.xp) + " XP · faltam " + Math.max(0, Math.round(prog.nextXp - prog.xp)) + " XP p/ o próximo";
     document.getElementById("bp-fill").style.width = prog.intoPct + "%";
 
-    var track = document.getElementById("bp-track");
-    track.innerHTML = tiers.map(function (t, i) {
-      var reached = i < prog.reached;
-      var claimed = BZG.storage.isTierClaimed(i);
-      var cls = "bp-tier " + (claimed ? "claimed" : (reached ? "reachable" : "locked"));
-      var action;
-      if (claimed) {
-        action = '<div class="bp-status claimed">✓ Resgatado</div>';
-      } else if (reached) {
-        action = '<button class="bp-claim-btn" data-tier="' + i + '">Resgatar</button>';
-      } else {
-        action = '<div class="bp-status locked">🔒 ' + BZG.battlepass.xpForTier(i + 1).toLocaleString("pt-BR") + ' XP</div>';
-      }
-      return '<div class="' + cls + '">' +
-        '<span class="bp-lvl">Lv ' + (i + 1) + '</span>' +
-        '<div class="bp-icon">' + t.icon + '</div>' +
-        '<div class="bp-reward">' + t.label + '</div>' +
-        action +
-        '</div>';
-    }).join("");
+    var currentChapter = Math.min(CHAPTERS.length - 1, Math.floor(prog.reached / TIERS_PER_CHAPTER));
 
-    Array.prototype.forEach.call(track.querySelectorAll(".bp-claim-btn"), function (btn) {
+    var nav = CHAPTERS.map(function (ch, ci) {
+      var from = ci * TIERS_PER_CHAPTER + 1, to = from + TIERS_PER_CHAPTER - 1;
+      var doneCount = 0;
+      for (var i = from - 1; i < to; i++) if (BZG.storage.isTierClaimed(i)) doneCount++;
+      var cls = "bp-chapter-pill" + (ci === currentChapter ? " current" : "") + (doneCount === TIERS_PER_CHAPTER ? " done" : "");
+      return '<button class="' + cls + '" data-jump="chapter-' + ci + '">' + ch.icon + ' ' + (ci + 1) + '</button>';
+    }).join("");
+    document.getElementById("bp-chapter-nav").innerHTML = nav;
+
+    var chaptersHTML = CHAPTERS.map(function (ch, ci) {
+      var from = ci * TIERS_PER_CHAPTER, to = from + TIERS_PER_CHAPTER; // 0-based range [from, to)
+      var reachedInChapter = Math.max(0, Math.min(TIERS_PER_CHAPTER, prog.reached - from));
+      var claimedInChapter = 0;
+      for (var i = from; i < to; i++) if (BZG.storage.isTierClaimed(i)) claimedInChapter++;
+
+      var cards = "";
+      for (var t = from; t < to; t++) cards += tierCardHTML(tiers[t], t, prog);
+
+      return '<section class="panel bp-chapter" id="chapter-' + ci + '">' +
+        '<div class="bp-chapter-head">' +
+          '<div class="bp-chapter-icon">' + ch.icon + '</div>' +
+          '<div class="bp-chapter-info">' +
+            '<h2>Capítulo ' + (ci + 1) + ': ' + ch.name + '</h2>' +
+            '<p>Níveis ' + (from + 1) + '–' + to + '</p>' +
+          '</div>' +
+          '<div class="bp-chapter-progress">' + claimedInChapter + ' / ' + TIERS_PER_CHAPTER + ' resgatados</div>' +
+        '</div>' +
+        '<div class="bp-track">' + cards + '</div>' +
+      '</section>';
+    }).join("");
+    document.getElementById("bp-chapters").innerHTML = chaptersHTML;
+
+    Array.prototype.forEach.call(document.querySelectorAll(".bp-claim-btn"), function (btn) {
       btn.addEventListener("click", function () {
         var reward = BZG.battlepass.claim(Number(btn.dataset.tier));
         if (reward) {
@@ -44,6 +91,14 @@
           if (reward.r === "reloadBoost") BZG.ui.toast("💳 Recarregue mais: " + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + " agora!", "success");
           render();
         }
+      });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".bp-chapter-pill"), function (btn) {
+      btn.addEventListener("click", function () {
+        var target = document.getElementById(btn.dataset.jump);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        BZG.sounds.click();
       });
     });
   }

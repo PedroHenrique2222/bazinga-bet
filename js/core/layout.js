@@ -2,12 +2,15 @@
 window.BZG = window.BZG || {};
 
 BZG.layout = (function () {
-  /* paginas de jogo vivem em games/, as demais (lobby, perfil, config, passe,
-     cadastro) ficam na raiz. Calcula os prefixos uma vez, na hora que o script
-     carrega, a partir da URL atual - assim o mesmo layout.js serve os dois casos. */
+  /* paginas de jogo vivem em games/, minigames sem aposta vivem em minigames/, as
+     demais (lobby, perfil, config, passe, colecao, cadastro) ficam na raiz. Calcula
+     os prefixos uma vez, na hora que o script carrega, a partir da URL atual - assim
+     o mesmo layout.js serve os tres casos. */
   var IN_GAMES = /\/games\//.test(window.location.pathname);
-  var ROOT_PREFIX = IN_GAMES ? "../" : "";
-  var GAMES_PREFIX = IN_GAMES ? "" : "games/";
+  var IN_MINIGAMES = /\/minigames\//.test(window.location.pathname);
+  var ROOT_PREFIX = (IN_GAMES || IN_MINIGAMES) ? "../" : "";
+  var GAMES_PREFIX = IN_GAMES ? "" : (IN_MINIGAMES ? "../games/" : "games/");
+  var MINIGAMES_PREFIX = IN_MINIGAMES ? "" : (IN_GAMES ? "../minigames/" : "minigames/");
 
   var NAV_ITEMS = [
     { href: "index.html", root: true, icon: "🏠", label: "Lobby", page: "lobby" },
@@ -28,8 +31,14 @@ BZG.layout = (function () {
     { href: "coinflip.html", icon: "🔋", label: "Moeda da Pilha", page: "coinflip" }
   ];
 
+  /* minigames sem aposta: nao mexem no saldo, so dao XP e recorde pessoal */
+  var MINIGAME_ITEMS = [
+    { href: "torre.html", icon: "🧱", label: "Torre da Turma", page: "torre-minigame", minigame: true }
+  ];
+
   function navHref(item) {
-    return (item.root ? ROOT_PREFIX : GAMES_PREFIX) + item.href;
+    var prefix = item.root ? ROOT_PREFIX : (item.minigame ? MINIGAMES_PREFIX : GAMES_PREFIX);
+    return prefix + item.href;
   }
 
   /* Starburst comic: estrela de pontas alternadas gerada por codigo (fica simetrica e limpa) */
@@ -87,13 +96,27 @@ BZG.layout = (function () {
         '</a>';
     }).join("");
 
+    var minigameNav = MINIGAME_ITEMS.map(function (item) {
+      var cls = "nav-item" + (item.page === activePage ? " active" : "");
+      return '<a class="' + cls + '" href="' + navHref(item) + '">' +
+        '<span class="nav-icon">' + item.icon + '</span>' +
+        '<span class="nav-label">' + item.label + '</span>' +
+        '</a>';
+    }).join("");
+
     el.innerHTML = logoHTML() +
       '<nav class="sidebar-nav">' +
         '<div class="nav-group-title">Jogos</div>' +
         nav +
+        '<div class="nav-group-title">Minigames</div>' +
+        minigameNav +
       '</nav>' +
       '<div class="sidebar-footer">' +
         '<div class="online-count"><span class="online-dot"></span><span id="online-count-value">—</span> online</div>' +
+        '<a class="nav-item' + (activePage === "colecao" ? " active" : "") + '" href="' + ROOT_PREFIX + 'colecao.html">' +
+          '<span class="nav-icon">🎴</span>' +
+          '<span class="nav-label">Coleção</span>' +
+        '</a>' +
         '<a class="nav-item' + (activePage === "passe" ? " active" : "") + '" href="' + ROOT_PREFIX + 'passe.html">' +
           '<span class="nav-icon">🎫</span>' +
           '<span class="nav-label">Passe de Batalha</span>' +
@@ -127,6 +150,19 @@ BZG.layout = (function () {
     }
   }
 
+  // atualiza os 3 mini-campos da topbar (nivel, recorde de saldo, maior premio)
+  function refreshTopbarStats() {
+    var lvlEl = document.getElementById("topbar-level");
+    var peakEl = document.getElementById("topbar-peak");
+    var maxwinEl = document.getElementById("topbar-maxwin");
+    if (!lvlEl && !peakEl && !maxwinEl) return;
+    var lvl = BZG.storage.getLevel();
+    var stats = BZG.storage.getStats();
+    if (lvlEl) lvlEl.textContent = "Lv " + lvl.level;
+    if (peakEl) peakEl.textContent = BZG.ui.formatMoney(stats.peakBalance || 0);
+    if (maxwinEl) maxwinEl.textContent = BZG.ui.formatMoney(stats.maxWin || 0);
+  }
+
   function renderTopbar(title, icon) {
     var el = document.getElementById("topbar");
     if (!el) return;
@@ -135,6 +171,20 @@ BZG.layout = (function () {
       '<button class="icon-btn topbar-menu" id="menu-btn" title="Menu" aria-label="Abrir menu">☰</button>' +
       '<div class="topbar-title">' + (icon ? icon + " " : "") + (title || "") + '</div>' +
       '<div class="topbar-spacer"></div>' +
+      '<div class="topbar-stats">' +
+        '<div class="mini-stat" title="Seu nível atual">' +
+          '<span class="mini-stat-icon">⭐</span>' +
+          '<span id="topbar-level">Lv 1</span>' +
+        '</div>' +
+        '<div class="mini-stat" title="Recorde: maior saldo que você já teve">' +
+          '<span class="mini-stat-icon">📈</span>' +
+          '<span id="topbar-peak">BZ$ 0</span>' +
+        '</div>' +
+        '<div class="mini-stat" title="Maior prêmio ganho numa única aposta">' +
+          '<span class="mini-stat-icon">🏆</span>' +
+          '<span id="topbar-maxwin">BZ$ 0</span>' +
+        '</div>' +
+      '</div>' +
       '<div class="balance-box">' +
         '<span class="balance-label">Saldo</span>' +
         '<span id="balance-value">BZ$ 0</span>' +
@@ -145,6 +195,7 @@ BZG.layout = (function () {
       '<button class="icon-btn" id="theme-btn" title="Tema claro/escuro"></button>';
 
     BZG.ui.refreshBalance();
+    refreshTopbarStats();
 
     document.getElementById("reset-balance-btn").addEventListener("click", function () {
       var current = BZG.storage.getBalance();
@@ -302,7 +353,13 @@ BZG.layout = (function () {
         BZG.ui.refreshBalance();
         BZG.ui.toast("💳 Seu saldo zerou! Recarregamos automaticamente: " + BZG.ui.formatMoney(amount), "info");
       }
+      refreshTopbarStats();
       if (BZG.achievements) BZG.achievements.check();
+    });
+
+    // uma aposta especifica acabou de ser registrada: chance pequena de dropar colecionavel
+    document.addEventListener("bzg:bet-recorded", function () {
+      if (BZG.collectibles) BZG.collectibles.rollOnBet();
     });
 
     // bonus diario aparece pouco depois de carregar

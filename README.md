@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.5
+# 🎰 Bazinga BET — v1.6
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -14,33 +14,38 @@ Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-s
 BZG-BET/
 ├── index.html            Lobby (pagina inicial)
 ├── cadastro.html         Tela de cadastro/login (obrigatoria no 1o acesso)
-├── profile.html          Perfil do jogador (avatar, cor do nome, titulo, stats)
-├── passe.html            Passe de Batalha (100 niveis)
+├── profile.html          Perfil do jogador (avatar, cor do nome, titulo, temas, stats)
+├── passe.html            Passe de Batalha (100 niveis, em 10 capitulos)
+├── colecao.html          Colecao/album de figurinhas dos Bazingas
 ├── settings.html         Configuracoes (som, tema, turbo, conta)
 ├── favicon.svg
-├── games/                Todas as paginas de JOGO ficam aqui
+├── games/                Todas as paginas de JOGO (com aposta) ficam aqui
 │   ├── crash.html, double.html, mines.html, tower.html, plinko.html,
 │   │   dice.html, hilo.html, roulette.html, blackjack.html,
 │   │   raspadinha.html, limbo.html, coinflip.html, horse.html
 │   └── bazinguinha.html, bonanza.html   (EM DESENVOLVIMENTO - ver abaixo)
+├── minigames/            Minigames SEM aposta (nao mexem no saldo)
+│   └── torre.html        Torre da Turma - empilhar blocos, da XP e recorde pessoal
 ├── css/
 │   ├── style.css         Estilos globais (sidebar, topbar, cards, temas)
 │   ├── games/*.css       Estilo especifico de cada jogo
-│   └── pages/*.css       Estilo especifico de cada pagina (perfil, passe, config, cadastro)
+│   ├── minigames/*.css   Estilo especifico de cada minigame
+│   └── pages/*.css       Estilo especifico de cada pagina (perfil, passe, colecao, config, cadastro)
 └── js/
     ├── core/             Modulos compartilhados (ver tabela abaixo)
-    ├── games/*.js        Logica de cada jogo
-    └── pages/*.js        Logica de cada pagina (lobby, perfil, passe, config, cadastro)
+    ├── games/*.js        Logica de cada jogo (com aposta)
+    ├── minigames/*.js    Logica de cada minigame (sem aposta)
+    └── pages/*.js        Logica de cada pagina (lobby, perfil, passe, colecao, config, cadastro)
 ```
 
-Cada jogo é só HTML + CSS + JS puro, sem build. Um jogo em `games/` referencia os arquivos compartilhados com `../` (ex.: `../css/style.css`, `../js/core/storage.js`). As páginas da raiz (lobby, perfil, config, passe, cadastro) referenciam sem `../`.
+Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `minigames/` referencia os arquivos compartilhados com `../` (ex.: `../css/style.css`, `../js/core/storage.js`). As páginas da raiz (lobby, perfil, config, passe, coleção, cadastro) referenciam sem `../`.
 
 ### Módulos em `js/core/`
 
 | Arquivo | Função |
 |---|---|
-| `storage.js` | Tudo fica salvo em UM objeto no `localStorage` (`bazingaBetState`): saldo, conta, perfil, estatísticas, histórico, cosméticos, Passe de Batalha |
-| `layout.js` | Monta a sidebar e a topbar em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento |
+| `storage.js` | Tudo fica salvo em UM objeto no `localStorage` (`bazingaBetState`): saldo, conta, perfil, estatísticas (incl. recorde de saldo), histórico, cosméticos, Passe de Batalha, colecionáveis, recordes de minigame |
+| `layout.js` | Monta a sidebar e a topbar (com os mini-campos de Nível/Recorde/Maior Prêmio) em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento; calcula os prefixos de pasta (`games/`, `minigames/`, raiz) dinamicamente |
 | `theme.js` | Sistema de temas (dark/light + 6 temas extras desbloqueáveis no Passe) |
 | `sounds.js` | Efeitos sonoros e música ambiente, gerados por código (Web Audio API) |
 | `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador |
@@ -49,6 +54,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Um jogo em `games/` referencia
 | `achievements.js` | Lista de conquistas + verificação automática |
 | `modes.js` | Modo Turbo (acelera as animações) |
 | `battlepass.js` | Regras do Passe de Batalha |
+| `collectibles.js` | Catálogo dos 80 colecionáveis (álbum de figurinhas), drop aleatório a cada aposta, recompensa por álbum completo |
 
 ---
 
@@ -100,12 +106,27 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 - **100 níveis**, cada um custando **600 XP** (o XP é o mesmo do perfil: 1 XP a cada BZ$10 apostados) — são **60.000 XP** para zerar o passe.
 - **Não dá mais dinheiro direto.** Os níveis sem recompensa especial dão **+BZ$ 5.000 no valor de recarga** (o botão "Recarregar" fica maior a cada nível desses — ver `battlepass.js`, reward `reloadBoost`).
 - ~33 níveis-marco dão recompensas especiais: avatares, cores de nome, temas, títulos e o Modo Turbo (nível 30).
-- Progresso e resgate ficam em `passe.html`; o botão "Resgatar tudo" resgata todos os níveis já alcançados de uma vez.
+- **Organizado em 10 capítulos temáticos** de 10 níveis cada (ex.: "Mesa de Iniciante", "Salão VIP", "Trono BZG") — ver `CHAPTERS` em `js/pages/passe.js`. Uma barra de navegação rápida no topo pula direto para qualquer capítulo.
+- Progresso e resgate ficam em `passe.html`; o botão "Resgatar tudo" resgata todos os níveis já alcançados de uma vez, em qualquer capítulo.
+
+## 🎴 Coleção de colecionáveis
+
+- Um **álbum de figurinhas temáticas** dos 8 personagens da equipe BZG (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão), **10 itens cada = 80 no total** — ver `js/core/collectibles.js`.
+- **Drop aleatório**: toda aposta em qualquer jogo tem uma chance pequena (15%) de soltar uma figurinha aleatória — ver o evento `bzg:bet-recorded` (disparado por `storage.recordBet`) e o listener em `layout.js` que chama `collectibles.rollOnBet()`.
+- **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo).
+- Página própria em `colecao.html`, com aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve** — comprar pacotes com BZ$ é a próxima etapa, ainda não implementada.
+- No Perfil aparece um resumo compacto do progresso de cada personagem, com link para o álbum completo.
+
+## 🧱 Minigames (sem aposta)
+
+- Seção nova, separada dos jogos de aposta: minigames que **não mexem no saldo**, vivem em `minigames/` (com `css/minigames/` e `js/minigames/` próprios) e têm sua própria seção na sidebar.
+- **Torre da Turma** (`minigames/torre.html`): mecânica clássica de empilhar blocos (clique/espaço para soltar na hora certa). Cada andar dá XP de perfil/Passe; o melhor resultado fica salvo como recorde pessoal (`storage.reportMinigameScore`). Sem relação com o jogo de aposta "Lixeira do Linden" (Tower).
+- Mais minigames podem ser adicionados depois seguindo o mesmo padrão (`MINIGAME_ITEMS` em `layout.js`).
 
 ## ⚙️ Configurações
 
 - Música e efeitos sonoros (ligar/desligar)
-- Tema visual: dark/light + 6 temas extras (desbloqueados no Passe)
+- Tema visual: dark/light + 6 temas extras (desbloqueados no Passe) — também dá pra trocar pelo mostruário na página de Perfil
 - Modo Turbo: acelera as animações dos jogos (desbloqueado no Passe, nível 30)
 - Conta: editar perfil, ver saldo e valor de recarga atual, **sair da conta**
 - Zona de perigo: apagar todos os dados (saldo, perfil, histórico, conquistas e conta)
@@ -115,10 +136,11 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 - Todo jogador começa com **BZ$ 10.000**.
 - O botão "Recarregar" (na topbar e em Configurações) preenche o saldo até o **valor de recarga atual** (base + bônus do Passe de Batalha).
 - **Se o saldo chegar a zero**, o site recarrega sozinho automaticamente (sem precisar clicar em nada) e avisa com um toast — ver o listener central em `layout.js` (`bzg:balance-changed`).
+- **Topbar**: além do saldo, 3 mini-campos mostram sempre **Nível**, **Recorde de saldo** (maior saldo que o jogador já teve, `stats.peakBalance`) e **Maior prêmio** (maior pagamento em uma única aposta, `stats.maxWin`) — atualizam ao vivo a cada aposta/bônus/recarga.
 
 ## 🏆 Conquistas
 
-Mais de 65 conquistas em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, bônus diário, cosméticos desbloqueados, recargas automáticas e marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural). São verificadas automaticamente a cada aposta.
+**74 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, bônus diário, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis e recordes no minigame Torre da Turma. São verificadas automaticamente a cada aposta.
 
 ---
 
@@ -145,6 +167,16 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.6 (2026-07-08)
+- **Primeiros passos rumo à v2.0** (visão de multiplayer/placar de líderes com jogadores reais — ainda não implementada; tudo abaixo continua 100% local, sem backend):
+- **Topbar**: 3 mini-campos novos ao lado do saldo — Nível, Recorde de saldo (`stats.peakBalance`, novo) e Maior prêmio (`stats.maxWin`). `storage.js` agora rastreia o pico de saldo em todo ponto que altera o saldo (aposta, bônus diário, recarga manual/automática).
+- **Perfil reestruturado**: avatares, cores de nome, títulos e temas agora mostram **todos os itens possíveis**, os bloqueados com selo de cadeado 🔒 e dica de como desbloquear (Passe de Batalha ou Coleção) — antes só apareciam os já desbloqueados. Novas seções de Temas (mostruário com clique pra aplicar) e resumo da Coleção. Estatísticas ganharam "Recorde de saldo" e "Maior prêmio único".
+- **Passe de Batalha reestruturado em 10 capítulos temáticos** de 10 níveis cada, com navegação rápida por capítulo (era uma lista única com os 100 níveis em sequência).
+- **Coleção de colecionáveis** (novo sistema): álbum de 80 figurinhas (8 personagens BZG × 10), com drop aleatório a cada aposta (15% de chance) e avatar exclusivo ao completar o álbum de um personagem. Nova página `colecao.html`; aba "Loja" já visível mas marcada Em breve.
+- **Minigame sem aposta**: "Torre da Turma" (`minigames/torre.html`) — empilhar blocos sem arriscar fichas, dá XP e guarda recorde pessoal. Nova pasta `minigames/` (com `css/minigames/`, `js/minigames/`) e nova seção "Minigames" na sidebar, preparada para receber mais minigames no futuro.
+- **+7 conquistas novas** (total 74): progresso na Coleção (primeira figurinha, 20, 50, álbum completo de 1 personagem, todos os 8) e recordes na Torre da Turma (10 e 25 andares).
+- Corrigido durante o desenvolvimento: `claimBonus()` não estava atualizando o recorde de saldo (`peakBalance`) ao creditar o bônus diário.
 
 ### v1.5 (2026-07-08)
 - **Reorganização completa de pastas**: todos os HTML de jogo foram movidos para `games/`; só lobby, perfil, config, passe e o novo cadastro ficam na raiz. `layout.js` calcula os caminhos dinamicamente (raiz vs. `games/`).

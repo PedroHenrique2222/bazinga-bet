@@ -42,7 +42,7 @@
                 Salvar perfil
               </button>
               <p style="color:var(--text-muted); font-size:12px; margin:10px 0 0; text-align:center;">
-                Desbloqueie mais avatares, cores e títulos no <a href="passe.html" style="color:var(--yellow-dark); font-weight:700;">Passe de Batalha</a> 🎫
+                Itens com 🔒 se desbloqueiam no <a href="passe.html" style="color:var(--yellow-dark); font-weight:700;">Passe de Batalha</a> 🎫 ou completando a <a href="colecao.html" style="color:var(--yellow-dark); font-weight:700;">Coleção</a> 🎴
               </p>
             </div>
           </section>
@@ -63,6 +63,20 @@
             <section class="panel" style="margin-bottom:20px;">
               <h2 class="section-title">📊 Suas estatísticas</h2>
               <div class="stats-grid" id="stats-grid"></div>
+            </section>
+
+            <section class="panel" style="margin-bottom:20px;">
+              <h2 class="section-title">🎨 Temas</h2>
+              <div class="theme-picker" id="theme-picker"></div>
+              <p style="color:var(--text-muted); font-size:12.5px; margin:10px 0 0;">
+                O tema aplicado aqui vale pro site inteiro (também pode trocar rápido pelo ícone da topbar).
+              </p>
+            </section>
+
+            <section class="panel" style="margin-bottom:20px;">
+              <h2 class="section-title">🎴 Coleção <span id="collection-total" style="color:var(--yellow-dark);"></span></h2>
+              <div class="collection-summary" id="collection-summary"></div>
+              <a href="colecao.html" class="btn btn--ghost btn--sm" style="margin-top:14px; display:inline-block;">Ver álbum completo</a>
             </section>
 
             <section class="panel" style="margin-bottom:20px;">
@@ -93,6 +107,7 @@
   <script src="js/core/achievements.js"></script>
   <script src="js/core/modes.js"></script>
   <script src="js/core/battlepass.js"></script>
+  <script src="js/core/collectibles.js"></script>
   <script src="js/pages/profile.js"></script>
 </body>
 </html>

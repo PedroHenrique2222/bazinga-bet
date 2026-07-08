@@ -49,6 +49,7 @@
 }
 
 .avatar-option {
+  position: relative;
   font-size: 22px;
   padding: 8px 0;
   border-radius: var(--radius-sm);
@@ -67,6 +68,46 @@
   border-color: var(--yellow);
   box-shadow: 0 0 12px rgba(255, 204, 0, 0.4);
   background: rgba(255, 204, 0, 0.12);
+}
+
+/* ---------- Itens bloqueados (avatar/cor/titulo/tema): mostra o item real, opaco, com cadeado ---------- */
+
+.avatar-option.locked,
+.color-option.locked,
+.title-option.locked,
+.theme-option.locked {
+  opacity: 0.45;
+  filter: grayscale(0.7);
+  cursor: not-allowed;
+}
+
+.avatar-option.locked:hover { transform: none; border-color: var(--border); }
+
+.lock-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.color-option.locked .lock-badge,
+.title-option.locked .lock-badge {
+  position: static;
+  width: auto;
+  height: auto;
+  background: none;
+  border: none;
+  box-shadow: none;
+  margin-left: 4px;
 }
 
 .level-info {
@@ -126,4 +167,70 @@
 .color-option.selected, .title-option.selected {
   border-color: var(--yellow);
   box-shadow: 0 0 10px rgba(255, 204, 0, 0.35);
+}
+
+/* ---------- Mostruario de temas ---------- */
+
+.theme-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.theme-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 12.5px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+}
+
+.theme-option .opt-icon { font-size: 15px; }
+
+.theme-option.selected {
+  border-color: var(--yellow);
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.35);
+}
+
+/* ---------- Resumo da Colecao ---------- */
+
+.collection-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+}
+
+.collection-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  font-size: 20px;
+  opacity: 0.6;
+  filter: grayscale(0.5);
+}
+
+.collection-mini.complete {
+  opacity: 1;
+  filter: none;
+  border-color: rgba(255, 204, 0, 0.45);
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.18);
+}
+
+.collection-mini-count {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--text-muted);
 }

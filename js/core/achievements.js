@@ -201,7 +201,25 @@ BZG.achievements = (function () {
     { id: "coinflip-20wins", icon: "🔋", name: "Moeda favorável", desc: "Vença 20 vezes na Moeda da Pilha",
       check: function (s) { return gameWinCount(s, "coinflip") >= 20; } },
     { id: "horse-10wins", icon: "🏇", name: "Jóquei sortudo", desc: "Vença 10 corridas na Corrida BZG",
-      check: function (s) { return gameWinCount(s, "horse") >= 10; } }
+      check: function (s) { return gameWinCount(s, "horse") >= 10; } },
+
+    /* ---------- Colecionaveis ---------- */
+    { id: "col-first", icon: "🎴", name: "Primeira figurinha", desc: "Ganhe seu primeiro colecionável jogando",
+      check: function (s) { return Object.keys(s.collectibles.owned).length >= 1; } },
+    { id: "col-20", icon: "🎴", name: "Álbum enchendo", desc: "Junte 20 colecionáveis",
+      check: function (s) { return Object.keys(s.collectibles.owned).length >= 20; } },
+    { id: "col-50", icon: "🎴", name: "Quase completo", desc: "Junte 50 colecionáveis",
+      check: function (s) { return Object.keys(s.collectibles.owned).length >= 50; } },
+    { id: "col-set-1", icon: "🏆", name: "Álbum fechado", desc: "Complete o conjunto de figurinhas de um personagem BZG",
+      check: function () { return BZG.collectibles && BZG.collectibles.characters().some(function (c) { return BZG.collectibles.isSetComplete(c.key); }); } },
+    { id: "col-set-all", icon: "👑", name: "Colecionador supremo", desc: "Complete o álbum de todos os 8 personagens BZG",
+      check: function () { return BZG.collectibles && BZG.collectibles.characters().every(function (c) { return BZG.collectibles.isSetComplete(c.key); }); } },
+
+    /* ---------- Minigame Torre da Turma ---------- */
+    { id: "torre-10", icon: "🧱", name: "Construtor", desc: "Alcance 10 andares na Torre da Turma",
+      check: function (s) { return (s.minigames.torre && s.minigames.torre.bestFloor || 0) >= 10; } },
+    { id: "torre-25", icon: "🏗️", name: "Arquiteto BZG", desc: "Alcance 25 andares na Torre da Turma",
+      check: function (s) { return (s.minigames.torre && s.minigames.torre.bestFloor || 0) >= 25; } }
   ];
 
   function all() {
