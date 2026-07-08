@@ -35,16 +35,16 @@
             </button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              8 ou mais gemas iguais (em qualquer lugar) pagam. Elas somem, novas caem: é a cascata!
+              5 ou mais gemas iguais coladas (na horizontal ou vertical) pagam. Elas explodem, novas caem: é a cascata!
             </p>
 
             <div class="paytable">
-              <h2 class="section-title" style="margin-top:20px;">Paga em qualquer lugar</h2>
-              <div class="paytable-row"><span>⚡ ×12+</span><strong>20x</strong></div>
-              <div class="paytable-row"><span>💎 ×12+</span><strong>10x</strong></div>
-              <div class="paytable-row"><span>🔴 ×12+</span><strong>6x</strong></div>
-              <div class="paytable-row"><span>🟠 ×12+</span><strong>4x</strong></div>
-              <div class="paytable-row"><span>💥 NUCLEAR</span><strong>×2 a ×10</strong></div>
+              <h2 class="section-title" style="margin-top:20px;">Cluster (gemas coladas)</h2>
+              <div class="paytable-row"><span>Cluster</span><strong>a partir de 5 gemas</strong></div>
+              <div class="paytable-row"><span>💎 diamante</span><strong>paga mais</strong></div>
+              <div class="paytable-row"><span>🔴 vermelho</span><strong>alto</strong></div>
+              <div class="paytable-row"><span>Cluster maior</span><strong>prêmio maior</strong></div>
+              <div class="paytable-row"><span>🔥 Febre do Ouro</span><strong>×2 a ×25</strong></div>
             </div>
 
             <div class="history-list">
@@ -54,6 +54,10 @@
           </section>
 
           <section class="panel stage" id="bonanza-stage">
+            <div class="bonanza-meter" id="bonanza-meter">
+              <span class="bonanza-meter-label">🔥 Febre do Ouro</span>
+              <div class="bonanza-meter-bar"><div class="bonanza-meter-fill" id="bonanza-meter-fill"></div></div>
+            </div>
             <div class="bonanza-frame">
               <div class="bonanza-grid" id="bonanza-grid"></div>
               <div class="bonanza-banner" id="bonanza-banner"></div>

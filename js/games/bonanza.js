@@ -1,24 +1,25 @@
-/* Bazinga BET - Bazinga Bonanza: grade 6x5, paga em qualquer lugar (>=8 iguais),
-   cascata (vencedores somem, novas gemas caem) + multiplicador NUCLEAR.
-   Pagamentos calibrados por Monte Carlo (2M giros): RTP ~92%. */
+/* Bazinga BET - Bazinga Bonanza (estilo Gems Bonanza): grade 8x8, CLUSTER PAYS
+   (5+ gemas iguais coladas na horizontal/vertical pagam), cascata (vencedores somem,
+   novas gemas caem) e a FEBRE DO OURO: encha o medidor coletando gemas para um
+   multiplicador. Pagamentos calibrados por Monte Carlo (2M giros): RTP ~92%. */
 (function () {
-  var COLS = 6, ROWS = 5;
-  var SCALE = 2.85;
+  var COLS = 8, ROWS = 8;
+  var SCALE = 5.0;
+  var MIN_CLUSTER = 5;     // minimo de gemas coladas para pagar
+  var FEAT_THRESH = 30;    // gemas coletadas no giro para ativar a Febre do Ouro
 
   var SYMBOLS = [
-    { icon: "🔵", weight: 16, pays: [0.2, 0.5, 1.5] },
-    { icon: "🟢", weight: 15, pays: [0.2, 0.6, 1.8] },
-    { icon: "🟣", weight: 14, pays: [0.3, 0.7, 2] },
-    { icon: "🟡", weight: 13, pays: [0.4, 0.9, 3] },
-    { icon: "🟠", weight: 12, pays: [0.5, 1.1, 4] },
-    { icon: "🔴", weight: 10, pays: [0.7, 1.5, 6] },
-    { icon: "💎", weight: 8,  pays: [1.2, 2.5, 10] },
-    { icon: "⚡", weight: 5,  pays: [2, 4, 20] }
+    { icon: "🔵", weight: 22, base: 0.020 },
+    { icon: "🟢", weight: 20, base: 0.030 },
+    { icon: "🟣", weight: 18, base: 0.042 },
+    { icon: "🟡", weight: 15, base: 0.060 },
+    { icon: "🔴", weight: 12, base: 0.100 },
+    { icon: "💎", weight: 8,  base: 0.200 }
   ];
   var TOTALW = SYMBOLS.reduce(function (s, x) { return s + x.weight; }, 0);
-  var BYICON = {}; SYMBOLS.forEach(function (s) { BYICON[s.icon] = s; });
+  var BASE = {}; SYMBOLS.forEach(function (s) { BASE[s.icon] = s.base; });
 
-  var betInput, spinBtn, statusEl, historyListEl, gridEl, bannerEl, winEl, stageEl;
+  var betInput, spinBtn, statusEl, historyListEl, gridEl, bannerEl, winEl, stageEl, meterFillEl, meterEl;
   var grid = [];      // grid[c][r], r=0 topo
   var spinning = false;
 
@@ -31,59 +32,88 @@
     return SYMBOLS[SYMBOLS.length - 1].icon;
   }
 
-  function payFor(icon, count) {
-    if (count < 8) return 0;
-    var p = BYICON[icon].pays;
-    if (count <= 9) return p[0];
-    if (count <= 11) return p[1];
-    return p[2];
-  }
+  function sizeFactor(s) { return Math.pow(s - (MIN_CLUSTER - 1), 1.5); }
 
   function newGrid() {
     grid = [];
     for (var c = 0; c < COLS; c++) { grid[c] = []; for (var r = 0; r < ROWS; r++) grid[c][r] = pick(); }
   }
 
-  function evaluate() {
-    var counts = {};
-    for (var c = 0; c < COLS; c++) for (var r = 0; r < ROWS; r++) counts[grid[c][r]] = (counts[grid[c][r]] || 0) + 1;
-    var pay = 0, winners = {};
-    Object.keys(counts).forEach(function (icon) {
-      var p = payFor(icon, counts[icon]);
-      if (p > 0) { pay += p; winners[icon] = true; }
-    });
-    return { pay: pay, winners: winners };
+  function blankGrid() {
+    var m = [];
+    for (var c = 0; c < COLS; c++) { m[c] = []; for (var r = 0; r < ROWS; r++) m[c][r] = false; }
+    return m;
   }
 
-  function tumble(winners) {
+  /* acha todos os clusters (>=MIN_CLUSTER) conectados em 4 direcoes.
+     retorna { pay, remove (grade bool das gemas premiadas), removed } */
+  function evaluate() {
+    var seen = blankGrid();
+    var remove = blankGrid();
+    var pay = 0, removed = 0;
+
+    for (var c = 0; c < COLS; c++) {
+      for (var r = 0; r < ROWS; r++) {
+        if (seen[c][r]) continue;
+        var icon = grid[c][r];
+        var stack = [[c, r]]; seen[c][r] = true;
+        var cells = [];
+        while (stack.length) {
+          var cur = stack.pop(); cells.push(cur);
+          var cc = cur[0], rr = cur[1];
+          var nb = [[cc + 1, rr], [cc - 1, rr], [cc, rr + 1], [cc, rr - 1]];
+          for (var k = 0; k < 4; k++) {
+            var nc = nb[k][0], nr = nb[k][1];
+            if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) continue;
+            if (seen[nc][nr]) continue;
+            if (grid[nc][nr] === icon) { seen[nc][nr] = true; stack.push([nc, nr]); }
+          }
+        }
+        if (cells.length >= MIN_CLUSTER) {
+          pay += BASE[icon] * sizeFactor(cells.length);
+          removed += cells.length;
+          for (var m = 0; m < cells.length; m++) remove[cells[m][0]][cells[m][1]] = true;
+        }
+      }
+    }
+    return { pay: pay, remove: remove, removed: removed };
+  }
+
+  function tumble(remove) {
     for (var c = 0; c < COLS; c++) {
       var kept = [];
-      for (var r = 0; r < ROWS; r++) if (!winners[grid[c][r]]) kept.push(grid[c][r]);
+      for (var r = 0; r < ROWS; r++) if (!remove[c][r]) kept.push(grid[c][r]);
       var col = [];
       for (var m = 0; m < ROWS - kept.length; m++) col.push(pick());
       grid[c] = col.concat(kept);
     }
   }
 
-  function rollMult() {
-    if (Math.random() >= 0.09) return 1;
+  function drawFeat() {
     var r = Math.random();
-    if (r < 0.60) return 2;
-    if (r < 0.85) return 3;
-    if (r < 0.95) return 5;
-    return 10;
+    if (r < 0.50) return 2;
+    if (r < 0.80) return 3;
+    if (r < 0.93) return 5;
+    if (r < 0.985) return 10;
+    return 25;
   }
 
-  function renderGrid(winners, drop) {
+  function renderGrid(remove, drop) {
     var html = "";
     for (var r = 0; r < ROWS; r++) {
       for (var c = 0; c < COLS; c++) {
         var icon = grid[c][r];
-        var cls = "gem" + (drop ? " drop" : "") + (winners && winners[icon] ? " win" : "");
+        var cls = "gem" + (drop ? " drop" : "") + (remove && remove[c][r] ? " win" : "");
         html += '<div class="' + cls + '">' + icon + '</div>';
       }
     }
     gridEl.innerHTML = html;
+  }
+
+  function setMeter(collected) {
+    var pct = Math.min(100, (collected / FEAT_THRESH) * 100);
+    if (meterFillEl) meterFillEl.style.width = pct + "%";
+    if (meterEl) meterEl.classList.toggle("full", pct >= 100);
   }
 
   function renderHistory() {
@@ -118,48 +148,53 @@
     spinBtn.disabled = true;
     winEl.textContent = "";
     winEl.className = "bonanza-win";
+    setMeter(0);
     setStatus("Girando...");
     BZG.sounds.bet();
 
     newGrid();
     renderGrid(null, true);
 
-    var totalPay = 0;
+    var totalPay = 0, collected = 0;
 
     function step() {
       var ev = evaluate();
       if (ev.pay <= 0) {
-        finish(totalPay, bet);
+        finish(totalPay, collected, bet);
         return;
       }
       totalPay += ev.pay;
-      renderGrid(ev.winners, false); // destaca vencedores
+      collected += ev.removed;
+      renderGrid(ev.remove, false);   // destaca clusters vencedores
+      setMeter(collected);
       BZG.sounds.pegHit();
       setTimeout(function () {
-        tumble(ev.winners);
-        renderGrid(null, true);     // cascata
+        tumble(ev.remove);
+        renderGrid(null, true);       // cascata
         BZG.sounds.tick();
-        setTimeout(step, spd(320));
-      }, spd(650));
+        setTimeout(step, spd(300));
+      }, spd(640));
     }
     setTimeout(step, spd(400));
   }
 
-  function finish(totalPay, bet) {
+  function finish(totalPay, collected, bet) {
     var mult = 1;
-    if (totalPay > 0) mult = rollMult();
-    var effMult = totalPay * mult * SCALE;
+    var feature = totalPay > 0 && collected >= FEAT_THRESH;
+    if (feature) mult = drawFeat();
+
+    var effMult = totalPay * SCALE * mult;
     var payout = Math.round(bet * effMult);
     var won = payout > 0;
 
-    if (mult > 1) {
-      showBanner(mult >= 5 ? "NUCLEAR ×" + mult : "×" + mult);
+    if (feature) {
+      showBanner("FEBRE DO OURO ×" + mult);
       BZG.sounds.jackpot();
     }
 
     BZG.storage.recordBet("bonanza", {
       bet: bet, multiplier: effMult, payout: payout, won: won,
-      detail: won ? effMult.toFixed(2) + "x" + (mult > 1 ? " 💥×" + mult : "") : "sem ganho"
+      detail: won ? effMult.toFixed(2) + "x" + (feature ? " 🔥×" + mult : "") : "sem ganho"
     });
     BZG.ui.refreshBalance();
     document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
@@ -177,11 +212,12 @@
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, big ? 110 : 55);
       if (effMult >= 20 || payout >= 25000) BZG.effects.bigWin(payout, effMult);
     } else {
-      winEl.textContent = "Sem gemas suficientes... gire de novo!";
-      setStatus("Nenhuma combinação de 8+. Tente outra vez!");
+      winEl.textContent = "Sem clusters... gire de novo!";
+      setStatus("Nenhum cluster de 5+ gemas. Tente outra vez!");
       BZG.sounds.lose();
     }
 
+    setMeter(0);
     spinning = false;
     betInput.disabled = false;
     spinBtn.disabled = false;
@@ -201,9 +237,12 @@
     bannerEl = document.getElementById("bonanza-banner");
     winEl = document.getElementById("bonanza-win");
     stageEl = document.getElementById("bonanza-stage");
+    meterEl = document.getElementById("bonanza-meter");
+    meterFillEl = document.getElementById("bonanza-meter-fill");
 
     newGrid();
     renderGrid(null, false);
+    setMeter(0);
     BZG.ui.refreshBalance();
     renderHistory();
 

@@ -8,18 +8,18 @@
 .bonanza-frame {
   position: relative;
   width: 100%;
-  max-width: 460px;
+  max-width: 480px;
   background: linear-gradient(170deg, #5a3410, #3a2109);
   border: 3px solid #b98a2a;
   border-radius: 16px;
-  padding: 10px;
+  padding: 9px;
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5), 0 14px 34px rgba(0, 0, 0, 0.45);
 }
 
 .bonanza-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -29,11 +29,52 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(20px, 6vw, 34px);
-  border-radius: 8px;
+  font-size: clamp(13px, 4.2vw, 28px);
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
+
+/* medidor da Febre do Ouro */
+.bonanza-meter {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bonanza-meter-label {
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  color: var(--yellow-dark);
+}
+:root[data-theme="dark"] .bonanza-meter-label { color: var(--yellow); }
+
+.bonanza-meter-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.bonanza-meter-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff8a00, #ffd400);
+  transition: width 0.3s ease;
+}
+
+.bonanza-meter.full .bonanza-meter-fill {
+  background: linear-gradient(90deg, #ffd400, #fff3b0, #ffd400);
+  box-shadow: 0 0 14px rgba(255, 212, 0, 0.8);
+}
+.bonanza-meter.full .bonanza-meter-label { animation: meter-flash 0.5s ease-in-out infinite alternate; }
+@keyframes meter-flash { from { opacity: 0.6; } to { opacity: 1; } }
 
 .gem.drop { animation: gem-drop 0.32s cubic-bezier(0.3, 1.2, 0.5, 1); }
 @keyframes gem-drop {
@@ -51,7 +92,7 @@
   to { transform: scale(1.12); }
 }
 
-/* banner NUCLEAR / multiplicador */
+/* banner Febre do Ouro / multiplicador */
 .bonanza-banner {
   position: absolute;
   top: 50%;
