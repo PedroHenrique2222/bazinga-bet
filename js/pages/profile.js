@@ -4,9 +4,9 @@
   var GAME_LABELS = {
     crash: "🛶 Canoa Furada", mines: "🥒 Mines do Pikles", plinko: "🎃 Plinko da Abóbora",
     double: "🎡 Double", tower: "🗑️ Lixeira do Linden", dice: "🎲 Dado 616", hilo: "🃏 HiLo do Panetone",
-    slots: "🎰 Slots", roulette: "🎯 Roleta", blackjack: "🍑 21 do Bogão",
+    roulette: "🎯 Roleta", blackjack: "🍑 21 do Bogão",
     bazinguinha: "🐯 Bazinguinha", raspadinha: "🎟️ Raspadinha", limbo: "📉 Limbo",
-    wheel: "🎡 Roda da Sorte", coinflip: "🔋 Moeda da Pilha",
+    coinflip: "🔋 Moeda da Pilha",
     bonanza: "💎 Bazinga Bonanza", horse: "🏇 Corrida BZG", stack: "🏗️ Torre BZG"
   };
 

@@ -16,8 +16,6 @@
     { id: "blackjack", href: "blackjack.html", icon: "🍑", name: "21 do Bogão", desc: "Vença o Bogão no blackjack." },
     { id: "raspadinha", href: "raspadinha.html", icon: "🎟️", name: "Raspadinha", desc: "Raspe e ache 3 iguais para ganhar.", badge: "NOVO" },
     { id: "limbo", href: "limbo.html", icon: "📉", name: "Limbo", desc: "Passou do seu alvo? Você ganha.", badge: "NOVO" },
-    { id: "wheel", href: "wheel.html", icon: "🎡", name: "Roda da Sorte", desc: "Gire a roda até 15x.", badge: "NOVO" },
-    { id: "slots", href: "slots.html", icon: "🎰", name: "Slots", desc: "Jackpot BAZINGA de 500x!" },
     { id: "roulette", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x." }
   ];
 

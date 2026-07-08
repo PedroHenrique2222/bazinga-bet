@@ -11,7 +11,6 @@ BZG.layout = (function () {
     { href: "plinko.html", icon: "🎃", label: "Plinko da Abóbora", page: "plinko" },
     { href: "dice.html", icon: "🎲", label: "Dado 616", page: "dice" },
     { href: "hilo.html", icon: "🃏", label: "HiLo do Panetone", page: "hilo" },
-    { href: "slots.html", icon: "🎰", label: "Slots", page: "slots" },
     { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette" },
     { href: "blackjack.html", icon: "🍑", label: "21 do Bogão", page: "blackjack" },
     { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha", hot: true },
@@ -20,7 +19,6 @@ BZG.layout = (function () {
     { href: "stack.html", icon: "🏗️", label: "Torre BZG", page: "stack", hot: true },
     { href: "raspadinha.html", icon: "🎟️", label: "Raspadinha", page: "raspadinha" },
     { href: "limbo.html", icon: "📉", label: "Limbo", page: "limbo" },
-    { href: "wheel.html", icon: "🎡", label: "Roda da Sorte", page: "wheel" },
     { href: "coinflip.html", icon: "🔋", label: "Moeda da Pilha", page: "coinflip" }
   ];
 
