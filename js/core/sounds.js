@@ -1,17 +1,14 @@
-/* Bazinga BET - efeitos sonoros e musica ambiente via Web Audio API (sem arquivos externos) */
+/* Bazinga BET - efeitos sonoros (Web Audio API, sem arquivos externos) e
+   musica ambiente (video do YouTube em loop, escondido - so o audio conta).
+   A musica ambiente e a UNICA parte do site que depende de internet: sem
+   conexao, os efeitos sonoros e o resto do site continuam funcionando 100%
+   local, so a musica de fundo nao toca. */
 window.BZG = window.BZG || {};
 
 BZG.sounds = (function () {
-  var MUSIC_VOL = 0.05;
-  var BAR_MS = 3800;       // duracao de cada acorde
-  var NOTE_LEN = 4.6;      // notas mais longas que o compasso = transicao suave
-
   var ctx = null;
   var sfxOn = true;
   var musicOn = true;
-  var musicBus = null;     // filtro -> gain -> destino
-  var musicTimer = null;
-  var chordIndex = 0;
 
   /* preferencias salvas (migra o antigo botao unico de mudo, se existir) */
   try {
@@ -61,112 +58,82 @@ BZG.sounds = (function () {
     }
   }
 
-  /* ---------- Musica ambiente ----------
-     Progressao Am - F - C - G com vozes proximas (transicoes suaves):
-     pads de triangulo passando por um filtro grave, baixo discreto e um
-     "brilho" ocasional. Acordes de 4.6s sobrepostos a cada 3.8s = sem picote. */
+  /* ---------- Musica ambiente: video do YouTube em loop, escondido ----------
+     So o audio importa - o player fica num divzinho de 1x1px, sem controles,
+     sem aparecer na tela. Precisa de internet; sem ela, so a musica de fundo
+     nao toca (o resto do site, incluindo os efeitos sonoros acima, e local). */
 
-  var CHORDS = [
-    { pad: [220.0, 261.63, 329.63, 440.0], bass: 110.0 },   // Am
-    { pad: [220.0, 261.63, 349.23, 440.0], bass: 87.31 },   // F/A
-    { pad: [196.0, 261.63, 329.63, 392.0], bass: 130.81 },  // C/G
-    { pad: [196.0, 246.94, 293.66, 392.0], bass: 98.0 }     // G
-  ];
-  var SPARKLE_NOTES = [880, 987.77, 1174.66, 1318.51]; // pentatonica de La menor
+  var YT_VIDEO_ID = "PaFHwTjy1yE";
+  var YT_VOLUME = 25; // 0-100
 
-  function ensureMusicBus() {
-    var audioCtx = getContext();
-    if (musicBus) return audioCtx;
-    var gain = audioCtx.createGain();
-    gain.gain.value = MUSIC_VOL;
-    var filter = audioCtx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 950;
-    filter.Q.value = 0.5;
-    filter.connect(gain);
-    gain.connect(audioCtx.destination);
-    musicBus = { gain: gain, input: filter };
-    return audioCtx;
+  var ytPlayer = null;
+  var ytReady = false;
+  var ytApiLoading = false;
+  var wantPlaying = false; // true = deveria estar tocando assim que o player ficar pronto
+
+  function ensureYtApiLoaded(onReady) {
+    if (window.YT && window.YT.Player) { onReady(); return; }
+    var prevCallback = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = function () {
+      if (typeof prevCallback === "function") prevCallback();
+      onReady();
+    };
+    if (ytApiLoading) return;
+    ytApiLoading = true;
+    try {
+      var tag = document.createElement("script");
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(tag);
+    } catch (e) { /* sem internet ou bloqueado - musica de fundo so nao toca */ }
   }
 
-  function playChord(chord) {
+  function createYtPlayer() {
+    if (ytPlayer) return;
+    var holder = document.createElement("div");
+    holder.id = "bzg-yt-music";
+    holder.style.cssText = "position:fixed; left:0; bottom:0; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;";
+    document.body.appendChild(holder);
+
     try {
-      var audioCtx = ensureMusicBus();
-      var now = audioCtx.currentTime;
-
-      // pad: cada nota com dois osciladores levemente desafinados
-      for (var i = 0; i < chord.pad.length; i++) {
-        for (var d = 0; d < 2; d++) {
-          var osc = audioCtx.createOscillator();
-          var g = audioCtx.createGain();
-          osc.type = "triangle";
-          osc.frequency.value = chord.pad[i];
-          osc.detune.value = d === 0 ? -4 : 4;
-          g.gain.setValueAtTime(0.0001, now);
-          g.gain.linearRampToValueAtTime(0.5, now + 1.2);
-          g.gain.setValueAtTime(0.5, now + NOTE_LEN - 2.2);
-          g.gain.exponentialRampToValueAtTime(0.0001, now + NOTE_LEN);
-          osc.connect(g);
-          g.connect(musicBus.input);
-          osc.start(now);
-          osc.stop(now + NOTE_LEN + 0.05);
+      ytPlayer = new window.YT.Player("bzg-yt-music", {
+        videoId: YT_VIDEO_ID,
+        playerVars: {
+          autoplay: 0, controls: 0, disablekb: 1, fs: 0,
+          modestbranding: 1, rel: 0, iv_load_policy: 3,
+          loop: 1, playlist: YT_VIDEO_ID // "loop" sozinho nao repete video unico, precisa do playlist
+        },
+        events: {
+          onReady: function () {
+            ytReady = true;
+            ytPlayer.setVolume(YT_VOLUME);
+            if (wantPlaying) ytPlayer.playVideo();
+          },
+          onStateChange: function (e) {
+            // reforco do loop, caso o truque do playlist falhe
+            if (e.data === window.YT.PlayerState.ENDED) {
+              ytPlayer.seekTo(0);
+              ytPlayer.playVideo();
+            }
+          }
         }
-      }
-
-      // grave suave
-      var bass = audioCtx.createOscillator();
-      var bg = audioCtx.createGain();
-      bass.type = "sine";
-      bass.frequency.value = chord.bass;
-      bg.gain.setValueAtTime(0.0001, now);
-      bg.gain.linearRampToValueAtTime(0.9, now + 0.8);
-      bg.gain.setValueAtTime(0.9, now + NOTE_LEN - 2);
-      bg.gain.exponentialRampToValueAtTime(0.0001, now + NOTE_LEN);
-      bass.connect(bg);
-      bg.connect(musicBus.input);
-      bass.start(now);
-      bass.stop(now + NOTE_LEN + 0.05);
-
-      // brilho ocasional: nota aguda curtinha, bem baixa
-      if (Math.random() < 0.4) {
-        var sp = audioCtx.createOscillator();
-        var sg = audioCtx.createGain();
-        sp.type = "sine";
-        sp.frequency.value = SPARKLE_NOTES[Math.floor(Math.random() * SPARKLE_NOTES.length)];
-        var spStart = now + 0.8 + Math.random() * 1.6;
-        sg.gain.setValueAtTime(0.0001, spStart);
-        sg.gain.exponentialRampToValueAtTime(0.18, spStart + 0.04);
-        sg.gain.exponentialRampToValueAtTime(0.0001, spStart + 1.2);
-        sp.connect(sg);
-        sg.connect(musicBus.input);
-        sp.start(spStart);
-        sp.stop(spStart + 1.3);
-      }
-    } catch (e) { /* silencio */ }
+      });
+    } catch (e) { /* falha silenciosa */ }
   }
 
   function startMusic() {
-    if (!musicOn || musicTimer) return;
-    if (musicBus) musicBus.gain.gain.value = MUSIC_VOL;
-    playChord(CHORDS[chordIndex % CHORDS.length]);
-    chordIndex++;
-    musicTimer = setInterval(function () {
-      playChord(CHORDS[chordIndex % CHORDS.length]);
-      chordIndex++;
-    }, BAR_MS);
+    if (!musicOn) return;
+    wantPlaying = true;
+    if (ytReady && ytPlayer) {
+      try { ytPlayer.playVideo(); } catch (e) {}
+    } else {
+      ensureYtApiLoaded(createYtPlayer);
+    }
   }
 
   function stopMusic() {
-    if (musicTimer) {
-      clearInterval(musicTimer);
-      musicTimer = null;
-    }
-    if (musicBus) {
-      // deixa as notas atuais sumirem em fade natural
-      try {
-        var audioCtx = getContext();
-        musicBus.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.4);
-      } catch (e) {}
+    wantPlaying = false;
+    if (ytReady && ytPlayer) {
+      try { ytPlayer.pauseVideo(); } catch (e) {}
     }
   }
 

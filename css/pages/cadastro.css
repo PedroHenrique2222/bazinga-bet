@@ -50,7 +50,6 @@ body[data-page="cadastro"] {
 #cadastro-form label:first-of-type { margin-top: 0; }
 
 #cadastro-form input[type="text"],
-#cadastro-form input[type="email"],
 #cadastro-form input[type="password"] {
   width: 100%;
   padding: 11px 12px;

@@ -24,7 +24,7 @@ BZG.collectibles = (function () {
     { key: "dhani", name: "Dhani", avatar: "🏳️‍🌈", game: "Minigame: Sequência Arco-íris", group: "amigos" },
     { key: "shadow", name: "Shadow", avatar: "🌑", game: "Minigame: Sombra Rápida", group: "amigos" },
     { key: "cbpb", name: "CBPB_Gamer", avatar: "🎮", game: "Minigame: Torre da Turma", group: "amigos" },
-    { key: "alienjo", name: "Alien Jo", avatar: "🛸", game: "Minigame: Fuga Alienígena", group: "amigos" }
+    { key: "alienjo", name: "Alien Jo", avatar: "👽", game: "Minigame: Fuga Alienígena", group: "amigos" }
   ];
 
   var ITEM_DEFS = {
@@ -95,7 +95,7 @@ BZG.collectibles = (function () {
       ["🏅", "CBPB Campeão"], ["🏆", "CBPB Lendário"]
     ],
     alienjo: [
-      ["🛸", "Alien Jo Clássico"], ["👽", "Alien Jo Verdinho"], ["🌌", "Alien Jo Cósmico"],
+      ["👽", "Alien Jo Clássico"], ["🛸", "Alien Jo da Nave"], ["🌌", "Alien Jo Cósmico"],
       ["☄️", "Alien Jo Cometa"], ["🏆", "Alien Jo Lendário"]
     ]
   };

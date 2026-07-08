@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.7
+# 🎰 Bazinga BET — v1.8
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -65,7 +65,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 
 Ao abrir o site pela primeira vez em um navegador, a **tela de cadastro é obrigatória** (`cadastro.html`) antes de acessar qualquer outra página — isso é verificado por `layout.js` em toda página que carrega a sidebar/topbar.
 
-O cadastro pede nome de jogador, e-mail e senha, mas **não existe servidor nem banco de dados**: tudo fica gravado só no `localStorage` do navegador (dentro do mesmo objeto de sempre, chave `account`). Por isso:
+O cadastro pede só **nome de jogador e senha** (sem e-mail), mas **não existe servidor nem banco de dados**: tudo fica gravado só no `localStorage` do navegador (dentro do mesmo objeto de sempre, chave `account`). Por isso:
 
 - É **uma conta por navegador** — não dá para "logar" com o mesmo cadastro em outro computador ou celular.
 - A senha não passa por nenhum tipo de criptografia real (não faz sentido ter isso sem servidor) — é só para deixar o fluxo pronto para o dia em que o projeto ganhar um backend de verdade.
@@ -160,13 +160,14 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 ## ▶️ Como jogar localmente
 
-Não precisa instalar nada: baixe o projeto e dê **duplo-clique em `index.html`**. Como não há cadastro ainda nesse navegador, ele vai te mandar direto para `cadastro.html` — crie uma conta (fictícia) e o resto do site libera.
+Não precisa instalar nada: baixe o projeto e dê **duplo-clique em `index.html`**. Como não há cadastro ainda nesse navegador, ele vai te mandar direto para `cadastro.html` — crie uma conta (fictícia) e o resto do site libera. Tudo funciona offline, **exceto a música de fundo** (ver Tecnologia abaixo), que precisa de internet.
 
 ## 🛠️ Tecnologia
 
 - HTML + CSS + JavaScript puro — sem frameworks, sem build, sem servidor
 - Persistência via `localStorage` (uma chave única `bazingaBetState`, mais `bzgTheme`/`bzgMusic`/`bzgSfx`)
-- Sons gerados por código com Web Audio API (sem arquivos de áudio)
+- Efeitos sonoros gerados por código com Web Audio API (sem arquivos de áudio) — 100% local
+- **Música de fundo**: um vídeo do YouTube tocando em loop, escondido (só o áudio, sem player visível na tela) via YouTube IFrame API — ver `js/core/sounds.js`. É a **única parte do site que depende de internet**; sem conexão, ela simplesmente não toca e o resto do site continua funcionando normalmente. Como todo autoplay com som, só começa a tocar depois do primeiro clique/tecla do jogador (mesma regra de navegadores que já valia antes).
 - RTPs calibrados por simulação de Monte Carlo (scripts descartáveis, não fazem parte do site)
 
 ## 🚀 Deploy
@@ -181,6 +182,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.8 (2026-07-08)
+- **Cadastro simplificado**: removido o campo de e-mail — agora é só nome de jogador e senha. `storage.js` `createAccount()` não guarda mais e-mail (contas antigas que já tinham o campo continuam funcionando normalmente, o campo só fica sem uso).
+- **Música de fundo trocada**: saiu a trilha gerada por código (acordes via Web Audio API), entrou um vídeo do YouTube em loop, tocando escondido (só áudio, sem player visível) via YouTube IFrame API. É a única parte do site que passa a depender de internet — sem conexão, só a música não toca, o resto (efeitos sonoros inclusive) continua 100% local. Mesma regra de autoplay de antes: só começa a tocar depois do primeiro clique/tecla.
+- **Corrigido o avatar do Alien Jo**: voltou a ser 👽 (o pedido original) — o problema não era o emoji, era ele já estar liberado de graça pra todo mundo (na lista base de avatares) e também como recompensa do Passe, o que tornava inútil completar o álbum dele. Removido 👽 da lista de avatares gratuitos; agora é exclusivo de quem completa a Coleção do Alien Jo **ou** chega ao nível 27 do Passe. A dica de cadeado no Perfil agora mostra as duas formas quando existem duas.
 
 ### v1.7 (2026-07-08)
 - **Card de perfil movido da sidebar pro header**: avatar, nome colorido, título e nível agora aparecem num chip clicável na topbar (logo após o menu), em vez de no rodapé da sidebar. O link "Perfil" na sidebar virou um item simples igual aos outros (Coleção, Passe, Configurações).

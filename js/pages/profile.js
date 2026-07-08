@@ -1,6 +1,7 @@
 /* Bazinga BET - logica da pagina de perfil */
 (function () {
-  var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "👽", "🤑"];
+  // 👽 saiu da lista base: agora e exclusivo de quem completa o album do Alien Jo na Colecao (ou do Passe, tier 27)
+  var AVATARS = ["😎", "🔥", "👑", "🐯", "🚀", "💎", "🍀", "⚡", "🎯", "🃏", "🦈", "🤠", "😈", "🥇", "🎩", "🐺", "🤑"];
   var GAME_LABELS = {
     crash: "🛶 Canoa Furada", mines: "🥒 Mines do Pikles", plinko: "🎃 Plinko da Abóbora",
     double: "🎡 Double", tower: "🗑️ Lixeira do Linden", dice: "🎲 Dado 616", hilo: "🃏 HiLo do Panetone",
@@ -33,12 +34,13 @@
   }
 
   function lockLabelFor(kind, value, sources) {
-    if (sources[kind][value]) return "Passe de Batalha · Nível " + sources[kind][value];
+    var ways = [];
+    if (sources[kind][value]) ways.push("Passe de Batalha · Nível " + sources[kind][value]);
     if (kind === "avatar") {
       var char = collectibleCharacterForAvatar(value);
-      if (char) return "Coleção · complete o álbum de " + char.name;
+      if (char) ways.push("Coleção · complete o álbum de " + char.name);
     }
-    return "Bloqueado";
+    return ways.length ? ways.join(" OU ") : "Bloqueado";
   }
 
   function avatarCatalog() {

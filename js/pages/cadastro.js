@@ -12,16 +12,11 @@
       e.preventDefault();
 
       var nickname = document.getElementById("nickname").value.trim();
-      var email = document.getElementById("email").value.trim();
       var password = document.getElementById("password").value;
       var agree = document.getElementById("agree").checked;
 
       if (nickname.length < 2) {
         BZG.ui.toast("Digite um nome de jogador com pelo menos 2 letras.", "error");
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        BZG.ui.toast("Digite um e-mail válido.", "error");
         return;
       }
       if (password.length < 4) {
@@ -33,7 +28,7 @@
         return;
       }
 
-      BZG.storage.createAccount({ nickname: nickname, email: email, password: password });
+      BZG.storage.createAccount({ nickname: nickname, password: password });
       BZG.sounds.win();
       BZG.ui.toast("Bem-vindo(a), " + nickname + "! 🎉", "success");
       setTimeout(function () { window.location.href = "index.html"; }, 700);

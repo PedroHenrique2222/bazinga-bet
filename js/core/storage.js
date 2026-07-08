@@ -11,7 +11,7 @@ BZG.storage = (function () {
 
   function defaultState() {
     return {
-      account: null,        // { nickname, email, password, createdAt } - cadastro local, sem backend
+      account: null,        // { nickname, password, createdAt } - cadastro local, sem backend
       balance: STARTING_BALANCE,
       reloadBonus: 0,        // aumenta o valor do botao "Recarregar", recompensa do Passe de Batalha
       profile: {
@@ -488,7 +488,6 @@ BZG.storage = (function () {
     var state = getState();
     state.account = {
       nickname: data.nickname,
-      email: data.email || "",
       password: data.password || "",
       createdAt: Date.now()
     };
