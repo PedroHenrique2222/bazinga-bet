@@ -33,7 +33,10 @@ BZG.layout = (function () {
 
   /* minigames sem aposta: nao mexem no saldo, so dao XP e recorde pessoal */
   var MINIGAME_ITEMS = [
-    { href: "torre.html", icon: "🧱", label: "Torre da Turma", page: "torre-minigame", minigame: true }
+    { href: "torre.html", icon: "🧱", label: "Torre do CBPB_Gamer", page: "torre-minigame", minigame: true },
+    { href: "arcoiris.html", icon: "🏳️‍🌈", label: "Sequência Arco-íris", page: "rainbow-minigame", minigame: true },
+    { href: "sombra.html", icon: "🌑", label: "Sombra Rápida", page: "shadow-minigame", minigame: true },
+    { href: "alien.html", icon: "👽", label: "Fuga Alienígena", page: "alien-minigame", minigame: true }
   ];
 
   function navHref(item) {
@@ -123,24 +126,14 @@ BZG.layout = (function () {
           '<span class="nav-bp-dot" id="bp-dot" style="display:none;"></span>' +
         '</a>' +
         '<a class="nav-item' + (activePage === "profile" ? " active" : "") + '" href="' + ROOT_PREFIX + 'profile.html">' +
-          '<span class="nav-icon" id="sidebar-avatar">😎</span>' +
-          '<span class="nav-label" id="sidebar-nick">Perfil</span>' +
-          '<span class="nav-lvl" id="sidebar-lvl"></span>' +
+          '<span class="nav-icon">👤</span>' +
+          '<span class="nav-label">Perfil</span>' +
         '</a>' +
         '<a class="nav-item' + (activePage === "settings" ? " active" : "") + '" href="' + ROOT_PREFIX + 'settings.html">' +
           '<span class="nav-icon">⚙️</span>' +
           '<span class="nav-label">Configurações</span>' +
         '</a>' +
       '</div>';
-
-    var profile = BZG.storage.getProfile();
-    var lvl = BZG.storage.getLevel();
-    var avatarEl = document.getElementById("sidebar-avatar");
-    var nickEl = document.getElementById("sidebar-nick");
-    var lvlEl = document.getElementById("sidebar-lvl");
-    if (avatarEl) avatarEl.textContent = profile.avatar;
-    if (nickEl) nickEl.innerHTML = BZG.ui.nameHTML(profile.nickname);
-    if (lvlEl) lvlEl.textContent = "Lv " + lvl.level;
 
     // aviso de recompensas do passe a resgatar
     var bpDot = document.getElementById("bp-dot");
@@ -150,17 +143,26 @@ BZG.layout = (function () {
     }
   }
 
-  // atualiza os 3 mini-campos da topbar (nivel, recorde de saldo, maior premio)
+  // atualiza os campos dinamicos da topbar: card de perfil + os 3 mini-stats
   function refreshTopbarStats() {
     var lvlEl = document.getElementById("topbar-level");
     var peakEl = document.getElementById("topbar-peak");
     var maxwinEl = document.getElementById("topbar-maxwin");
-    if (!lvlEl && !peakEl && !maxwinEl) return;
+    var avatarEl = document.getElementById("topbar-profile-avatar");
+    var nameEl = document.getElementById("topbar-profile-name");
+    var chipLvlEl = document.getElementById("topbar-profile-lvl");
+    if (!lvlEl && !peakEl && !maxwinEl && !avatarEl) return;
     var lvl = BZG.storage.getLevel();
     var stats = BZG.storage.getStats();
     if (lvlEl) lvlEl.textContent = "Lv " + lvl.level;
     if (peakEl) peakEl.textContent = BZG.ui.formatMoney(stats.peakBalance || 0);
     if (maxwinEl) maxwinEl.textContent = BZG.ui.formatMoney(stats.maxWin || 0);
+    if (avatarEl || nameEl || chipLvlEl) {
+      var profile = BZG.storage.getProfile();
+      if (avatarEl) avatarEl.textContent = profile.avatar;
+      if (nameEl) nameEl.innerHTML = BZG.ui.nameHTML(profile.nickname);
+      if (chipLvlEl) chipLvlEl.textContent = "Lv " + lvl.level;
+    }
   }
 
   function renderTopbar(title, icon) {
@@ -169,6 +171,11 @@ BZG.layout = (function () {
 
     el.innerHTML = '' +
       '<button class="icon-btn topbar-menu" id="menu-btn" title="Menu" aria-label="Abrir menu">☰</button>' +
+      '<a class="topbar-profile" id="topbar-profile-link" href="' + ROOT_PREFIX + 'profile.html" title="Ver perfil">' +
+        '<span class="topbar-profile-avatar" id="topbar-profile-avatar">😎</span>' +
+        '<span class="topbar-profile-name" id="topbar-profile-name"></span>' +
+        '<span class="topbar-profile-lvl" id="topbar-profile-lvl">Lv 1</span>' +
+      '</a>' +
       '<div class="topbar-title">' + (icon ? icon + " " : "") + (title || "") + '</div>' +
       '<div class="topbar-spacer"></div>' +
       '<div class="topbar-stats">' +

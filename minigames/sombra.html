@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Torre do CBPB_Gamer — Bazinga BET</title>
+  <title>Sombra Rápida — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <script src="../js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/minigames/torre.css" />
+  <link rel="stylesheet" href="../css/minigames/sombra.css" />
 </head>
-<body data-page="torre-minigame" data-title="Torre do CBPB_Gamer" data-icon="🧱">
+<body data-page="shadow-minigame" data-title="Sombra Rápida" data-icon="🌑">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -20,36 +20,39 @@
       <header class="topbar" id="topbar"></header>
       <main class="container">
 
-        <section class="panel torre-hero">
-          <h1>🧱 Torre do <span class="torre-host">🎮 CBPB_Gamer</span></h1>
-          <p>Minigame sem aposta — nenhuma ficha em jogo! Clique (ou aperte espaço) na hora certa para empilhar o bloco e subir andares. Cada andar dá um pouco de XP e o seu melhor resultado fica salvo como recorde pessoal.</p>
+        <section class="panel sombra-hero">
+          <h1>🌑 Sombra Rápida <span class="sombra-host">com Shadow</span></h1>
+          <p>Minigame sem aposta — um olho aparece rapidamente em algum canto escuro. Clique nele antes que suma! Você tem 30 segundos por rodada.</p>
         </section>
 
         <div class="game-layout">
           <section class="panel controls">
-            <label>Andares nesta rodada</label>
-            <div class="torre-floor-count" id="torre-floor">0</div>
+            <label>Tempo restante</label>
+            <div class="sombra-timer" id="sombra-timer">30s</div>
+
+            <label>Acertos nesta rodada</label>
+            <div class="sombra-score" id="sombra-score">0</div>
 
             <label>Seu recorde</label>
-            <div class="torre-best" id="torre-best">0 andares</div>
+            <div class="sombra-best" id="sombra-best">0 acertos</div>
 
-            <button id="torre-action-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+            <button id="sombra-action-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
               Começar
             </button>
 
-            <p id="torre-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Clique em "Começar" e depois clique (ou espaço) para soltar o bloco.
+            <p id="sombra-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
+              Clique em "Começar" e fique de olho nas sombras.
             </p>
           </section>
 
           <div>
-            <section class="panel stage torre-stage" id="torre-stage">
-              <canvas id="torre-canvas" width="340" height="480"></canvas>
-              <div class="torre-gameover" id="torre-gameover">
-                <div class="torre-gameover-title">Fim de jogo!</div>
-                <div class="torre-gameover-floors" id="torre-gameover-floors">0 andares</div>
-                <div class="torre-gameover-sub" id="torre-gameover-sub"></div>
-                <button class="btn btn--gold" id="torre-retry-btn">Jogar de novo</button>
+            <section class="panel stage sombra-stage" id="sombra-stage">
+              <div class="sombra-grid" id="sombra-grid"></div>
+              <div class="sombra-gameover" id="sombra-gameover">
+                <div class="sombra-gameover-title">Tempo esgotado!</div>
+                <div class="sombra-gameover-score" id="sombra-gameover-score">0 acertos</div>
+                <div class="sombra-gameover-sub" id="sombra-gameover-sub"></div>
+                <button class="btn btn--gold" id="sombra-retry-btn">Jogar de novo</button>
               </div>
             </section>
           </div>
@@ -72,6 +75,6 @@
   <script src="../js/core/modes.js"></script>
   <script src="../js/core/battlepass.js"></script>
   <script src="../js/core/collectibles.js"></script>
-  <script src="../js/minigames/torre.js"></script>
+  <script src="../js/minigames/sombra.js"></script>
 </body>
 </html>

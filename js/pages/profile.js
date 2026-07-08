@@ -140,8 +140,8 @@
       btn.addEventListener("click", function () {
         BZG.storage.setCosmetic("nameColor", btn.dataset.color);
         renderNameColorPicker();
-        var sn = document.getElementById("sidebar-nick");
-        if (sn) sn.innerHTML = BZG.ui.nameHTML(nick);
+        var tn = document.getElementById("topbar-profile-name");
+        if (tn) tn.innerHTML = BZG.ui.nameHTML(nick);
         BZG.sounds.click();
       });
     });
@@ -270,10 +270,10 @@
     BZG.ui.toast("Perfil salvo!", "success");
     BZG.sounds.win();
 
-    // atualiza a sidebar sem recarregar
-    var nickEl = document.getElementById("sidebar-nick");
-    var avatarEl = document.getElementById("sidebar-avatar");
-    if (nickEl) nickEl.textContent = nick;
+    // atualiza o card de perfil na topbar sem recarregar
+    var nameEl = document.getElementById("topbar-profile-name");
+    var avatarEl = document.getElementById("topbar-profile-avatar");
+    if (nameEl) nameEl.innerHTML = BZG.ui.nameHTML(nick);
     if (avatarEl) avatarEl.textContent = selectedAvatar;
   }
 

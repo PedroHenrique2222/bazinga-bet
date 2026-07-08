@@ -1,0 +1,128 @@
+/* Bazinga BET - minigame Sombra Rapida (sem aposta) */
+
+.sombra-hero {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(10, 10, 20, 0.4), rgba(176, 38, 255, 0.08));
+  border-color: rgba(176, 38, 255, 0.2);
+}
+
+.sombra-hero h1 { margin: 0 0 6px; font-size: 24px; font-weight: 900; }
+.sombra-hero p { margin: 0; color: var(--text-muted); font-size: 13.5px; max-width: 680px; }
+
+.sombra-host { color: #a596c4; }
+
+.sombra-timer {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+  line-height: 1;
+}
+
+:root[data-theme="dark"] .sombra-timer { color: var(--yellow); }
+
+.sombra-score {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text);
+}
+
+.sombra-best {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.sombra-stage {
+  min-height: 420px;
+  padding: 22px;
+  background: #0a0710;
+}
+
+.sombra-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.sombra-tile {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(176, 38, 255, 0.18);
+  background: #150e22;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0;
+  transition: background 0.1s ease, box-shadow 0.1s ease;
+}
+
+.sombra-tile.lit {
+  background: radial-gradient(circle, #2a1a44, #150e22);
+  box-shadow: 0 0 20px rgba(176, 38, 255, 0.55);
+  animation: sombra-pop 0.15s ease;
+}
+
+.sombra-tile.lit::after {
+  content: "👁️";
+  font-size: 26px;
+}
+
+@keyframes sombra-pop {
+  from { transform: scale(0.7); }
+  to { transform: scale(1); }
+}
+
+.sombra-gameover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius: var(--radius);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.sombra-gameover.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sombra-gameover-title {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.sombra-gameover-score {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+}
+
+:root[data-theme="dark"] .sombra-gameover-score { color: var(--yellow); }
+
+.sombra-gameover-sub {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  min-height: 18px;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+  .sombra-grid { max-width: 300px; gap: 8px; }
+  .sombra-stage { padding: 14px; }
+  .sombra-tile.lit::after { font-size: 20px; }
+}

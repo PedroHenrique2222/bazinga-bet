@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.6
+# 🎰 Bazinga BET — v1.7
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -25,7 +25,10 @@ BZG-BET/
 │   │   raspadinha.html, limbo.html, coinflip.html, horse.html
 │   └── bazinguinha.html, bonanza.html   (EM DESENVOLVIMENTO - ver abaixo)
 ├── minigames/            Minigames SEM aposta (nao mexem no saldo)
-│   └── torre.html        Torre da Turma - empilhar blocos, da XP e recorde pessoal
+│   ├── torre.html        Torre do CBPB_Gamer - empilhar blocos
+│   ├── arcoiris.html     Sequencia Arco-iris (com Dhani) - memoria, tipo Simon Says
+│   ├── sombra.html       Sombra Rapida (com Shadow) - reflexo, tipo whack-a-mole
+│   └── alien.html        Fuga Alienigena (com Alien Jo) - desviar de meteoros, em canvas
 ├── css/
 │   ├── style.css         Estilos globais (sidebar, topbar, cards, temas)
 │   ├── games/*.css       Estilo especifico de cada jogo
@@ -45,7 +48,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 | Arquivo | Função |
 |---|---|
 | `storage.js` | Tudo fica salvo em UM objeto no `localStorage` (`bazingaBetState`): saldo, conta, perfil, estatísticas (incl. recorde de saldo), histórico, cosméticos, Passe de Batalha, colecionáveis, recordes de minigame |
-| `layout.js` | Monta a sidebar e a topbar (com os mini-campos de Nível/Recorde/Maior Prêmio) em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento; calcula os prefixos de pasta (`games/`, `minigames/`, raiz) dinamicamente |
+| `layout.js` | Monta a sidebar e a topbar (com o card de perfil e os mini-campos de Nível/Recorde/Maior Prêmio) em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento; calcula os prefixos de pasta (`games/`, `minigames/`, raiz) dinamicamente |
 | `theme.js` | Sistema de temas (dark/light + 6 temas extras desbloqueáveis no Passe) |
 | `sounds.js` | Efeitos sonoros e música ambiente, gerados por código (Web Audio API) |
 | `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador |
@@ -54,7 +57,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 | `achievements.js` | Lista de conquistas + verificação automática |
 | `modes.js` | Modo Turbo (acelera as animações) |
 | `battlepass.js` | Regras do Passe de Batalha |
-| `collectibles.js` | Catálogo dos 80 colecionáveis (álbum de figurinhas), drop aleatório a cada aposta, recompensa por álbum completo |
+| `collectibles.js` | Catálogo dos 110 colecionáveis (Equipe BZG + Amigos dos Bazingas), drop aleatório a cada aposta, recompensa por álbum completo |
 
 ---
 
@@ -111,16 +114,27 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 ## 🎴 Coleção de colecionáveis
 
-- Um **álbum de figurinhas temáticas** dos 8 personagens da equipe BZG (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão), **10 itens cada = 80 no total** — ver `js/core/collectibles.js`.
-- **Drop aleatório**: toda aposta em qualquer jogo tem uma chance pequena (15%) de soltar uma figurinha aleatória — ver o evento `bzg:bet-recorded` (disparado por `storage.recordBet`) e o listener em `layout.js` que chama `collectibles.rollOnBet()`.
-- **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo).
-- Página própria em `colecao.html`, com aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve** — comprar pacotes com BZ$ é a próxima etapa, ainda não implementada.
+- Um **álbum de figurinhas temáticas** com dois grupos — ver `js/core/collectibles.js`:
+  - **🎪 Equipe BZG**: 9 personagens (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, **Pitoco**), **10 itens cada = 90**.
+  - **🤝 Amigos dos Bazingas**: 4 personagens (Dhani, Shadow, CBPB_Gamer, Alien Jo — cada um também estrela um dos minigames sem aposta), **5 itens cada = 20**.
+  - **110 colecionáveis no total.**
+- **Drop 100% aleatório**: toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha sorteada entre **todos os 110 itens de todos os personagens** — não existe nenhum vínculo entre o jogo que você está jogando e qual figurinha pode cair. Ver o evento `bzg:bet-recorded` (disparado por `storage.recordBet`) e o listener em `layout.js` que chama `collectibles.rollOnBet()`.
+- **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo, quando aplicável).
+- Página própria em `colecao.html`, separada nas duas seções acima, com aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve** — comprar pacotes com BZ$ é a próxima etapa, ainda não implementada.
 - No Perfil aparece um resumo compacto do progresso de cada personagem, com link para o álbum completo.
 
 ## 🧱 Minigames (sem aposta)
 
-- Seção nova, separada dos jogos de aposta: minigames que **não mexem no saldo**, vivem em `minigames/` (com `css/minigames/` e `js/minigames/` próprios) e têm sua própria seção na sidebar.
-- **Torre da Turma** (`minigames/torre.html`): mecânica clássica de empilhar blocos (clique/espaço para soltar na hora certa). Cada andar dá XP de perfil/Passe; o melhor resultado fica salvo como recorde pessoal (`storage.reportMinigameScore`). Sem relação com o jogo de aposta "Lixeira do Linden" (Tower).
+- Seção separada dos jogos de aposta: minigames que **não mexem no saldo**, vivem em `minigames/` (com `css/minigames/` e `js/minigames/` próprios) e têm sua própria seção na sidebar. Cada um é estrelado por um dos Amigos dos Bazingas.
+
+| Minigame | Amigo | Mecânica | Recompensa |
+|---|---|---|---|
+| 🧱 Torre do CBPB_Gamer | CBPB_Gamer | Empilhar blocos, clique/espaço na hora certa (era "Torre da Turma") | XP + recorde de andares |
+| 🏳️‍🌈 Sequência Arco-íris | Dhani | Memorize e repita a sequência de cores (tipo Simon Says) | XP + recorde de rodadas |
+| 🌑 Sombra Rápida | Shadow | Clique nos "olhos" antes que sumam, 30s por rodada (tipo whack-a-mole) | XP + recorde de acertos |
+| 👽 Fuga Alienígena | Alien Jo | Desvie de meteoros com o disco voador (mouse/toque/setas), em canvas | XP + recorde de segundos |
+
+- Todos dão XP direto (`storage.addXp`) e guardam recorde pessoal (`storage.reportMinigameScore`/`getMinigameBest`, campo genérico `best`). Sem relação com os jogos de aposta existentes (ex.: a Torre não tem ligação com "Lixeira do Linden").
 - Mais minigames podem ser adicionados depois seguindo o mesmo padrão (`MINIGAME_ITEMS` em `layout.js`).
 
 ## ⚙️ Configurações
@@ -136,11 +150,11 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 - Todo jogador começa com **BZ$ 10.000**.
 - O botão "Recarregar" (na topbar e em Configurações) preenche o saldo até o **valor de recarga atual** (base + bônus do Passe de Batalha).
 - **Se o saldo chegar a zero**, o site recarrega sozinho automaticamente (sem precisar clicar em nada) e avisa com um toast — ver o listener central em `layout.js` (`bzg:balance-changed`).
-- **Topbar**: além do saldo, 3 mini-campos mostram sempre **Nível**, **Recorde de saldo** (maior saldo que o jogador já teve, `stats.peakBalance`) e **Maior prêmio** (maior pagamento em uma única aposta, `stats.maxWin`) — atualizam ao vivo a cada aposta/bônus/recarga.
+- **Topbar**: logo depois do menu, um **card de perfil clicável** (avatar, nome colorido, título, nível) leva direto pro Perfil — antes ficava só na sidebar. Mais à direita, 3 mini-campos mostram sempre **Nível**, **Recorde de saldo** (maior saldo que o jogador já teve, `stats.peakBalance`) e **Maior prêmio** (maior pagamento em uma única aposta, `stats.maxWin`) — tudo atualiza ao vivo a cada aposta/bônus/recarga.
 
 ## 🏆 Conquistas
 
-**74 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, bônus diário, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis e recordes no minigame Torre da Turma. São verificadas automaticamente a cada aposta.
+**80 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, bônus diário, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis (Equipe, Amigos e tudo junto) e recordes nos 4 minigames sem aposta. São verificadas automaticamente a cada aposta.
 
 ---
 
@@ -167,6 +181,15 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.7 (2026-07-08)
+- **Card de perfil movido da sidebar pro header**: avatar, nome colorido, título e nível agora aparecem num chip clicável na topbar (logo após o menu), em vez de no rodapé da sidebar. O link "Perfil" na sidebar virou um item simples igual aos outros (Coleção, Passe, Configurações).
+- **Corrigido bug do Recorde de Saldo**: quem já jogava antes da v1.6 ficava travado mostrando exatamente BZ$ 10.000 de recorde, mesmo tendo saldo muito maior — o preenchimento automático de campos novos (`Object.assign`) escondia a falta do dado antes do código de fallback rodar, então o fallback nunca disparava. Também corrigido: `claimBonus()` (bônus diário) não atualizava o recorde de saldo.
+- **Novo membro da Equipe BZG: 🐣 Pitoco** — 9º personagem, com álbum de 10 figurinhas próprio (mascote da casa, sem jogo associado) e entrada no painel ao vivo do Crash/Double (`bots.js`).
+- **Novo grupo na Coleção: 🤝 Amigos dos Bazingas** — 4 personagens novos, cada um com álbum de 5 figurinhas e seu próprio minigame sem aposta: Dhani (🏳️‍🌈), Shadow (🌑), CBPB_Gamer (🎮) e Alien Jo (🛸). Coleção agora tem 110 itens no total (era 80), exibidos em duas seções separadas em `colecao.html`.
+- **3 minigames novos + 1 retematizado** (Torre da Turma virou "Torre do CBPB_Gamer", com paleta neon): Sequência Arco-íris (Dhani, memória tipo Simon Says), Sombra Rápida (Shadow, reflexo tipo whack-a-mole, 30s por rodada) e Fuga Alienígena (Alien Jo, desviar de meteoros em canvas). `storage.js` generalizou o campo de recorde de minigame de `bestFloor` (só fazia sentido pra Torre) para `best` (serve pra qualquer um), com migração automática pra quem já tinha recorde salvo na Torre.
+- **Esclarecimento**: o drop de colecionáveis **já era** 100% aleatório entre todos os personagens desde a v1.6 — nenhum jogo específico sorteia só a figurinha "dele". Isso ficou mais explícito na documentação.
+- **+6 conquistas novas** (total 80): álbum completo da Equipe, álbum completo dos Amigos, e recordes nos 3 minigames novos, além de uma por ter pelo menos 1 recorde em cada minigame.
 
 ### v1.6 (2026-07-08)
 - **Primeiros passos rumo à v2.0** (visão de multiplayer/placar de líderes com jogadores reais — ainda não implementada; tudo abaixo continua 100% local, sem backend):

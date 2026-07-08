@@ -63,6 +63,18 @@
   cursor: not-allowed;
 }
 
+.col-group-title {
+  font-size: 15px;
+  font-weight: 900;
+  margin: 26px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.col-group-title:first-child {
+  margin-top: 0;
+}
+
 .col-char {
   margin-bottom: 18px;
 }

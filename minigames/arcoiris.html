@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sequência Arco-íris — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <script src="../js/core/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/minigames/arcoiris.css" />
+</head>
+<body data-page="rainbow-minigame" data-title="Sequência Arco-íris" data-icon="🏳️‍🌈">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <section class="panel arco-hero">
+          <h1>🏳️‍🌈 Sequência Arco-íris <span class="arco-host">com Dhani</span></h1>
+          <p>Minigame sem aposta — memorize e repita a sequência de cores que acende. Cada rodada certa adiciona mais uma cor. Erre uma vez e a rodada acaba!</p>
+        </section>
+
+        <div class="game-layout">
+          <section class="panel controls">
+            <label>Rodada atual</label>
+            <div class="arco-round-count" id="arco-round">0</div>
+
+            <label>Seu recorde</label>
+            <div class="arco-best" id="arco-best">0 rodadas</div>
+
+            <button id="arco-action-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+              Começar
+            </button>
+
+            <p id="arco-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
+              Clique em "Começar" e observe a sequência antes de repetir.
+            </p>
+          </section>
+
+          <div>
+            <section class="panel stage arco-stage" id="arco-stage">
+              <div class="arco-grid" id="arco-grid">
+                <button class="arco-pad" data-color="0" style="--pad-color:#ff2d3a;"></button>
+                <button class="arco-pad" data-color="1" style="--pad-color:#ff8a00;"></button>
+                <button class="arco-pad" data-color="2" style="--pad-color:#ffcc00;"></button>
+                <button class="arco-pad" data-color="3" style="--pad-color:#2ecc71;"></button>
+                <button class="arco-pad" data-color="4" style="--pad-color:#00c2ff;"></button>
+                <button class="arco-pad" data-color="5" style="--pad-color:#b026ff;"></button>
+              </div>
+              <div class="arco-gameover" id="arco-gameover">
+                <div class="arco-gameover-title">Fim de jogo!</div>
+                <div class="arco-gameover-rounds" id="arco-gameover-rounds">0 rodadas</div>
+                <div class="arco-gameover-sub" id="arco-gameover-sub"></div>
+                <button class="btn btn--gold" id="arco-retry-btn">Jogar de novo</button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="../js/core/storage.js"></script>
+  <script src="../js/core/sounds.js"></script>
+  <script src="../js/core/ui.js"></script>
+  <script src="../js/core/bots.js"></script>
+  <script src="../js/core/layout.js"></script>
+  <script src="../js/core/particles.js"></script>
+  <script src="../js/core/effects.js"></script>
+  <script src="../js/core/achievements.js"></script>
+  <script src="../js/core/modes.js"></script>
+  <script src="../js/core/battlepass.js"></script>
+  <script src="../js/core/collectibles.js"></script>
+  <script src="../js/minigames/arcoiris.js"></script>
+</body>
+</html>

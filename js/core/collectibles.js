@@ -1,22 +1,30 @@
-/* Bazinga BET - colecionaveis tematicos dos Bazingas (album de figurinhas da equipe).
-   8 personagens x 10 itens = 80 colecionaveis. Chance pequena de drop a cada aposta
-   (evento bzg:bet-recorded, disparado por storage.recordBet). Completar o album de
-   um personagem desbloqueia o avatar exclusivo dele (mesmo avatar usado pelo bot da
-   equipe no painel ao vivo - ver bots.js CREW). */
+/* Bazinga BET - colecionaveis tematicos dos Bazingas (album de figurinhas).
+   Dois grupos: a Equipe BZG (9 personagens x 10 itens) e os Amigos dos Bazingas
+   (4 personagens x 5 itens) = 110 colecionaveis. Chance pequena de drop a cada
+   aposta, em QUALQUER jogo (evento bzg:bet-recorded, disparado por
+   storage.recordBet) - o sorteio e sempre entre TODOS os itens de TODOS os
+   personagens, sem nenhum vinculo com o jogo que estava sendo jogado. Completar
+   o album de um personagem desbloqueia o avatar exclusivo dele (mesmo avatar
+   usado pelo bot da equipe no painel ao vivo - ver bots.js CREW). */
 window.BZG = window.BZG || {};
 
 BZG.collectibles = (function () {
   var DROP_CHANCE = 0.15;
 
   var CHARACTERS = [
-    { key: "abobora", name: "BZG Abóbora", avatar: "🎃", game: "Plinko da Abóbora" },
-    { key: "panetone", name: "BZG Panetone", avatar: "🍰", game: "HiLo do Panetone" },
-    { key: "canoa", name: "BZG Canoa Furada", avatar: "🛶", game: "Canoa Furada" },
-    { key: "seis16", name: "BZG 616", avatar: "🪖", game: "Dado 616" },
-    { key: "pikles", name: "BZG Pikles Gamer", avatar: "🥒", game: "Mines do Pikles" },
-    { key: "pilha", name: "BZG Pilha Avulsa", avatar: "🔋", game: "Moeda da Pilha" },
-    { key: "linden", name: "BZG Linden", avatar: "🗑️", game: "Lixeira do Linden" },
-    { key: "bogao", name: "BZG Bogão", avatar: "🍑", game: "21 do Bogão" }
+    { key: "abobora", name: "BZG Abóbora", avatar: "🎃", game: "Plinko da Abóbora", group: "equipe" },
+    { key: "panetone", name: "BZG Panetone", avatar: "🍰", game: "HiLo do Panetone", group: "equipe" },
+    { key: "canoa", name: "BZG Canoa Furada", avatar: "🛶", game: "Canoa Furada", group: "equipe" },
+    { key: "seis16", name: "BZG 616", avatar: "🪖", game: "Dado 616", group: "equipe" },
+    { key: "pikles", name: "BZG Pikles Gamer", avatar: "🥒", game: "Mines do Pikles", group: "equipe" },
+    { key: "pilha", name: "BZG Pilha Avulsa", avatar: "🔋", game: "Moeda da Pilha", group: "equipe" },
+    { key: "linden", name: "BZG Linden", avatar: "🗑️", game: "Lixeira do Linden", group: "equipe" },
+    { key: "bogao", name: "BZG Bogão", avatar: "🍑", game: "21 do Bogão", group: "equipe" },
+    { key: "pitoco", name: "BZG Pitoco", avatar: "🐣", game: "Mascote da casa", group: "equipe" },
+    { key: "dhani", name: "Dhani", avatar: "🏳️‍🌈", game: "Minigame: Sequência Arco-íris", group: "amigos" },
+    { key: "shadow", name: "Shadow", avatar: "🌑", game: "Minigame: Sombra Rápida", group: "amigos" },
+    { key: "cbpb", name: "CBPB_Gamer", avatar: "🎮", game: "Minigame: Torre da Turma", group: "amigos" },
+    { key: "alienjo", name: "Alien Jo", avatar: "🛸", game: "Minigame: Fuga Alienígena", group: "amigos" }
   ];
 
   var ITEM_DEFS = {
@@ -67,6 +75,28 @@ BZG.collectibles = (function () {
       ["🎉", "Bogão Festeiro"], ["💪", "Bogão Forte"], ["🎤", "Bogão Cantor"],
       ["🥇", "Bogão Campeão"], ["😂", "Bogão Engraçado"], ["🌟", "Bogão Estrela"],
       ["🏆", "Bogão Lendário"]
+    ],
+    pitoco: [
+      ["🐣", "Pitoco Clássico"], ["🥚", "Pitoco no Ovo"], ["🌾", "Pitoco do Milharal"],
+      ["🐤", "Pitoco Fofinho"], ["🎀", "Pitoco de Laço"], ["🍳", "Pitoco Chef"],
+      ["🌻", "Pitoco do Girassol"], ["⭐", "Pitoco Estrela"], ["🎩", "Pitoco Elegante"],
+      ["🏆", "Pitoco Lendário"]
+    ],
+    dhani: [
+      ["🏳️‍🌈", "Dhani Clássico"], ["🌈", "Dhani do Arco-íris"], ["✨", "Dhani Brilhante"],
+      ["🎨", "Dhani Artista"], ["🏆", "Dhani Lendário"]
+    ],
+    shadow: [
+      ["🌑", "Shadow Clássico"], ["🌙", "Shadow da Lua"], ["⭐", "Shadow Estrelado"],
+      ["🦉", "Shadow Coruja"], ["🏆", "Shadow Lendário"]
+    ],
+    cbpb: [
+      ["🎮", "CBPB Clássico"], ["🕹️", "CBPB Retrô"], ["🎧", "CBPB Streamer"],
+      ["🏅", "CBPB Campeão"], ["🏆", "CBPB Lendário"]
+    ],
+    alienjo: [
+      ["🛸", "Alien Jo Clássico"], ["👽", "Alien Jo Verdinho"], ["🌌", "Alien Jo Cósmico"],
+      ["☄️", "Alien Jo Cometa"], ["🏆", "Alien Jo Lendário"]
     ]
   };
 
@@ -81,6 +111,10 @@ BZG.collectibles = (function () {
   });
 
   function characters() { return CHARACTERS; }
+
+  function charactersByGroup(group) {
+    return CHARACTERS.filter(function (c) { return c.group === group; });
+  }
 
   function characterByKey(key) {
     for (var i = 0; i < CHARACTERS.length; i++) if (CHARACTERS[i].key === key) return CHARACTERS[i];
@@ -134,6 +168,7 @@ BZG.collectibles = (function () {
   return {
     DROP_CHANCE: DROP_CHANCE,
     characters: characters,
+    charactersByGroup: charactersByGroup,
     characterByKey: characterByKey,
     all: all,
     byCharacter: byCharacter,

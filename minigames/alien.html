@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Torre do CBPB_Gamer — Bazinga BET</title>
+  <title>Fuga Alienígena — Bazinga BET</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <script src="../js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
-  <link rel="stylesheet" href="../css/minigames/torre.css" />
+  <link rel="stylesheet" href="../css/minigames/alien.css" />
 </head>
-<body data-page="torre-minigame" data-title="Torre do CBPB_Gamer" data-icon="🧱">
+<body data-page="alien-minigame" data-title="Fuga Alienígena" data-icon="👽">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -20,36 +20,36 @@
       <header class="topbar" id="topbar"></header>
       <main class="container">
 
-        <section class="panel torre-hero">
-          <h1>🧱 Torre do <span class="torre-host">🎮 CBPB_Gamer</span></h1>
-          <p>Minigame sem aposta — nenhuma ficha em jogo! Clique (ou aperte espaço) na hora certa para empilhar o bloco e subir andares. Cada andar dá um pouco de XP e o seu melhor resultado fica salvo como recorde pessoal.</p>
+        <section class="panel alien-hero">
+          <h1>👽 Fuga Alienígena <span class="alien-host">com Alien Jo</span></h1>
+          <p>Minigame sem aposta — mova o disco voador (mouse, dedo ou setas ← →) e desvie dos meteoros. Quanto mais tempo sobreviver, mais XP você ganha!</p>
         </section>
 
         <div class="game-layout">
           <section class="panel controls">
-            <label>Andares nesta rodada</label>
-            <div class="torre-floor-count" id="torre-floor">0</div>
+            <label>Tempo sobrevivido</label>
+            <div class="alien-time" id="alien-time">0s</div>
 
             <label>Seu recorde</label>
-            <div class="torre-best" id="torre-best">0 andares</div>
+            <div class="alien-best" id="alien-best">0s</div>
 
-            <button id="torre-action-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
+            <button id="alien-action-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
               Começar
             </button>
 
-            <p id="torre-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              Clique em "Começar" e depois clique (ou espaço) para soltar o bloco.
+            <p id="alien-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
+              Clique em "Começar" e desvie dos meteoros.
             </p>
           </section>
 
           <div>
-            <section class="panel stage torre-stage" id="torre-stage">
-              <canvas id="torre-canvas" width="340" height="480"></canvas>
-              <div class="torre-gameover" id="torre-gameover">
-                <div class="torre-gameover-title">Fim de jogo!</div>
-                <div class="torre-gameover-floors" id="torre-gameover-floors">0 andares</div>
-                <div class="torre-gameover-sub" id="torre-gameover-sub"></div>
-                <button class="btn btn--gold" id="torre-retry-btn">Jogar de novo</button>
+            <section class="panel stage alien-stage" id="alien-stage">
+              <canvas id="alien-canvas" width="340" height="480"></canvas>
+              <div class="alien-gameover" id="alien-gameover">
+                <div class="alien-gameover-title">Nave atingida!</div>
+                <div class="alien-gameover-time" id="alien-gameover-time">0s</div>
+                <div class="alien-gameover-sub" id="alien-gameover-sub"></div>
+                <button class="btn btn--gold" id="alien-retry-btn">Jogar de novo</button>
               </div>
             </section>
           </div>
@@ -72,6 +72,6 @@
   <script src="../js/core/modes.js"></script>
   <script src="../js/core/battlepass.js"></script>
   <script src="../js/core/collectibles.js"></script>
-  <script src="../js/minigames/torre.js"></script>
+  <script src="../js/minigames/alien.js"></script>
 </body>
 </html>

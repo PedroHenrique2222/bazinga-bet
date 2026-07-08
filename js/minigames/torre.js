@@ -10,7 +10,7 @@
   var MARGIN = 14;
   var VISIBLE = 12;
   var PERFECT_TOLERANCE = 5;
-  var COLORS = ["#ff2d3a", "#ffcc00", "#ff8a00", "#2ecc71", "#00c2ff", "#b026ff"];
+  var COLORS = ["#00e5ff", "#b026ff", "#39ff14", "#ff2d7e", "#ffcc00", "#00ff88"]; // paleta neon-gamer (CBPB_Gamer)
 
   var canvas, ctx, floorEl, bestEl, statusEl, actionBtn, gameoverEl, gameoverFloorsEl, gameoverSubEl, retryBtn;
 

@@ -42,7 +42,8 @@ BZG.bots = (function () {
     { name: "BZG Pikles Gamer", avatar: "🥒" },
     { name: "BZG Pilha Avulsa", avatar: "🔋" },
     { name: "BZG Linden", avatar: "🗑️" },    // a lata de lixo
-    { name: "BZG Bogão", avatar: "🍑" }       // a bunda
+    { name: "BZG Bogão", avatar: "🍑" },      // a bunda
+    { name: "BZG Pitoco", avatar: "🐣" }
   ];
 
   function randomBot() {

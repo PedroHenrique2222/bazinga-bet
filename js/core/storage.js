@@ -44,7 +44,7 @@ BZG.storage = (function () {
       turboOn: false,       // modo turbo ligado
       battlepass: { claimed: {} },
       collectibles: { owned: {} },   // colecionaveis tematicos dos Bazingas: owned[itemId] = timestamp
-      minigames: { torre: { bestFloor: 0 } }, // recordes pessoais dos minigames sem aposta
+      minigames: { torre: { best: 0 }, rainbow: { best: 0 }, shadow: { best: 0 }, alien: { best: 0 } }, // recordes pessoais dos minigames sem aposta (best = andares/rodadas/acertos/segundos, conforme o jogo)
       resetToken: RESET_TOKEN,
       stats: {
         totalWagered: 0,
@@ -98,6 +98,9 @@ BZG.storage = (function () {
       var parsed = JSON.parse(raw);
       // preenche campos que possam faltar (ex.: versoes futuras)
       var base = defaultState();
+      // precisa saber SE o registro original ja tinha peakBalance antes do merge
+      // abaixo preencher esse campo com o valor padrao (senao o fallback nunca dispara)
+      var hadPeakBalance = !!parsed.stats && typeof parsed.stats.peakBalance === "number" && !isNaN(parsed.stats.peakBalance);
       parsed.stats = Object.assign({}, base.stats, parsed.stats);
       parsed.history = Object.assign({}, base.history, parsed.history);
       parsed.profile = Object.assign({}, base.profile, parsed.profile);
@@ -111,7 +114,13 @@ BZG.storage = (function () {
       parsed.collectibles = Object.assign({}, base.collectibles, parsed.collectibles);
       if (!parsed.collectibles.owned) parsed.collectibles.owned = {};
       parsed.minigames = Object.assign({}, base.minigames, parsed.minigames);
-      if (!parsed.minigames.torre) parsed.minigames.torre = { bestFloor: 0 };
+      Object.keys(base.minigames).forEach(function (g) {
+        if (!parsed.minigames[g]) parsed.minigames[g] = { best: 0 };
+        // migracao: campo antigo "bestFloor" (so existia no Torre) vira "best" generico
+        if (typeof parsed.minigames[g].best !== "number") {
+          parsed.minigames[g].best = parsed.minigames[g].bestFloor || 0;
+        }
+      });
       if (typeof parsed.turboOn !== "boolean") parsed.turboOn = false;
       if (typeof parsed.account === "undefined") parsed.account = null;
       if (typeof parsed.reloadBonus !== "number" || isNaN(parsed.reloadBonus)) parsed.reloadBonus = 0;
@@ -119,9 +128,11 @@ BZG.storage = (function () {
       if (typeof parsed.balance !== "number" || isNaN(parsed.balance)) {
         parsed.balance = base.balance;
       }
-      // quem ja jogava antes desse campo existir: usa o saldo atual como piso do recorde
-      if (typeof parsed.stats.peakBalance !== "number" || isNaN(parsed.stats.peakBalance)) {
-        parsed.stats.peakBalance = parsed.balance;
+      // quem ja jogava antes desse campo existir: usa o MAIOR entre o saldo atual e o
+      // padrao de fabrica como piso do recorde (nao da pra recuperar o pico historico
+      // real, que nunca foi salvo antes da v1.6)
+      if (!hadPeakBalance) {
+        parsed.stats.peakBalance = Math.max(parsed.balance || 0, base.balance);
       }
       // Reset unico de niveis/XP e do Passe de Batalha (roda uma vez por navegador)
       if (parsed.resetToken !== RESET_TOKEN) {
@@ -455,17 +466,17 @@ BZG.storage = (function () {
 
   function getMinigameBest(game) {
     var state = getState();
-    return (state.minigames[game] && state.minigames[game].bestFloor) || 0;
+    return (state.minigames[game] && state.minigames[game].best) || 0;
   }
 
   // registra o resultado de uma rodada de minigame; so atualiza o recorde se for melhor
   function reportMinigameScore(game, value) {
     var state = getState();
-    if (!state.minigames[game]) state.minigames[game] = { bestFloor: 0 };
-    var isNewBest = value > state.minigames[game].bestFloor;
-    if (isNewBest) state.minigames[game].bestFloor = value;
+    if (!state.minigames[game]) state.minigames[game] = { best: 0 };
+    var isNewBest = value > state.minigames[game].best;
+    if (isNewBest) state.minigames[game].best = value;
     saveState(state);
-    return { isNewBest: isNewBest, best: state.minigames[game].bestFloor };
+    return { isNewBest: isNewBest, best: state.minigames[game].best };
   }
 
   /* ---------- Cadastro (conta local, sem backend/banco de dados) ---------- */

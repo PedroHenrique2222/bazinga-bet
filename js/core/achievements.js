@@ -210,16 +210,28 @@ BZG.achievements = (function () {
       check: function (s) { return Object.keys(s.collectibles.owned).length >= 20; } },
     { id: "col-50", icon: "🎴", name: "Quase completo", desc: "Junte 50 colecionáveis",
       check: function (s) { return Object.keys(s.collectibles.owned).length >= 50; } },
-    { id: "col-set-1", icon: "🏆", name: "Álbum fechado", desc: "Complete o conjunto de figurinhas de um personagem BZG",
+    { id: "col-set-1", icon: "🏆", name: "Álbum fechado", desc: "Complete o conjunto de figurinhas de um personagem",
       check: function () { return BZG.collectibles && BZG.collectibles.characters().some(function (c) { return BZG.collectibles.isSetComplete(c.key); }); } },
-    { id: "col-set-all", icon: "👑", name: "Colecionador supremo", desc: "Complete o álbum de todos os 8 personagens BZG",
+    { id: "col-set-crew", icon: "👑", name: "Elenco completo", desc: "Complete o álbum de todos os membros da Equipe BZG",
+      check: function () { return BZG.collectibles && BZG.collectibles.characters().filter(function (c) { return c.group === "equipe"; }).every(function (c) { return BZG.collectibles.isSetComplete(c.key); }); } },
+    { id: "col-set-friends", icon: "🤝", name: "Turma completa", desc: "Complete o álbum de todos os Amigos dos Bazingas",
+      check: function () { return BZG.collectibles && BZG.collectibles.characters().filter(function (c) { return c.group === "amigos"; }).every(function (c) { return BZG.collectibles.isSetComplete(c.key); }); } },
+    { id: "col-set-all", icon: "🌟", name: "Colecionador supremo", desc: "Complete o álbum de TODOS os personagens (Equipe + Amigos)",
       check: function () { return BZG.collectibles && BZG.collectibles.characters().every(function (c) { return BZG.collectibles.isSetComplete(c.key); }); } },
 
-    /* ---------- Minigame Torre da Turma ---------- */
+    /* ---------- Minigames sem aposta ---------- */
     { id: "torre-10", icon: "🧱", name: "Construtor", desc: "Alcance 10 andares na Torre da Turma",
-      check: function (s) { return (s.minigames.torre && s.minigames.torre.bestFloor || 0) >= 10; } },
+      check: function (s) { return (s.minigames.torre && s.minigames.torre.best || 0) >= 10; } },
     { id: "torre-25", icon: "🏗️", name: "Arquiteto BZG", desc: "Alcance 25 andares na Torre da Turma",
-      check: function (s) { return (s.minigames.torre && s.minigames.torre.bestFloor || 0) >= 25; } }
+      check: function (s) { return (s.minigames.torre && s.minigames.torre.best || 0) >= 25; } },
+    { id: "rainbow-10", icon: "🏳️‍🌈", name: "Memória colorida", desc: "Alcance a rodada 10 na Sequência Arco-íris",
+      check: function (s) { return (s.minigames.rainbow && s.minigames.rainbow.best || 0) >= 10; } },
+    { id: "shadow-15", icon: "🌑", name: "Reflexo na escuridão", desc: "Acerte 15 sombras numa rodada de Sombra Rápida",
+      check: function (s) { return (s.minigames.shadow && s.minigames.shadow.best || 0) >= 15; } },
+    { id: "alien-30", icon: "👽", name: "Sobrevivente espacial", desc: "Sobreviva 30 segundos na Fuga Alienígena",
+      check: function (s) { return (s.minigames.alien && s.minigames.alien.best || 0) >= 30; } },
+    { id: "minigames-all", icon: "🕹️", name: "Todo-terreno", desc: "Tenha pelo menos um recorde em cada minigame sem aposta",
+      check: function (s) { return ["torre", "rainbow", "shadow", "alien"].every(function (g) { return (s.minigames[g] && s.minigames[g].best || 0) > 0; }); } }
   ];
 
   function all() {

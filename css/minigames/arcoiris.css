@@ -1,0 +1,122 @@
+/* Bazinga BET - minigame Sequencia Arco-iris (sem aposta) */
+
+.arco-hero {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(255, 45, 58, 0.1), rgba(176, 38, 255, 0.1));
+  border-color: rgba(176, 38, 255, 0.28);
+}
+
+.arco-hero h1 { margin: 0 0 6px; font-size: 24px; font-weight: 900; }
+.arco-hero p { margin: 0; color: var(--text-muted); font-size: 13.5px; max-width: 680px; }
+
+.arco-host {
+  background: linear-gradient(90deg, #ff2d3a, #ffcc00, #2ecc71, #00c2ff, #b026ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.arco-round-count {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+  line-height: 1;
+}
+
+:root[data-theme="dark"] .arco-round-count { color: var(--yellow); }
+
+.arco-best {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.arco-stage {
+  min-height: 420px;
+  padding: 30px;
+}
+
+.arco-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.arco-pad {
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  background: var(--pad-color);
+  opacity: 0.4;
+  filter: saturate(0.6);
+  transition: opacity 0.12s ease, filter 0.12s ease, transform 0.1s ease;
+  box-shadow: inset 0 -6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.arco-pad:hover {
+  opacity: 0.6;
+}
+
+.arco-pad:active {
+  transform: scale(0.95);
+}
+
+.arco-pad.lit {
+  opacity: 1;
+  filter: saturate(1.2);
+  box-shadow: 0 0 26px var(--pad-color), inset 0 -6px 14px rgba(0, 0, 0, 0.15);
+}
+
+.arco-gameover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius: var(--radius);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.arco-gameover.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.arco-gameover-title {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.arco-gameover-rounds {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--yellow-dark);
+}
+
+:root[data-theme="dark"] .arco-gameover-rounds { color: var(--yellow); }
+
+.arco-gameover-sub {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  min-height: 18px;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 480px) {
+  .arco-grid { max-width: 280px; gap: 10px; }
+  .arco-stage { padding: 18px; }
+}
