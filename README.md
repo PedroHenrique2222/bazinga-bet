@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.10
+# 🎰 Bazinga BET — v1.11
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -50,7 +50,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 |---|---|
 | `storage.js` | Tudo fica salvo em UM objeto no `localStorage` (`bazingaBetState`): saldo, conta, perfil, estatísticas (incl. recorde de saldo), histórico, cosméticos, Passe de Batalha, colecionáveis, recordes de minigame |
 | `layout.js` | Monta a sidebar e a topbar (com o card de perfil e os mini-campos de Nível/Recorde/Maior Prêmio) em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento; calcula os prefixos de pasta (`games/`, `minigames/`, raiz) dinamicamente |
-| `theme.js` | Sistema de temas (dark/light + 6 temas extras desbloqueáveis no Passe) |
+| `theme.js` | Sistema de temas (dark/light + 10 temas extras desbloqueáveis no Passe) |
 | `sounds.js` | Efeitos sonoros gerados por código (Web Audio API, 100% local) + música ambiente (vídeo do YouTube em loop, escondido — única parte do site que depende de internet) |
 | `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador |
 | `bots.js` | Só gera os "outros jogadores" simulados no painel ao vivo do Crash e do Double (ver seção própria) |
@@ -104,6 +104,8 @@ Isso muda quando o modo multiplayer/ranking (planejado com Supabase) for ao ar: 
 | 🔋 Moeda da Pilha | Coinflip | Cara ou coroa, quase 2x | ~98% |
 | 🏇 Corrida BZG | Horse | Aposte num dos 6 corredores da equipe BZG; se ele vencer, **dobra a aposta (2x fixo)**, sem odds diferentes por corredor | ~96% |
 
+**Controles que valem pra todos os jogos de aposta** (centralizados em `layout.js`): apertar **Enter** num campo de valor já aposta/joga; os botões rápidos **½ / 2x / Máx** nunca deixam o valor passar do seu saldo; e o site **lembra o último valor apostado** em cada jogo (guardado por página no `localStorage`, chave `bzgBet:<caminho>`).
+
 ### 🚧 Em desenvolvimento (fora do ar)
 
 - 🐯 **Bazinguinha** e 💎 **Bazinga Bonanza** aparecem na sidebar e no lobby com o selo **"EM DESENVOLVIMENTO"**, sem link clicável. Os arquivos continuam no projeto (em `games/`) mas `layout.js` bloqueia o acesso direto pela URL e redireciona para o lobby com um aviso. Para reativar um dos dois: em `js/core/layout.js` e `js/pages/lobby.js`, troque a flag `dev: true` do item por `hot: true` (ou remova a flag).
@@ -118,7 +120,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 - **100 níveis**, cada um custando **600 XP** (o XP é o mesmo do perfil: 1 XP a cada BZ$10 apostados) — são **60.000 XP** para zerar o passe.
 - **Organizado em 10 capítulos de 10 níveis, um por personagem**: o Capítulo 1 é dedicado a todos os **4 Amigos dos Bazingas** juntos (Dhani, Shadow, CBPB_Gamer, Alien Jo); os Capítulos 2–10 são um pra cada um dos **9 membros da Equipe BZG** (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, Pitoco) — ver `CHAPTERS` em `js/pages/passe.js` e `SPECIALS` em `js/core/battlepass.js`. Uma barra de navegação rápida no topo pula direto para qualquer capítulo.
-- **Todo nível dá uma recompensa específica** (nenhum nível "genérico" — ver `SPECIALS` em `battlepass.js`, cobre os 100 níveis 1 a 1): 44 níveis dão cosméticos — 23 avatares (um pra cada personagem, o mesmo avatar que dá pra ganhar completando a Coleção dele, é só um segundo caminho pro mesmo prêmio), as 7 cores de nome, os 6 temas extras, os 7 títulos e o Modo Turbo (nível 30). Os outros **56 níveis dão uma figurinha garantida da Coleção** do personagem daquele capítulo (reward `collectible`, chama `storage.grantCollectible` direto — sem depender do drop aleatório).
+- **Todo nível dá uma recompensa cosmética específica** (nenhum nível "genérico", e **nenhuma figurinha** — a Coleção agora é só drop; ver `SPECIALS` em `battlepass.js`, cobre os 100 níveis 1 a 1): **56 avatares** (um pra cada personagem + dezenas de novos: 🦖🐳🦋🍕🎸🛸🪐🗿🏰🐬🐘 e mais), **15 cores de nome** (as 7 antigas + Aqua, Lava, Tóxico, Realeza, Pôr do Sol, Galáxia, Algodão Doce, Esmeralda), **10 temas extras** (os 6 antigos + Sangue, Oceano, Vulcão, Lavanda) e **18 títulos**, além do **Modo Turbo** (nível 30). As cores/temas/títulos novos foram adicionados junto (CSS `.bzg-name.color-*` e `:root[data-skin="*"]` em `style.css`, `THEMES` em `theme.js`, `TITLES`/`COLOR_LABELS` em `battlepass.js`).
 - **A única recarga do Passe vem do bônus de capítulo**: ao resgatar o último nível de qualquer um dos 10 capítulos (10, 20, 30... 100), o jogador ganha **+BZ$ 5.000 de recarga** — exatamente uma vez por capítulo, **+BZ$ 50.000 no total** ao zerar o passe inteiro. Nenhum outro nível dá recarga. Ver `CHAPTER_BONUS` em `battlepass.js`; cada capítulo mostra esse aviso no cabeçalho.
 - Progresso e resgate ficam em `passe.html`; o botão "Resgatar tudo" resgata todos os níveis já alcançados de uma vez, em qualquer capítulo (incluindo os bônus de capítulo).
 
@@ -128,7 +130,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
   - **🎪 Equipe BZG**: 9 personagens (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, **Pitoco**), **10 itens cada = 90**.
   - **🤝 Amigos dos Bazingas**: 4 personagens (Dhani, Shadow, CBPB_Gamer, Alien Jo — cada um também estrela um dos minigames sem aposta), **5 itens cada = 20**.
   - **110 colecionáveis no total.**
-- **Duas formas de conseguir figurinhas**: (1) **drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha sorteada entre **todos os 110 itens de todos os personagens**, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`); (2) **56 níveis do Passe de Batalha dão uma figurinha garantida** do personagem daquele capítulo (reward `collectible` em `battlepass.js`) — sem depender de sorte.
+- **Só uma forma de conseguir figurinhas: drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha sorteada entre **todos os 110 itens de todos os personagens**, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`). O Passe de Batalha **não dá mais figurinhas** — de propósito, a Coleção virou uma coleta lenta que depende só da sorte, pra dar valor a completar cada álbum.
 - **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo, quando aplicável).
 - Página própria em `colecao.html`, separada nas duas seções acima, com aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve** — comprar pacotes com BZ$ é a próxima etapa, ainda não implementada.
 - No Perfil aparece um resumo compacto do progresso de cada personagem, com link para o álbum completo.
@@ -139,10 +141,10 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 | Minigame | Amigo | Mecânica | Recompensa |
 |---|---|---|---|
-| 🧱 Torre do CBPB_Gamer | CBPB_Gamer | Empilhar blocos, clique/espaço na hora certa (era "Torre da Turma") | XP + recorde de andares |
-| 🏳️‍🌈 Sequência Arco-íris | Dhani | Memorize e repita a sequência de cores (tipo Simon Says) | XP + recorde de rodadas |
-| 🌑 Sombra Rápida | Shadow | Clique nos "olhos" antes que sumam, 30s por rodada (tipo whack-a-mole) | XP + recorde de acertos |
-| 👽 Fuga Alienígena | Alien Jo | Desvie de meteoros com o disco voador (mouse/toque/setas), em canvas | XP + recorde de segundos |
+| 🧱 Torre do CBPB_Gamer | CBPB_Gamer | Empilhar blocos, clique/espaço na hora certa; **encaixes perfeitos seguidos fazem a torre voltar a crescer** | XP + recorde de andares |
+| 🏳️‍🌈 Sequência Arco-íris | Dhani | Memorize e repita a sequência de cores (tipo Simon Says); **cada pad toca uma nota musical própria** (vira uma melodia) | XP + recorde de rodadas |
+| 🌑 Sombra Rápida | Shadow | Clique nos "olhos" antes que sumam, 30s por rodada; de vez em quando aparece um **olho dourado ⭐ que vale 3** | XP + recorde de acertos |
+| 👽 Fuga Alienígena | Alien Jo | Desvie de meteoros com o disco voador (mouse/toque/setas); **pegue as estrelas ⭐ pra ganhar +2s** cada | XP + recorde de segundos |
 
 - Todos dão XP direto (`storage.addXp`) e guardam recorde pessoal (`storage.reportMinigameScore`/`getMinigameBest`, campo genérico `best`). Sem relação com os jogos de aposta existentes (ex.: a Torre não tem ligação com "Lixeira do Linden").
 - Mais minigames podem ser adicionados depois seguindo o mesmo padrão (`MINIGAME_ITEMS` em `layout.js`).
@@ -150,7 +152,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 ## ⚙️ Configurações
 
 - Música e efeitos sonoros (ligar/desligar)
-- Tema visual: dark/light + 6 temas extras (desbloqueados no Passe) — também dá pra trocar pelo mostruário na página de Perfil
+- Tema visual: dark/light + 10 temas extras (desbloqueados no Passe) — também dá pra trocar pelo mostruário na página de Perfil
 - Modo Turbo: acelera as animações dos jogos (desbloqueado no Passe, nível 30)
 - Conta: editar perfil, ver saldo e valor de recarga atual, **sair da conta**
 - Zona de perigo: apagar todos os dados (saldo, perfil, histórico, conquistas e conta)
@@ -193,6 +195,17 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 
 ## 📝 Changelog
 
+### v1.11 (2026-07-09)
+- **Passe de Batalha sem figurinhas — só cosméticos**: os 56 níveis que davam figurinha da Coleção agora dão **cosméticos de verdade**. O Passe passou a ter, ao todo, **56 avatares** (um por personagem + dezenas de novos), **15 cores de nome** (8 novas: Aqua, Lava, Tóxico, Realeza, Pôr do Sol, Galáxia, Algodão Doce, Esmeralda), **10 temas** (4 novos: Sangue, Oceano, Vulcão, Lavanda) e **18 títulos** (11 novos). A **Coleção virou 100% drop** (só cai apostando, nunca pelo Passe) — de propósito, pra ser uma coleta lenta e valorizar completar cada álbum. Ver `SPECIALS`/`TITLES`/`COLOR_LABELS` em `battlepass.js`, `THEMES` em `theme.js` e as regras `.bzg-name.color-*` / `:root[data-skin="*"]` em `style.css`. O bônus de capítulo (+BZ$ 5.000 por capítulo, +50.000 no total) **não mudou**.
+- **Subir de nível ficou bem mais demorado (de novo)**: a curva progressiva ficou bem mais dura — o custo base subiu de 1.000 → **3.000 XP** e o incremento por nível de 100 → **750 XP** (nível 1→2 agora pede 3.000 XP = BZ$ 30.000 apostados; 2→3 pede 3.750; 3→4 pede 4.500...). Ver `LEVEL_BASE_XP`/`LEVEL_STEP_XP` em `storage.js`. O Passe (600 XP fixo por nível) não muda.
+- **Responsividade completa no celular**: revisão de todas as páginas em telas pequenas (testado de 320px a 390px, sem estouro horizontal em nenhuma). Principais correções: **topbar** agora cabe inteira no celular — o botão "Recarregar" vira um ícone 🔄 e o chip de perfil mostra só o avatar (o botão de tema não some mais, cortado na borda); **cabeçalho dos capítulos do Passe** empilha direito (o título parava de ficar espremido palavra por palavra e o selo de bônus desce pra sua própria linha); **mesa da Roleta** ficou mais compacta e rola na horizontal dentro do painel. Jogos, minigames, Coleção e Perfil já eram responsivos e passaram no teste. Ver os novos blocos `@media` em `style.css`, `passe.css` e `roulette.css`.
+- **Revisão de todos os jogos com melhorias**:
+  - **Todos os jogos de aposta** ganharam 3 melhorias de uma vez (centralizadas em `layout.js`, valem pra todos): (1) **apertar Enter** num campo de valor já aposta/joga, sem precisar clicar no botão; (2) os botões **½ / 2x / Máx nunca passam do seu saldo** (o 2x para no que você tem); (3) o site **lembra o último valor apostado** em cada jogo, pra não ter que redigitar toda vez que voltar.
+  - **Sombra Rápida**: agora aparece de vez em quando um **olho dourado ⭐ que vale 3** (em vez de 1) — mais chance de recorde e um "coin" de comemoração.
+  - **Torre do CBPB_Gamer**: **encaixes perfeitos seguidos fazem a torre voltar a crescer** (mecânica clássica de stack) — do 2º encaixe perfeito em diante o bloco alarga de novo, recompensando a precisão.
+  - **Fuga Alienígena**: além de desviar dos meteoros, agora caem **estrelas ⭐ que você pode pegar pra ganhar +2s** cada — risco x recompensa (ir atrás da estrela sem bater num meteoro).
+  - **Sequência Arco-íris**: cada pad toca uma **nota musical própria** (dó-ré-mi-sol-lá-dó), então o jogo vira uma melodia de verdade, que nem o Simon original (novo `tone` exposto em `sounds.js`).
+
 ### v1.10 (2026-07-09)
 - **Recarga do Passe rebalanceada**: a recarga deixou de vir de dezenas de níveis avulsos — agora o **único jeito de ganhar recarga no Passe é o bônus de capítulo** (+BZ$ 5.000 exatos por capítulo completo, 10 no total = +BZ$ 50.000 ao zerar). Todos os 56 níveis que antes davam `reloadBoost` agora dão uma **figurinha garantida da Coleção** do personagem daquele capítulo (novo reward `collectible` em `battlepass.js`, chama `storage.grantCollectible` direto). Passe de Batalha agora tem uma recompensa específica em **todos** os 100 níveis (nenhum nível "genérico" sobrando).
 - **Corrigido bug de reinício no meio da partida** (relatado por um jogador) na **Sombra Rápida** e na **Sequência Arco-íris**: o botão de ação também serve pra reiniciar durante a partida ("Reiniciar"), mas clicar nele no meio de uma rodada não cancelava os `setTimeout` da rodada anterior — duas sequências ficavam rodando ao mesmo tempo, causando comportamento errado (sombras/pads acendendo fora de hora, placar estranho). `sombra.js` agora cancela os timers antigos no início de `startGame()`; `arcoiris.js` usa um contador de "geração" (`gameToken`) pra invalidar cadeias antigas e força limpar todos os pads ao reiniciar. Torre e Fuga Alienígena não tinham esse bug (usam `cancelAnimationFrame`/redesenho completo a cada frame, sem estado de CSS residual).
@@ -201,7 +214,7 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 - **Nível muito mais difícil de subir**: saiu o custo fixo de 1.000 XP por nível, entrou uma **curva progressiva** — cada nível pede 100 XP a mais que o anterior (nível 1→2 custa 1.000, 2→3 custa 1.100, 3→4 custa 1.200...). No nível 25 já é ~2x mais difícil que antes; no nível 100, quase 6x mais difícil (584.100 XP acumulado, contra 99.000 antes). Ver `xpForLevel()`/`getLevel()` em `storage.js`. As conquistas de nível (10/25/50/75/100 e "Veterano") foram recalculadas pros novos limiares. O Passe de Batalha **não muda** (continua 600 XP fixo por nível — usa o mesmo XP total, mas com progressão própria).
 - **Política de Privacidade** (`privacidade.html`, nova): explica o que é guardado (hoje, nada em servidor — tudo no `localStorage`), os serviços de terceiros usados (Google Fonts, YouTube) e o que muda quando o multiplayer chegar. Acessível mesmo sem conta; linkada no cadastro e em Configurações.
 - **Passe de Batalha reestruturado por personagem**: os 10 capítulos deixaram de ter nomes genéricos e passaram a ser 1 por personagem — Capítulo 1 = **todos os 4 Amigos dos Bazingas juntos**, Capítulos 2–10 = um pra cada um dos **9 membros da Equipe BZG** (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, Pitoco).
-- **Passe de Batalha com muito mais cosméticos**: 44 níveis com recompensa especial agora (eram 33) — 23 avatares (quase o dobro, incluindo um de cada personagem), as 7 cores, os 6 temas extras e os 7 títulos continuam todos lá. Inclui os avatares 🐒 (Macaco) e 🇧🇷 (Bandeira do Brasil) pedidos pelo usuário.
+- **Passe de Batalha com muito mais cosméticos**: 44 níveis com recompensa especial agora (eram 33) — 23 avatares (quase o dobro, incluindo um de cada personagem), as 7 cores, os 10 temas extras e os 7 títulos continuam todos lá. Inclui os avatares 🐒 (Macaco) e 🇧🇷 (Bandeira do Brasil) pedidos pelo usuário.
 - **Bônus de capítulo**: completar (resgatar) o último nível de qualquer um dos 10 capítulos dá **+BZ$ 5.000 de recarga extra**, além do que aquele nível já desse — ver `CHAPTER_BONUS` em `battlepass.js`. Aparece como aviso no cabeçalho de cada capítulo em `passe.html`.
 
 ### v1.8 (2026-07-08)

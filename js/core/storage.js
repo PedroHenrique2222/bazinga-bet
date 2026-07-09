@@ -6,9 +6,10 @@ BZG.storage = (function () {
   var STARTING_BALANCE = 10000;
   var MAX_HISTORY_ENTRIES = 25;
   // Custo de XP por nivel: progressivo (cada nivel pede mais que o anterior),
-  // nao mais fixo - ver getLevel()/xpForLevel() abaixo.
-  var LEVEL_BASE_XP = 1000;
-  var LEVEL_STEP_XP = 100;
+  // nao mais fixo - ver getLevel()/xpForLevel() abaixo. Subir de nivel ficou bem
+  // mais demorado: o custo base subiu de 1000 -> 3000 e o incremento de 100 -> 750.
+  var LEVEL_BASE_XP = 3000;
+  var LEVEL_STEP_XP = 750;
   // Marca de reset: ao mudar este valor, TODO jogador tem os niveis/XP zerados
   // uma unica vez ao abrir o site (o Passe de Batalha tambem reinicia).
   var RESET_TOKEN = "levels-reset-2026-07";
@@ -299,9 +300,9 @@ BZG.storage = (function () {
 
   /* Nivel: custo progressivo. XP total (cumulativo) pra ALCANCAR um nivel L
      (L>=1, nivel 1 = 0 XP): cada nivel custa LEVEL_BASE_XP + LEVEL_STEP_XP a
-     mais que o anterior (nivel 1->2 custa 1000, 2->3 custa 1100, 3->4 custa
-     1200...) - fica bem mais dificil nos niveis altos, sem pesar tanto no
-     comeco. */
+     mais que o anterior (nivel 1->2 custa 3000, 2->3 custa 3750, 3->4 custa
+     4500...) - fica bem mais dificil nos niveis altos, e ja bem mais demorado
+     no comeco (1 XP a cada BZ$10 apostados: o nivel 2 pede BZ$30.000). */
   function xpForLevel(level) {
     var stepsIn = level - 1;
     return stepsIn * LEVEL_BASE_XP + LEVEL_STEP_XP * (stepsIn * (stepsIn - 1) / 2);

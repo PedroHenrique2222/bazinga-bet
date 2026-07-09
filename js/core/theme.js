@@ -9,8 +9,12 @@
     ouro:   { name: "Ouro Real",    icon: "👑", mode: "dark" },
     matrix: { name: "Matrix",       icon: "🟢", mode: "dark" },
     rubi:   { name: "Rubi",         icon: "🔴", mode: "dark" },
+    sangue: { name: "Sangue",       icon: "🩸", mode: "dark" },
+    oceano: { name: "Oceano",       icon: "🌊", mode: "dark" },
+    vulcao: { name: "Vulcão",       icon: "🌋", mode: "dark" },
     rosa:   { name: "Rosa Chiclete", icon: "🩷", mode: "light" },
-    gelo:   { name: "Gelo",         icon: "🧊", mode: "light" }
+    gelo:   { name: "Gelo",         icon: "🧊", mode: "light" },
+    lavanda: { name: "Lavanda",     icon: "💜", mode: "light" }
   };
 
   function apply(id) {

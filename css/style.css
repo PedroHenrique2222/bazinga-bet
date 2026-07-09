@@ -1551,16 +1551,34 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   .balance-label { display: none; }
   .balance-box { padding: 7px 12px; }
   #balance-value { font-size: 14px; }
-  #reset-balance-btn { padding: 8px 10px; font-size: 12px; }
   .icon-btn { width: 34px; height: 34px; font-size: 15px; }
   .topbar-stats .mini-stat:not(:first-child) { display: none; }
   .mini-stat { padding: 6px 9px; font-size: 11.5px; }
   .topbar-profile-name { display: none; }
   .topbar-profile { padding: 4px 8px 4px 4px; gap: 5px; }
+  /* "Recarregar" vira so um icone pra caber a barra inteira num celular */
+  #reset-balance-btn {
+    font-size: 0;
+    padding: 0;
+    width: 36px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  #reset-balance-btn::before { content: "🔄"; font-size: 16px; }
 }
 
 @media (max-width: 560px) {
   .topbar-stats { display: none; }
+}
+
+@media (max-width: 480px) {
+  /* chip de perfil so com o avatar (o nivel aparece no Perfil e nas mini-stats) */
+  .topbar-profile-lvl { display: none; }
+  .topbar-profile { padding: 3px; }
+  .topbar { gap: 5px; }
 }
 
 /* celulares */
@@ -1606,7 +1624,7 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
 @media (max-width: 380px) {
   .lobby-grid { grid-template-columns: 1fr 1fr; }
   .balance-box { padding: 6px 9px; }
-  #reset-balance-btn { display: none; } /* recarga continua nas Configurações */
+  .topbar { gap: 4px; padding: 9px 8px; }
 }
 
 /* ==================== TEMAS (Passe de Batalha) ==================== */
@@ -1672,6 +1690,46 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   --yellow: #00bcd4; --yellow-dark: #0097a7; --yellow-glow: rgba(0, 188, 212, 0.4);
 }
 
+:root[data-skin="sangue"] {
+  --bg: #0f0304; --bg-alt: #170608;
+  --panel: rgba(220, 20, 40, 0.05); --panel-solid: #1c0709; --panel-alt: #260a0d;
+  --border: rgba(220, 40, 60, 0.2); --text: #ffe3e6; --text-muted: #c48a90;
+  --topbar-bg: rgba(15, 3, 4, 0.82); --sidebar-bg: #140406;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55); --glow-soft: rgba(200, 15, 30, 0.25);
+  --red: #e01020; --red-dark: #9c0010; --red-glow: rgba(224, 16, 32, 0.55);
+  --yellow: #ff5a3c; --yellow-dark: #cc3a20; --yellow-glow: rgba(255, 90, 60, 0.5);
+}
+
+:root[data-skin="oceano"] {
+  --bg: #030812; --bg-alt: #06101f;
+  --panel: rgba(0, 145, 234, 0.05); --panel-solid: #0a1526; --panel-alt: #0f1d33;
+  --border: rgba(40, 130, 210, 0.2); --text: #dcefff; --text-muted: #7d9fc4;
+  --topbar-bg: rgba(3, 8, 18, 0.82); --sidebar-bg: #060d1a;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55); --glow-soft: rgba(0, 120, 210, 0.22);
+  --red: #0091ea; --red-dark: #0067b0; --red-glow: rgba(0, 145, 234, 0.55);
+  --yellow: #00e5cc; --yellow-dark: #00b8a3; --yellow-glow: rgba(0, 229, 204, 0.5);
+}
+
+:root[data-skin="vulcao"] {
+  --bg: #0d0603; --bg-alt: #150a04;
+  --panel: rgba(255, 90, 0, 0.05); --panel-solid: #1a0e06; --panel-alt: #24140a;
+  --border: rgba(255, 100, 20, 0.2); --text: #ffeede; --text-muted: #c49a7d;
+  --topbar-bg: rgba(13, 6, 3, 0.82); --sidebar-bg: #120804;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.55); --glow-soft: rgba(255, 80, 0, 0.22);
+  --red: #ff5a1f; --red-dark: #c23a00; --red-glow: rgba(255, 90, 31, 0.55);
+  --yellow: #ffb300; --yellow-dark: #cc8f00; --yellow-glow: rgba(255, 179, 0, 0.5);
+}
+
+:root[data-skin="lavanda"] {
+  --bg: #f3f0fb; --bg-alt: #ffffff;
+  --panel: rgba(140, 80, 255, 0.06); --panel-solid: #ffffff; --panel-alt: #ece6fb;
+  --border: rgba(90, 50, 160, 0.14); --text: #241a3a; --text-muted: #6f6389;
+  --topbar-bg: rgba(243, 240, 251, 0.9); --sidebar-bg: #ffffff;
+  --shadow: 0 8px 24px rgba(90, 50, 160, 0.12); --glow-soft: rgba(140, 80, 255, 0.12);
+  --red: #8c50ff; --red-dark: #6a2fd1; --red-glow: rgba(140, 80, 255, 0.4);
+  --yellow: #d16aff; --yellow-dark: #a83fd1; --yellow-glow: rgba(209, 106, 255, 0.4);
+}
+
 /* ==================== CORES DE NOME (Passe de Batalha) ==================== */
 
 .bzg-name { font-weight: inherit; }
@@ -1697,6 +1755,35 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   animation: name-rainbow 4s linear infinite;
 }
 @keyframes name-rainbow { to { background-position: 200% 0; } }
+
+.bzg-name.color-aqua { color: #26e0d4; text-shadow: 0 0 6px rgba(38, 224, 212, 0.45); }
+.bzg-name.color-lava {
+  background: linear-gradient(90deg, #ff8a00, #ff2d3a);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-toxic {
+  background: linear-gradient(90deg, #b6ff00, #39ff14);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-royal {
+  background: linear-gradient(90deg, #7c4dff, #2979ff);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-sunset {
+  background: linear-gradient(90deg, #ff9500, #ff2d7e);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-galaxy {
+  background: linear-gradient(90deg, #b026ff, #2979ff, #ff2d7e);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  background-size: 200% 100%;
+  animation: name-rainbow 5s linear infinite;
+}
+.bzg-name.color-candy {
+  background: linear-gradient(90deg, #ff6ec4, #ffb3d9);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bzg-name.color-emerald { color: #2ecc71; text-shadow: 0 0 6px rgba(46, 204, 113, 0.45); }
 
 .bzg-title {
   font-size: 10px;

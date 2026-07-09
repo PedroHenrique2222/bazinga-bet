@@ -219,3 +219,23 @@
   justify-content: center;
   box-shadow: 0 0 8px var(--red-glow);
 }
+
+/* ---------- Celular: cabecalho do capitulo empilha ---------- */
+@media (max-width: 640px) {
+  .bp-chapter-head { flex-wrap: wrap; gap: 12px; }
+  .bp-chapter-icon { width: 48px; height: 48px; font-size: 26px; }
+  .bp-chapter-info { flex: 1; }
+  .bp-chapter-info h2 { font-size: 16px; }
+  /* a barra de progresso + bonus do capitulo desce pra sua propria linha */
+  .bp-chapter-progress {
+    flex-basis: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .bp-chapter-bonus { white-space: normal; }
+  .bp-track { grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); }
+}

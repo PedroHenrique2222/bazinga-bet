@@ -294,6 +294,7 @@ BZG.sounds = (function () {
   }
 
   return {
+    tone: tone,
     click: click,
     bet: bet,
     win: win,

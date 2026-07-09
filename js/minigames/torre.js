@@ -10,6 +10,7 @@
   var MARGIN = 14;
   var VISIBLE = 12;
   var PERFECT_TOLERANCE = 5;
+  var REGROW = 12; // encaixes perfeitos seguidos fazem a torre voltar a crescer
   var COLORS = ["#00e5ff", "#b026ff", "#39ff14", "#ff2d7e", "#ffcc00", "#00ff88"]; // paleta neon-gamer (CBPB_Gamer)
 
   var canvas, ctx, floorEl, bestEl, statusEl, actionBtn, gameoverEl, gameoverFloorsEl, gameoverSubEl, retryBtn;
@@ -20,6 +21,7 @@
   var state = "idle"; // idle | playing | gameover
   var rafId = null;
   var lastTime = 0;
+  var perfectStreak = 0; // encaixes perfeitos consecutivos
 
   function pickColor(i) { return COLORS[i % COLORS.length]; }
 
@@ -51,6 +53,7 @@
 
   function startGame() {
     blocks = [];
+    perfectStreak = 0;
     state = "playing";
     spawnMoving();
     updateFloorUI();
@@ -91,15 +94,31 @@
     var placed;
     if (below.width - overlapW <= PERFECT_TOLERANCE) {
       // encaixe quase perfeito: nao corta, encaixa alinhado (mais generoso e satisfatorio)
-      placed = { x: below.x, width: below.width, color: moving.color };
+      perfectStreak++;
+      var newX = below.x, newWidth = below.width;
+      // a partir do 2o encaixe perfeito seguido, a torre volta a CRESCER um pouco
+      // (mecanica classica de stack) - recompensa a precisao, ate a largura da base
+      if (perfectStreak >= 2) {
+        var grow = Math.min(REGROW, BASE_W - below.width);
+        if (grow > 0) {
+          newWidth = below.width + grow;
+          newX = below.x - grow / 2;
+          if (newX < MARGIN) newX = MARGIN;
+          if (newX + newWidth > W - MARGIN) newX = W - MARGIN - newWidth;
+        }
+        statusEl.textContent = "Encaixe perfeito ×" + perfectStreak + "! A torre está crescendo de novo 🔥";
+      }
+      placed = { x: newX, width: newWidth, color: moving.color };
       BZG.effects.flash(document.getElementById("torre-stage"), "gold");
+      BZG.sounds.coin();
     } else {
+      perfectStreak = 0;
       placed = { x: overlapLeft, width: overlapW, color: moving.color };
+      BZG.sounds.tick();
     }
 
     blocks.push(placed);
     updateFloorUI();
-    BZG.sounds.tick();
     spawnMoving();
   }
 

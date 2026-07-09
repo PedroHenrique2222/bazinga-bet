@@ -5,19 +5,34 @@
   var W = 340, H = 480;
   var UFO_R = 17;
   var UFO_Y = H - 46;
+  var STAR_BONUS = 2;      // cada estrela pega vale +2s
+  var STAR_INTERVAL = 4200; // aparece uma estrela a cada ~4.2s
 
   var canvas, ctx, timeEl, bestEl, statusEl, actionBtn, gameoverEl, gameoverTimeEl, gameoverSubEl, retryBtn;
 
   var state = "idle"; // idle | playing | gameover
   var ufoX = W / 2;
   var meteors = [];
+  var stars = [];
   var elapsed = 0;
+  var bonus = 0;          // segundos de bonus vindos das estrelas
   var lastSpawnAt = 0;
+  var lastStarAt = 0;
   var lastTime = 0;
   var rafId = null;
 
   function updateTimeUI() {
-    timeEl.textContent = Math.floor(elapsed) + "s";
+    timeEl.textContent = Math.floor(elapsed + bonus) + "s";
+  }
+
+  function spawnStar() {
+    var r = 13;
+    stars.push({
+      x: r + Math.random() * (W - r * 2),
+      y: -r,
+      r: r,
+      speed: 70 + Math.random() * 30 // caem mais devagar que os meteoros, pra dar pra pegar
+    });
   }
 
   function updateBestUI() {
@@ -37,13 +52,16 @@
   function startGame() {
     state = "playing";
     meteors = [];
+    stars = [];
     elapsed = 0;
+    bonus = 0;
     lastSpawnAt = 0;
+    lastStarAt = 0;
     ufoX = W / 2;
     updateTimeUI();
     gameoverEl.classList.remove("visible");
     actionBtn.textContent = "Reiniciar";
-    statusEl.textContent = "Desvie dos meteoros!";
+    statusEl.textContent = "Desvie dos meteoros ☄️ e pegue as estrelas ⭐ (+2s cada)!";
     lastTime = performance.now();
     if (rafId) cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(loop);
@@ -73,6 +91,25 @@
       }
     }
 
+    // estrelas: aparecem de vez em quando e, se voce encostar, dao +2s de bonus
+    if (now - lastStarAt > STAR_INTERVAL) {
+      spawnStar();
+      lastStarAt = now;
+    }
+    for (var s = stars.length - 1; s >= 0; s--) {
+      var st = stars[s];
+      st.y += st.speed * dt;
+      if (st.y - st.r > H) { stars.splice(s, 1); continue; }
+      var sdx = st.x - ufoX, sdy = st.y - UFO_Y;
+      if (Math.sqrt(sdx * sdx + sdy * sdy) < st.r + UFO_R - 2) {
+        stars.splice(s, 1);
+        bonus += STAR_BONUS;
+        updateTimeUI();
+        BZG.sounds.coin();
+        statusEl.textContent = "Pegou uma estrela! +" + STAR_BONUS + "s ⭐";
+      }
+    }
+
     render();
     rafId = requestAnimationFrame(loop);
   }
@@ -89,13 +126,18 @@
       ctx.font = (m.r * 2) + "px sans-serif";
       ctx.fillText("☄️", m.x, m.y);
     });
+
+    stars.forEach(function (s) {
+      ctx.font = (s.r * 2) + "px sans-serif";
+      ctx.fillText("⭐", s.x, s.y);
+    });
   }
 
   function endGame() {
     state = "gameover";
     if (rafId) cancelAnimationFrame(rafId);
 
-    var seconds = Math.floor(elapsed);
+    var seconds = Math.floor(elapsed + bonus);
     var xpGain = seconds * 5;
     if (xpGain > 0) BZG.storage.addXp(xpGain);
     var res = BZG.storage.reportMinigameScore("alien", seconds);

@@ -369,6 +369,59 @@ BZG.layout = (function () {
       if (BZG.collectibles) BZG.collectibles.rollOnBet();
     });
 
+    // Atalho de teclado: apertar Enter num campo numerico (ex.: valor da aposta)
+    // dispara o botao principal do jogo, pra apostar/jogar sem precisar clicar.
+    // Vale em qualquer jogo (o botao principal e sempre um .btn--primary nos
+    // controles). Se esse botao estiver desabilitado (rodada em andamento), nao
+    // faz nada. Os minigames nao tem campo numerico, entao nem sao afetados.
+    document.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var el = document.activeElement;
+      if (!el || el.tagName !== "INPUT") return;
+      if ((el.getAttribute("type") || "").toLowerCase() !== "number") return;
+      var btn = document.querySelector(".controls .btn--primary:not([disabled])") ||
+                document.querySelector(".btn--primary:not([disabled])");
+      if (btn) { e.preventDefault(); btn.click(); }
+    });
+
+    // Botoes rapidos de aposta (½/2x/Máx) nunca passam do seu saldo: depois que o
+    // jogo ajusta o valor, a gente limita ao saldo atual. Central pra valer em todo
+    // jogo sem mexer em cada um (roda no bubbling, depois do handler do proprio botao).
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      if (!t || (t.id !== "bet-half" && t.id !== "bet-double" && t.id !== "bet-max")) return;
+      var betInput = document.getElementById("bet-amount");
+      if (!betInput) return;
+      var balance = BZG.storage.getBalance();
+      var v = Math.round(Number(betInput.value) || 0);
+      var capped = Math.max(1, Math.min(v, Math.max(1, balance)));
+      if (capped !== v) {
+        betInput.value = capped;
+        // avisa o jogo pra atualizar previews (ganho potencial etc.) se ele escutar input
+        betInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    });
+
+    // Lembra o ultimo valor de aposta de cada jogo (por pagina), pra nao ter que
+    // redigitar toda vez. So mexe no campo #bet-amount, que so existe nos jogos.
+    (function () {
+      var betInput = document.getElementById("bet-amount");
+      if (!betInput) return;
+      var key = "bzgBet:" + window.location.pathname;
+      try {
+        var saved = localStorage.getItem(key);
+        if (saved !== null && !isNaN(Number(saved)) && Number(saved) >= 1) {
+          betInput.value = Math.round(Number(saved));
+          betInput.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+      } catch (err) {}
+      function save() {
+        try { localStorage.setItem(key, String(Math.max(1, Math.round(Number(betInput.value) || 0)))); } catch (err) {}
+      }
+      betInput.addEventListener("input", save);
+      document.addEventListener("bzg:bet-recorded", save);
+    })();
+
     // bonus diario aparece pouco depois de carregar
     setTimeout(showDailyBonus, 700);
   }

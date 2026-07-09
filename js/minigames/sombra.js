@@ -11,6 +11,8 @@
   var timeLeft = ROUND_SECONDS;
   var score = 0;
   var litIndex = -1;
+  var litGolden = false; // o olho atual e dourado (vale +3)?
+  var GOLDEN_CHANCE = 0.15;
   var tickIntervalId = null;
   var spawnTimeoutId = null;
   var hideTimeoutId = null;
@@ -35,8 +37,9 @@
   function updateBestUI() { bestEl.textContent = BZG.storage.getMinigameBest("shadow") + " acertos"; }
 
   function clearLit() {
-    if (litIndex !== -1) tiles[litIndex].classList.remove("lit");
+    if (litIndex !== -1) tiles[litIndex].classList.remove("lit", "golden");
     litIndex = -1;
+    litGolden = false;
   }
 
   function spawnNext() {
@@ -47,13 +50,16 @@
       var idx;
       do { idx = Math.floor(Math.random() * GRID_SIZE); } while (idx === litIndex);
       litIndex = idx;
+      litGolden = Math.random() < GOLDEN_CHANCE;
       tiles[idx].classList.add("lit");
+      if (litGolden) tiles[idx].classList.add("golden");
       var elapsed = ROUND_SECONDS - timeLeft;
       var visibleMs = Math.max(320, 900 - elapsed * 18);
       hideTimeoutId = setTimeout(function () {
         if (litIndex === idx) {
-          tiles[idx].classList.remove("lit");
+          tiles[idx].classList.remove("lit", "golden");
           litIndex = -1;
+          litGolden = false;
         }
         spawnNext();
       }, visibleMs);
@@ -63,10 +69,12 @@
   function tileClick(index) {
     if (state !== "playing" || index !== litIndex) return;
     clearTimeout(hideTimeoutId);
+    var gained = litGolden ? 3 : 1;
+    var wasGolden = litGolden;
     clearLit();
-    score++;
+    score += gained;
     updateScoreUI();
-    BZG.sounds.tick();
+    if (wasGolden) BZG.sounds.coin(); else BZG.sounds.tick();
     spawnNext();
   }
 
@@ -85,7 +93,7 @@
     updateTimerUI();
     gameoverEl.classList.remove("visible");
     actionBtn.textContent = "Reiniciar";
-    statusEl.textContent = "Vai! Clique nos olhos assim que aparecerem.";
+    statusEl.textContent = "Vai! Clique nos olhos assim que aparecerem — os olhos dourados ⭐ valem 3!";
 
     tickIntervalId = setInterval(function () {
       timeLeft--;

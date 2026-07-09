@@ -70,6 +70,13 @@
   font-size: 26px;
 }
 
+/* olho dourado: vale +3 (aparece de vez em quando) */
+.sombra-tile.lit.golden {
+  background: radial-gradient(circle, #4a3a10, #150e22);
+  box-shadow: 0 0 24px rgba(255, 204, 0, 0.75);
+}
+.sombra-tile.lit.golden::after { content: "⭐"; }
+
 @keyframes sombra-pop {
   from { transform: scale(0.7); }
   to { transform: scale(1); }

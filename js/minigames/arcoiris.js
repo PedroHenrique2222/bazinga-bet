@@ -7,6 +7,14 @@
 
   var pads, roundEl, bestEl, statusEl, actionBtn, gameoverEl, gameoverRoundsEl, gameoverSubEl, retryBtn;
 
+  // uma nota musical por pad (dó ré mi sol lá dó) - o jogo toca uma melodia,
+  // que nem o Simon original, em vez do mesmo "tick" pra todos
+  var PAD_TONES = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+  function padTone(index) {
+    if (BZG.sounds.tone) BZG.sounds.tone(PAD_TONES[index] || 523.25, 0.22, "sine", 0, 0.14);
+    else BZG.sounds.tick();
+  }
+
   var sequence = [];
   var playerIndex = 0;
   var state = "idle"; // idle | showing | input | gameover
@@ -46,7 +54,7 @@
         return;
       }
       litPad(sequence[i], true);
-      BZG.sounds.tick();
+      padTone(sequence[i]);
       i++;
       setTimeout(step, speed);
     }
@@ -73,7 +81,7 @@
     if (state !== "input") return;
     if (sequence[playerIndex] === index) {
       litPad(index, true);
-      BZG.sounds.tick();
+      padTone(index);
       setTimeout(function () { litPad(index, false); }, 180);
       playerIndex++;
       if (playerIndex >= sequence.length) {
