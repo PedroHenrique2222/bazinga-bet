@@ -71,6 +71,12 @@
   }
 
   function startGame() {
+    // cancela qualquer timer de uma rodada anterior (ex.: clicou "Reiniciar" no
+    // meio do jogo) - senao duas cadeias de spawn ficam rodando ao mesmo tempo
+    clearInterval(tickIntervalId);
+    clearTimeout(spawnTimeoutId);
+    clearTimeout(hideTimeoutId);
+
     state = "playing";
     timeLeft = ROUND_SECONDS;
     score = 0;
@@ -81,7 +87,6 @@
     actionBtn.textContent = "Reiniciar";
     statusEl.textContent = "Vai! Clique nos olhos assim que aparecerem.";
 
-    clearInterval(tickIntervalId);
     tickIntervalId = setInterval(function () {
       timeLeft--;
       updateTimerUI();

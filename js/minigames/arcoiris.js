@@ -10,6 +10,9 @@
   var sequence = [];
   var playerIndex = 0;
   var state = "idle"; // idle | showing | input | gameover
+  // sobe a cada startGame(): cadeias de setTimeout de uma rodada anterior (ex.:
+  // clicou "Reiniciar" no meio do jogo) se auto-cancelam ao ver um token velho
+  var gameToken = 0;
 
   function updateRoundUI() {
     roundEl.textContent = String(sequence.length);
@@ -30,9 +33,11 @@
   function playSequence() {
     state = "showing";
     statusEl.textContent = "Observe a sequência...";
+    var myToken = gameToken;
     var i = 0;
     var speed = flashSpeed();
     function step() {
+      if (myToken !== gameToken) return; // uma rodada nova comecou, aborta essa cadeia velha
       if (i > 0) litPad(sequence[i - 1], false);
       if (i >= sequence.length) {
         state = "input";
@@ -55,7 +60,10 @@
   }
 
   function startGame() {
+    gameToken++; // invalida qualquer cadeia de setTimeout de uma rodada anterior
     sequence = [];
+    // a cadeia antiga pode ter deixado um pad aceso ao ser abortada - limpa todos
+    pads.forEach(function (p) { p.classList.remove("lit"); });
     gameoverEl.classList.remove("visible");
     actionBtn.textContent = "Reiniciar";
     nextRound();
@@ -70,7 +78,8 @@
       playerIndex++;
       if (playerIndex >= sequence.length) {
         state = "showing"; // trava input ate a proxima sequencia comecar
-        setTimeout(nextRound, 700);
+        var myToken = gameToken;
+        setTimeout(function () { if (myToken === gameToken) nextRound(); }, 700);
       }
     } else {
       endGame();

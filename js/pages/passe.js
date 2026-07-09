@@ -92,6 +92,7 @@
           if (reward.r === "theme") BZG.ui.toast("Novo tema disponível nas Configurações! 🎨", "success");
           if (reward.r === "turbo") BZG.ui.toast("⚡ Modo Turbo liberado nas Configurações!", "success");
           if (reward.r === "reloadBoost") BZG.ui.toast("💳 Recarregue mais: " + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + " agora!", "success");
+          if (reward.r === "collectible") BZG.ui.toast("🎴 Nova figurinha guardada na sua Coleção!", "success");
           if (reward.chapterBonus) {
             setTimeout(function () {
               BZG.ui.toast("🎉 Capítulo completo! +" + BZG.ui.formatMoney(reward.chapterBonus) + " na recarga!", "success");

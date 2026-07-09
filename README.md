@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.9
+# 🎰 Bazinga BET — v1.10
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -118,8 +118,8 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 - **100 níveis**, cada um custando **600 XP** (o XP é o mesmo do perfil: 1 XP a cada BZ$10 apostados) — são **60.000 XP** para zerar o passe.
 - **Organizado em 10 capítulos de 10 níveis, um por personagem**: o Capítulo 1 é dedicado a todos os **4 Amigos dos Bazingas** juntos (Dhani, Shadow, CBPB_Gamer, Alien Jo); os Capítulos 2–10 são um pra cada um dos **9 membros da Equipe BZG** (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, Pitoco) — ver `CHAPTERS` em `js/pages/passe.js` e `SPECIALS` em `js/core/battlepass.js`. Uma barra de navegação rápida no topo pula direto para qualquer capítulo.
-- **44 níveis dão recompensas especiais** (quase o dobro de antes): avatares (23 no total, incluindo um pra cada personagem — o mesmo avatar que dá pra ganhar completando a Coleção dele, é só um segundo caminho pro mesmo prêmio), as 7 cores de nome, os 6 temas extras, os 7 títulos e o Modo Turbo (nível 30). Os outros 56 níveis dão **+BZ$ 5.000 no valor de recarga** (reward `reloadBoost` em `battlepass.js`).
-- **Bônus de capítulo**: ao resgatar o último nível de qualquer capítulo (10, 20, 30... 100), o jogador ganha **mais +BZ$ 5.000 de recarga**, por cima do que aquele nível já dava — ver `CHAPTER_BONUS` em `battlepass.js`. Cada capítulo mostra esse aviso no cabeçalho.
+- **Todo nível dá uma recompensa específica** (nenhum nível "genérico" — ver `SPECIALS` em `battlepass.js`, cobre os 100 níveis 1 a 1): 44 níveis dão cosméticos — 23 avatares (um pra cada personagem, o mesmo avatar que dá pra ganhar completando a Coleção dele, é só um segundo caminho pro mesmo prêmio), as 7 cores de nome, os 6 temas extras, os 7 títulos e o Modo Turbo (nível 30). Os outros **56 níveis dão uma figurinha garantida da Coleção** do personagem daquele capítulo (reward `collectible`, chama `storage.grantCollectible` direto — sem depender do drop aleatório).
+- **A única recarga do Passe vem do bônus de capítulo**: ao resgatar o último nível de qualquer um dos 10 capítulos (10, 20, 30... 100), o jogador ganha **+BZ$ 5.000 de recarga** — exatamente uma vez por capítulo, **+BZ$ 50.000 no total** ao zerar o passe inteiro. Nenhum outro nível dá recarga. Ver `CHAPTER_BONUS` em `battlepass.js`; cada capítulo mostra esse aviso no cabeçalho.
 - Progresso e resgate ficam em `passe.html`; o botão "Resgatar tudo" resgata todos os níveis já alcançados de uma vez, em qualquer capítulo (incluindo os bônus de capítulo).
 
 ## 🎴 Coleção de colecionáveis
@@ -128,7 +128,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
   - **🎪 Equipe BZG**: 9 personagens (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, **Pitoco**), **10 itens cada = 90**.
   - **🤝 Amigos dos Bazingas**: 4 personagens (Dhani, Shadow, CBPB_Gamer, Alien Jo — cada um também estrela um dos minigames sem aposta), **5 itens cada = 20**.
   - **110 colecionáveis no total.**
-- **Drop 100% aleatório**: toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha sorteada entre **todos os 110 itens de todos os personagens** — não existe nenhum vínculo entre o jogo que você está jogando e qual figurinha pode cair. Ver o evento `bzg:bet-recorded` (disparado por `storage.recordBet`) e o listener em `layout.js` que chama `collectibles.rollOnBet()`.
+- **Duas formas de conseguir figurinhas**: (1) **drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha sorteada entre **todos os 110 itens de todos os personagens**, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`); (2) **56 níveis do Passe de Batalha dão uma figurinha garantida** do personagem daquele capítulo (reward `collectible` em `battlepass.js`) — sem depender de sorte.
 - **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo, quando aplicável).
 - Página própria em `colecao.html`, separada nas duas seções acima, com aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve** — comprar pacotes com BZ$ é a próxima etapa, ainda não implementada.
 - No Perfil aparece um resumo compacto do progresso de cada personagem, com link para o álbum completo.
@@ -192,6 +192,10 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.10 (2026-07-09)
+- **Recarga do Passe rebalanceada**: a recarga deixou de vir de dezenas de níveis avulsos — agora o **único jeito de ganhar recarga no Passe é o bônus de capítulo** (+BZ$ 5.000 exatos por capítulo completo, 10 no total = +BZ$ 50.000 ao zerar). Todos os 56 níveis que antes davam `reloadBoost` agora dão uma **figurinha garantida da Coleção** do personagem daquele capítulo (novo reward `collectible` em `battlepass.js`, chama `storage.grantCollectible` direto). Passe de Batalha agora tem uma recompensa específica em **todos** os 100 níveis (nenhum nível "genérico" sobrando).
+- **Corrigido bug de reinício no meio da partida** (relatado por um jogador) na **Sombra Rápida** e na **Sequência Arco-íris**: o botão de ação também serve pra reiniciar durante a partida ("Reiniciar"), mas clicar nele no meio de uma rodada não cancelava os `setTimeout` da rodada anterior — duas sequências ficavam rodando ao mesmo tempo, causando comportamento errado (sombras/pads acendendo fora de hora, placar estranho). `sombra.js` agora cancela os timers antigos no início de `startGame()`; `arcoiris.js` usa um contador de "geração" (`gameToken`) pra invalidar cadeias antigas e força limpar todos os pads ao reiniciar. Torre e Fuga Alienígena não tinham esse bug (usam `cancelAnimationFrame`/redesenho completo a cada frame, sem estado de CSS residual).
 
 ### v1.9 (2026-07-09)
 - **Nível muito mais difícil de subir**: saiu o custo fixo de 1.000 XP por nível, entrou uma **curva progressiva** — cada nível pede 100 XP a mais que o anterior (nível 1→2 custa 1.000, 2→3 custa 1.100, 3→4 custa 1.200...). No nível 25 já é ~2x mais difícil que antes; no nível 100, quase 6x mais difícil (584.100 XP acumulado, contra 99.000 antes). Ver `xpForLevel()`/`getLevel()` em `storage.js`. As conquistas de nível (10/25/50/75/100 e "Veterano") foram recalculadas pros novos limiares. O Passe de Batalha **não muda** (continua 600 XP fixo por nível — usa o mesmo XP total, mas com progressão própria).
