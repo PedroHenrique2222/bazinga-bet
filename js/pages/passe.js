@@ -1,16 +1,16 @@
 /* Bazinga BET - pagina do Passe de Batalha, organizada em capitulos de 10 niveis */
 (function () {
   var CHAPTERS = [
-    { name: "Mesa de Iniciante", icon: "🎲" },
-    { name: "Rodada Quente", icon: "🔥" },
-    { name: "Turno da Sorte", icon: "🍀" },
-    { name: "Fichas Altas", icon: "💰" },
-    { name: "Meio da Noite", icon: "🌙" },
-    { name: "Salão VIP", icon: "🥂" },
-    { name: "Mesa dos Tubarões", icon: "🦈" },
-    { name: "Cofre da Casa", icon: "🔐" },
-    { name: "Lenda em Ascensão", icon: "⭐" },
-    { name: "Trono BZG", icon: "👑" }
+    { name: "Amigos dos Bazingas", icon: "🤝" },
+    { name: "BZG Abóbora", icon: "🎃" },
+    { name: "BZG Panetone", icon: "🍰" },
+    { name: "BZG Canoa Furada", icon: "🛶" },
+    { name: "BZG 616", icon: "🪖" },
+    { name: "BZG Pikles Gamer", icon: "🥒" },
+    { name: "BZG Pilha Avulsa", icon: "🔋" },
+    { name: "BZG Linden", icon: "🗑️" },
+    { name: "BZG Bogão", icon: "🍑" },
+    { name: "BZG Pitoco", icon: "🐣" }
   ];
   var TIERS_PER_CHAPTER = 10;
 
@@ -71,7 +71,10 @@
             '<h2>Capítulo ' + (ci + 1) + ': ' + ch.name + '</h2>' +
             '<p>Níveis ' + (from + 1) + '–' + to + '</p>' +
           '</div>' +
-          '<div class="bp-chapter-progress">' + claimedInChapter + ' / ' + TIERS_PER_CHAPTER + ' resgatados</div>' +
+          '<div class="bp-chapter-progress">' +
+            claimedInChapter + ' / ' + TIERS_PER_CHAPTER + ' resgatados' +
+            '<span class="bp-chapter-bonus">🎉 +' + BZG.ui.formatMoney(BZG.battlepass.CHAPTER_BONUS) + ' na recarga ao completar</span>' +
+          '</div>' +
         '</div>' +
         '<div class="bp-track">' + cards + '</div>' +
       '</section>';
@@ -89,6 +92,11 @@
           if (reward.r === "theme") BZG.ui.toast("Novo tema disponível nas Configurações! 🎨", "success");
           if (reward.r === "turbo") BZG.ui.toast("⚡ Modo Turbo liberado nas Configurações!", "success");
           if (reward.r === "reloadBoost") BZG.ui.toast("💳 Recarregue mais: " + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + " agora!", "success");
+          if (reward.chapterBonus) {
+            setTimeout(function () {
+              BZG.ui.toast("🎉 Capítulo completo! +" + BZG.ui.formatMoney(reward.chapterBonus) + " na recarga!", "success");
+            }, 500);
+          }
           render();
         }
       });
@@ -106,11 +114,16 @@
   document.addEventListener("DOMContentLoaded", function () {
     render();
     document.getElementById("claim-all-btn").addEventListener("click", function () {
-      var claimed = BZG.battlepass.claimAll();
-      if (claimed.length) {
-        BZG.ui.toast("🎉 " + claimed.length + " recompensa(s) resgatada(s)!", "success");
+      var result = BZG.battlepass.claimAll();
+      if (result.claimed.length) {
+        BZG.ui.toast("🎉 " + result.claimed.length + " recompensa(s) resgatada(s)!", "success");
         BZG.sounds.win();
         BZG.effects.confetti(window.innerWidth / 2, window.innerHeight / 3, 80);
+        if (result.chapterBonus) {
+          setTimeout(function () {
+            BZG.ui.toast("🎉 Capítulo(s) completo(s)! +" + BZG.ui.formatMoney(result.chapterBonus) + " na recarga!", "success");
+          }, 600);
+        }
         render();
       } else {
         BZG.ui.toast("Nenhuma recompensa disponível para resgatar agora.", "info");

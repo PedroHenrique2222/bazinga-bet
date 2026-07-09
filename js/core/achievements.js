@@ -73,7 +73,7 @@ BZG.achievements = (function () {
     {
       id: "veteran", icon: "🎖️", name: "Veterano",
       desc: "Chegue ao nível 5",
-      check: function (s) { return s.profile.xp >= 4000; }
+      check: function (s) { return s.profile.xp >= 4600; }
     },
     {
       id: "millionaire", icon: "🤑", name: "Alto lá, milionário",
@@ -97,11 +97,11 @@ BZG.achievements = (function () {
     },
 
     /* ---------- Progressao de nivel ---------- */
-    { id: "lvl-10", icon: "🎖️", name: "Nível 10", desc: "Chegue ao nível 10", check: function (s) { return s.profile.xp >= 9000; } },
-    { id: "lvl-25", icon: "🎖️", name: "Nível 25", desc: "Chegue ao nível 25", check: function (s) { return s.profile.xp >= 24000; } },
-    { id: "lvl-50", icon: "🏅", name: "Nível 50", desc: "Chegue ao nível 50", check: function (s) { return s.profile.xp >= 49000; } },
-    { id: "lvl-75", icon: "🏅", name: "Nível 75", desc: "Chegue ao nível 75", check: function (s) { return s.profile.xp >= 74000; } },
-    { id: "lvl-100", icon: "👑", name: "Nível máximo", desc: "Chegue ao nível 100", check: function (s) { return s.profile.xp >= 99000; } },
+    { id: "lvl-10", icon: "🎖️", name: "Nível 10", desc: "Chegue ao nível 10", check: function (s) { return s.profile.xp >= 12600; } },
+    { id: "lvl-25", icon: "🎖️", name: "Nível 25", desc: "Chegue ao nível 25", check: function (s) { return s.profile.xp >= 51600; } },
+    { id: "lvl-50", icon: "🏅", name: "Nível 50", desc: "Chegue ao nível 50", check: function (s) { return s.profile.xp >= 166600; } },
+    { id: "lvl-75", icon: "🏅", name: "Nível 75", desc: "Chegue ao nível 75", check: function (s) { return s.profile.xp >= 344100; } },
+    { id: "lvl-100", icon: "👑", name: "Nível máximo", desc: "Chegue ao nível 100", check: function (s) { return s.profile.xp >= 584100; } },
 
     /* ---------- Passe de Batalha ---------- */
     { id: "bp-10", icon: "🎫", name: "Passe: esquentando", desc: "Alcance o nível 10 do Passe de Batalha",

@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.8
+# 🎰 Bazinga BET — v1.9
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -18,6 +18,7 @@ BZG-BET/
 ├── passe.html            Passe de Batalha (100 niveis, em 10 capitulos)
 ├── colecao.html          Colecao/album de figurinhas dos Bazingas
 ├── settings.html         Configuracoes (som, tema, turbo, conta)
+├── privacidade.html      Politica de Privacidade (acessivel sem conta, LGPD)
 ├── favicon.svg
 ├── games/                Todas as paginas de JOGO (com aposta) ficam aqui
 │   ├── crash.html, double.html, mines.html, tower.html, plinko.html,
@@ -33,7 +34,7 @@ BZG-BET/
 │   ├── style.css         Estilos globais (sidebar, topbar, cards, temas)
 │   ├── games/*.css       Estilo especifico de cada jogo
 │   ├── minigames/*.css   Estilo especifico de cada minigame
-│   └── pages/*.css       Estilo especifico de cada pagina (perfil, passe, colecao, config, cadastro)
+│   └── pages/*.css       Estilo especifico de cada pagina (perfil, passe, colecao, config, cadastro, legal.css p/ privacidade)
 └── js/
     ├── core/             Modulos compartilhados (ver tabela abaixo)
     ├── games/*.js        Logica de cada jogo (com aposta)
@@ -50,7 +51,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 | `storage.js` | Tudo fica salvo em UM objeto no `localStorage` (`bazingaBetState`): saldo, conta, perfil, estatísticas (incl. recorde de saldo), histórico, cosméticos, Passe de Batalha, colecionáveis, recordes de minigame |
 | `layout.js` | Monta a sidebar e a topbar (com o card de perfil e os mini-campos de Nível/Recorde/Maior Prêmio) em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento; calcula os prefixos de pasta (`games/`, `minigames/`, raiz) dinamicamente |
 | `theme.js` | Sistema de temas (dark/light + 6 temas extras desbloqueáveis no Passe) |
-| `sounds.js` | Efeitos sonoros e música ambiente, gerados por código (Web Audio API) |
+| `sounds.js` | Efeitos sonoros gerados por código (Web Audio API, 100% local) + música ambiente (vídeo do YouTube em loop, escondido — única parte do site que depende de internet) |
 | `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador |
 | `bots.js` | Só gera os "outros jogadores" simulados no painel ao vivo do Crash e do Double (ver seção própria) |
 | `particles.js` / `effects.js` | Confete, flash de tela, animação de "Big Win" |
@@ -71,6 +72,15 @@ O cadastro pede só **nome de jogador e senha** (sem e-mail), mas **não existe 
 - A senha não passa por nenhum tipo de criptografia real (não faz sentido ter isso sem servidor) — é só para deixar o fluxo pronto para o dia em que o projeto ganhar um backend de verdade.
 - "Sair da conta" (em Configurações) volta para a tela de cadastro, mas mantém saldo/histórico salvos — só é preciso cadastrar de novo (ou o próximo visitante do navegador cria a própria conta).
 - "Apagar tudo" (em Configurações) apaga a conta também, e o site pede um novo cadastro.
+- **Política de Privacidade** (`privacidade.html`): página independente, **acessível mesmo sem conta** (não passa pelo "porteiro" do `layout.js`) — link no checkbox do cadastro e no rodapé de Configurações. Explica que hoje nada sai do navegador, exceto o tráfego técnico de terceiros (Google Fonts, YouTube da música de fundo). Ver seção LGPD abaixo.
+
+---
+
+## ⚖️ LGPD e privacidade
+
+Hoje (sem backend), o risco de LGPD é baixo: nome de jogador e senha ficam só no `localStorage`, quem administra o site nunca recebe nem armazena esses dados. As únicas trocas com terceiros são o carregamento do Google Fonts e do vídeo do YouTube (música de fundo) — ambos processam o IP de quem visita, como a maioria dos sites da internet, e isso está documentado em `privacidade.html`. O botão "Apagar tudo" em Configurações já cobre o direito de eliminação de dados.
+
+Isso muda quando o modo multiplayer/ranking (planejado com Supabase) for ao ar: nesse momento o site passa a coletar e-mail e estatísticas num servidor de verdade, e vira necessário ter base legal (consentimento no cadastro), e fluxos reais de acesso/correção/exclusão dos dados guardados no servidor. Isso está no escopo do plano de multiplayer.
 
 ---
 
@@ -107,10 +117,10 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 ## 🎫 Passe de Batalha
 
 - **100 níveis**, cada um custando **600 XP** (o XP é o mesmo do perfil: 1 XP a cada BZ$10 apostados) — são **60.000 XP** para zerar o passe.
-- **Não dá mais dinheiro direto.** Os níveis sem recompensa especial dão **+BZ$ 5.000 no valor de recarga** (o botão "Recarregar" fica maior a cada nível desses — ver `battlepass.js`, reward `reloadBoost`).
-- ~33 níveis-marco dão recompensas especiais: avatares, cores de nome, temas, títulos e o Modo Turbo (nível 30).
-- **Organizado em 10 capítulos temáticos** de 10 níveis cada (ex.: "Mesa de Iniciante", "Salão VIP", "Trono BZG") — ver `CHAPTERS` em `js/pages/passe.js`. Uma barra de navegação rápida no topo pula direto para qualquer capítulo.
-- Progresso e resgate ficam em `passe.html`; o botão "Resgatar tudo" resgata todos os níveis já alcançados de uma vez, em qualquer capítulo.
+- **Organizado em 10 capítulos de 10 níveis, um por personagem**: o Capítulo 1 é dedicado a todos os **4 Amigos dos Bazingas** juntos (Dhani, Shadow, CBPB_Gamer, Alien Jo); os Capítulos 2–10 são um pra cada um dos **9 membros da Equipe BZG** (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, Pitoco) — ver `CHAPTERS` em `js/pages/passe.js` e `SPECIALS` em `js/core/battlepass.js`. Uma barra de navegação rápida no topo pula direto para qualquer capítulo.
+- **44 níveis dão recompensas especiais** (quase o dobro de antes): avatares (23 no total, incluindo um pra cada personagem — o mesmo avatar que dá pra ganhar completando a Coleção dele, é só um segundo caminho pro mesmo prêmio), as 7 cores de nome, os 6 temas extras, os 7 títulos e o Modo Turbo (nível 30). Os outros 56 níveis dão **+BZ$ 5.000 no valor de recarga** (reward `reloadBoost` em `battlepass.js`).
+- **Bônus de capítulo**: ao resgatar o último nível de qualquer capítulo (10, 20, 30... 100), o jogador ganha **mais +BZ$ 5.000 de recarga**, por cima do que aquele nível já dava — ver `CHAPTER_BONUS` em `battlepass.js`. Cada capítulo mostra esse aviso no cabeçalho.
+- Progresso e resgate ficam em `passe.html`; o botão "Resgatar tudo" resgata todos os níveis já alcançados de uma vez, em qualquer capítulo (incluindo os bônus de capítulo).
 
 ## 🎴 Coleção de colecionáveis
 
@@ -182,6 +192,13 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.9 (2026-07-09)
+- **Nível muito mais difícil de subir**: saiu o custo fixo de 1.000 XP por nível, entrou uma **curva progressiva** — cada nível pede 100 XP a mais que o anterior (nível 1→2 custa 1.000, 2→3 custa 1.100, 3→4 custa 1.200...). No nível 25 já é ~2x mais difícil que antes; no nível 100, quase 6x mais difícil (584.100 XP acumulado, contra 99.000 antes). Ver `xpForLevel()`/`getLevel()` em `storage.js`. As conquistas de nível (10/25/50/75/100 e "Veterano") foram recalculadas pros novos limiares. O Passe de Batalha **não muda** (continua 600 XP fixo por nível — usa o mesmo XP total, mas com progressão própria).
+- **Política de Privacidade** (`privacidade.html`, nova): explica o que é guardado (hoje, nada em servidor — tudo no `localStorage`), os serviços de terceiros usados (Google Fonts, YouTube) e o que muda quando o multiplayer chegar. Acessível mesmo sem conta; linkada no cadastro e em Configurações.
+- **Passe de Batalha reestruturado por personagem**: os 10 capítulos deixaram de ter nomes genéricos e passaram a ser 1 por personagem — Capítulo 1 = **todos os 4 Amigos dos Bazingas juntos**, Capítulos 2–10 = um pra cada um dos **9 membros da Equipe BZG** (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, Pitoco).
+- **Passe de Batalha com muito mais cosméticos**: 44 níveis com recompensa especial agora (eram 33) — 23 avatares (quase o dobro, incluindo um de cada personagem), as 7 cores, os 6 temas extras e os 7 títulos continuam todos lá. Inclui os avatares 🐒 (Macaco) e 🇧🇷 (Bandeira do Brasil) pedidos pelo usuário.
+- **Bônus de capítulo**: completar (resgatar) o último nível de qualquer um dos 10 capítulos dá **+BZ$ 5.000 de recarga extra**, além do que aquele nível já desse — ver `CHAPTER_BONUS` em `battlepass.js`. Aparece como aviso no cabeçalho de cada capítulo em `passe.html`.
 
 ### v1.8 (2026-07-08)
 - **Cadastro simplificado**: removido o campo de e-mail — agora é só nome de jogador e senha. `storage.js` `createAccount()` não guarda mais e-mail (contas antigas que já tinham o campo continuam funcionando normalmente, o campo só fica sem uso).

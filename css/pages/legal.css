@@ -1,0 +1,72 @@
+/* Bazinga BET - paginas legais (privacidade, termos) - sem sidebar/topbar, tela cheia */
+
+body[data-page="privacidade"], body[data-page="termos"] {
+  display: flex;
+  min-height: 100vh;
+}
+
+.legal-screen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 45, 58, 0.12), transparent 55%), var(--bg);
+}
+
+.legal-card {
+  width: 100%;
+  max-width: 720px;
+  background: var(--panel-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 34px 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.legal-back {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.legal-back:hover { color: var(--yellow-dark); }
+:root[data-theme="dark"] .legal-back:hover { color: var(--yellow); }
+
+.legal-card h1 { font-size: 24px; font-weight: 900; margin: 0 0 4px; }
+
+.legal-updated {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0 0 22px;
+}
+
+.legal-card h2 {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 26px 0 8px;
+}
+
+.legal-card p { margin: 0 0 12px; font-size: 14px; }
+
+.legal-card ul { margin: 0 0 12px; padding-left: 20px; }
+.legal-card li { font-size: 14px; margin-bottom: 6px; }
+
+.legal-card code {
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12.5px;
+}
+
+.legal-card a { color: var(--yellow-dark); font-weight: 700; }
+:root[data-theme="dark"] .legal-card a { color: var(--yellow); }
+
+@media (max-width: 640px) {
+  .legal-card { padding: 24px 20px 30px; }
+  .legal-card h1 { font-size: 20px; }
+}

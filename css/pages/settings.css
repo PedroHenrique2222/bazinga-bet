@@ -80,6 +80,13 @@
   margin: 4px 0 0;
 }
 
+.settings-version a {
+  color: var(--yellow-dark);
+  font-weight: 700;
+  text-decoration: underline;
+}
+:root[data-theme="dark"] .settings-version a { color: var(--yellow); }
+
 /* grade de temas */
 .theme-grid {
   display: grid;

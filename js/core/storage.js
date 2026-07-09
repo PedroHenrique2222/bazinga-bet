@@ -5,6 +5,10 @@ BZG.storage = (function () {
   var STORAGE_KEY = "bazingaBetState";
   var STARTING_BALANCE = 10000;
   var MAX_HISTORY_ENTRIES = 25;
+  // Custo de XP por nivel: progressivo (cada nivel pede mais que o anterior),
+  // nao mais fixo - ver getLevel()/xpForLevel() abaixo.
+  var LEVEL_BASE_XP = 1000;
+  var LEVEL_STEP_XP = 100;
   // Marca de reset: ao mudar este valor, TODO jogador tem os niveis/XP zerados
   // uma unica vez ao abrir o site (o Passe de Batalha tambem reinicia).
   var RESET_TOKEN = "levels-reset-2026-07";
@@ -293,15 +297,27 @@ BZG.storage = (function () {
     return state.profile;
   }
 
-  /* Nivel: comeca em 1, sobe a cada 1000 XP */
+  /* Nivel: custo progressivo. XP total (cumulativo) pra ALCANCAR um nivel L
+     (L>=1, nivel 1 = 0 XP): cada nivel custa LEVEL_BASE_XP + LEVEL_STEP_XP a
+     mais que o anterior (nivel 1->2 custa 1000, 2->3 custa 1100, 3->4 custa
+     1200...) - fica bem mais dificil nos niveis altos, sem pesar tanto no
+     comeco. */
+  function xpForLevel(level) {
+    var stepsIn = level - 1;
+    return stepsIn * LEVEL_BASE_XP + LEVEL_STEP_XP * (stepsIn * (stepsIn - 1) / 2);
+  }
+
   function getLevel() {
     var xp = getState().profile.xp;
-    var level = 1 + Math.floor(xp / 1000);
+    var level = 1;
+    while (xp >= xpForLevel(level + 1)) level++;
+    var into = xp - xpForLevel(level);
+    var needed = xpForLevel(level + 1) - xpForLevel(level);
     return {
       level: level,
       xp: Math.round(xp),
-      into: Math.round(xp % 1000),
-      needed: 1000
+      into: Math.round(into),
+      needed: Math.round(needed)
     };
   }
 
