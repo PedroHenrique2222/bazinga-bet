@@ -167,9 +167,71 @@
   filter: grayscale(0.6);
 }
 
+/* ---------- Raridade das figurinhas ---------- */
+.col-slot-rarity {
+  font-size: 8.5px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--slot-rarity-color, var(--text-muted));
+}
+.col-slot.rarity-common    { --slot-rarity-color: #9aa0b0; }
+.col-slot.rarity-rare      { --slot-rarity-color: #3fa9ff; }
+.col-slot.rarity-epic      { --slot-rarity-color: #b96cff; }
+.col-slot.rarity-legendary { --slot-rarity-color: #ffc400; }
+
+.col-slot--owned.rarity-common    { border-color: rgba(154, 160, 176, 0.5); box-shadow: 0 0 8px rgba(154, 160, 176, 0.14); }
+.col-slot--owned.rarity-rare      { border-color: rgba(63, 169, 255, 0.6); box-shadow: 0 0 12px rgba(63, 169, 255, 0.22); }
+.col-slot--owned.rarity-epic      { border-color: rgba(185, 108, 255, 0.6); box-shadow: 0 0 14px rgba(185, 108, 255, 0.28); }
+.col-slot--owned.rarity-legendary { border-color: rgba(255, 196, 0, 0.65); box-shadow: 0 0 16px rgba(255, 196, 0, 0.34); }
+
+/* ---------- Extras do topo (progresso, legenda, recentes) ---------- */
+#col-extra { margin-top: 16px; }
+
+.col-progress { display: flex; align-items: center; gap: 12px; }
+.col-progress-bar {
+  flex: 1;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.col-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--red), var(--yellow));
+  transition: width 0.5s ease;
+}
+.col-progress-label { font-size: 12.5px; font-weight: 800; color: var(--text-muted); white-space: nowrap; }
+
+.col-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.col-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+.col-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.col-recent { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.col-recent-title {
+  font-size: 11.5px; font-weight: 800; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.col-recent-item {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  border-radius: 10px;
+  background: var(--panel-alt);
+  border: 1px solid var(--rec-color, var(--border));
+  box-shadow: 0 0 8px var(--rec-glow, transparent);
+}
+.col-recent-item.rarity-common    { --rec-color: rgba(154, 160, 176, 0.5); }
+.col-recent-item.rarity-rare      { --rec-color: #3fa9ff; --rec-glow: rgba(63, 169, 255, 0.25); }
+.col-recent-item.rarity-epic      { --rec-color: #b96cff; --rec-glow: rgba(185, 108, 255, 0.3); }
+.col-recent-item.rarity-legendary { --rec-color: #ffc400; --rec-glow: rgba(255, 196, 0, 0.35); }
+
 @media (max-width: 640px) {
   .col-hero h1 { font-size: 21px; }
   .col-total { font-size: 17px; padding: 6px 12px; }
   .col-grid { grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
   .col-slot-icon { font-size: 21px; }
+  .col-slot-rarity { font-size: 8px; }
 }

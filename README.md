@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.11
+# 🎰 Bazinga BET — v1.12
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -130,9 +130,11 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
   - **🎪 Equipe BZG**: 9 personagens (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, **Pitoco**), **10 itens cada = 90**.
   - **🤝 Amigos dos Bazingas**: 4 personagens (Dhani, Shadow, CBPB_Gamer, Alien Jo — cada um também estrela um dos minigames sem aposta), **5 itens cada = 20**.
   - **110 colecionáveis no total.**
-- **Só uma forma de conseguir figurinhas: drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha sorteada entre **todos os 110 itens de todos os personagens**, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`). O Passe de Batalha **não dá mais figurinhas** — de propósito, a Coleção virou uma coleta lenta que depende só da sorte, pra dar valor a completar cada álbum.
-- **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo, quando aplicável).
-- Página própria em `colecao.html`, separada nas duas seções acima, com aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve** — comprar pacotes com BZ$ é a próxima etapa, ainda não implementada.
+- **Só uma forma de conseguir figurinhas: drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`). O Passe de Batalha **não dá mais figurinhas** — de propósito, a Coleção virou uma coleta lenta que depende só da sorte, pra dar valor a completar cada álbum.
+- **Raridade** (4 níveis, ver `RARITY`/`rarityFor()` em `collectibles.js`): cada figurinha é **Comum** (cinza), **Rara** (azul), **Épica** (roxa) ou **Lendária** (dourada) — derivada da posição no álbum (o último item de cada personagem é sempre o Lendário). O sorteio é **ponderado por raridade** (Comum peso 12, Rara 5, Épica 2, Lendária 1), então as Lendárias caem bem menos — e como completar o álbum exige a Lendária, a coleta é de propósito longa.
+- **Aviso de drop repaginado**: em vez de um toast simples, sai um **card animado no centro da tela** ("revelação") com a figurinha grande, um brilho passando por cima, a raridade colorida, o nome e o progresso do álbum daquele personagem; Épicas/Lendárias/álbum-completo ainda soltam confete. Não bloqueia o jogo (fecha sozinho ou ao tocar). Ver `reveal()` em `collectibles.js` e os estilos `.cr-*` em `style.css`.
+- **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo, quando aplicável) — com uma revelação especial "🏆 Álbum completo!".
+- Página própria em `colecao.html`: barra de **progresso geral** (%), **legenda de raridades**, faixa de **"Últimas" figurinhas** (as 6 mais recentes) e cada carta mostra sua raridade com borda/brilho colorido. Tem aba "Álbum" (funcional) e aba **"Loja" marcada como Em breve**.
 - No Perfil aparece um resumo compacto do progresso de cada personagem, com link para o álbum completo.
 
 ## 🧱 Minigames (sem aposta)
@@ -194,6 +196,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.12 (2026-07-09)
+- **Aviso de colecionável muito melhor**: o antigo toast virou um **card de revelação animado no centro da tela** — figurinha grande com brilho passando, raridade colorida, nome e progresso do álbum, confete nas melhores, e um card dourado especial pra "🏆 Álbum completo!". Não bloqueia o jogo (`pointer-events:none` no fundo; fecha sozinho ou ao tocar). Ver `reveal()` em `collectibles.js` + estilos `.cr-*` em `style.css`.
+- **Sistema de colecionáveis com raridade**: 4 níveis (Comum/Rara/Épica/Lendária) derivados da posição no álbum (`rarityFor()`), com **sorteio ponderado** (`RARITY` weights 12/5/2/1) — Lendárias caem bem menos, então completar álbum ficou de propósito mais demorado. Na página da Coleção (`colecao.html`): **barra de progresso geral %**, **legenda de raridades**, faixa **"Últimas"** (6 figurinhas mais recentes por data) e cada carta com borda/brilho da cor da raridade. Novos exports em `collectibles.js` (`RARITY`, `rarityFor`, `rarityMeta`).
+- **Polimento visual geral** (`style.css`): botões principais ganharam um **brilho premium** no topo; **títulos de seção** ganharam uma barrinha de destaque vermelho→amarelo; **painéis** ganharam um filete de luz no topo; **cards de jogo** têm uma passada de brilho ao passar o mouse; o **lobby** entra com um fade suave escalonado (só opacidade, respeitando `prefers-reduced-motion`). Aplicado nos componentes compartilhados, então melhora Lobby, telas de jogo, Perfil, Passe e Coleção de uma vez.
 
 ### v1.11 (2026-07-09)
 - **Passe de Batalha sem figurinhas — só cosméticos**: os 56 níveis que davam figurinha da Coleção agora dão **cosméticos de verdade**. O Passe passou a ter, ao todo, **56 avatares** (um por personagem + dezenas de novos), **15 cores de nome** (8 novas: Aqua, Lava, Tóxico, Realeza, Pôr do Sol, Galáxia, Algodão Doce, Esmeralda), **10 temas** (4 novos: Sangue, Oceano, Vulcão, Lavanda) e **18 títulos** (11 novos). A **Coleção virou 100% drop** (só cai apostando, nunca pelo Passe) — de propósito, pra ser uma coleta lenta e valorizar completar cada álbum. Ver `SPECIALS`/`TITLES`/`COLOR_LABELS` em `battlepass.js`, `THEMES` em `theme.js` e as regras `.bzg-name.color-*` / `:root[data-skin="*"]` em `style.css`. O bônus de capítulo (+BZ$ 5.000 por capítulo, +50.000 no total) **não mudou**.

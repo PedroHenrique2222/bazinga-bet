@@ -110,6 +110,33 @@ BZG.collectibles = (function () {
     });
   });
 
+  /* Raridade: derivada da posicao do item no album (o ultimo item de cada
+     personagem e sempre o Lendario). Itens mais raros caem MENOS (peso menor no
+     sorteio), entao completar um album - que exige o Lendario - e de proposito
+     uma coleta longa. */
+  var RARITY = {
+    common:    { key: "common",    label: "Comum",    weight: 12, color: "#9aa0b0" },
+    rare:      { key: "rare",      label: "Raro",     weight: 5,  color: "#3fa9ff" },
+    epic:      { key: "epic",      label: "Épico",    weight: 2,  color: "#b96cff" },
+    legendary: { key: "legendary", label: "Lendário", weight: 1,  color: "#ffc400" }
+  };
+
+  function rarityFor(item) {
+    var total = (BY_CHAR[item.char] || []).length;
+    if (item.n >= total) return "legendary";
+    if (item.n >= total - 1) return "epic";
+    if (item.n >= Math.ceil(total * 0.6)) return "rare";
+    return "common";
+  }
+  function rarityMeta(r) { return RARITY[r] || RARITY.common; }
+
+  // pool ponderada por raridade pro sorteio do drop (lendarios repetem menos)
+  var WEIGHTED_POOL = [];
+  ALL_ITEMS.forEach(function (it) {
+    var w = rarityMeta(rarityFor(it)).weight;
+    for (var i = 0; i < w; i++) WEIGHTED_POOL.push(it);
+  });
+
   function characters() { return CHARACTERS; }
 
   function charactersByGroup(group) {
@@ -142,31 +169,70 @@ BZG.collectibles = (function () {
 
   function totalItems() { return ALL_ITEMS.length; }
 
-  // roda a cada aposta registrada (bzg:bet-recorded): chance pequena de soltar 1 colecionavel aleatorio
+  // roda a cada aposta registrada (bzg:bet-recorded): chance pequena de soltar 1
+  // colecionavel (sorteio ponderado por raridade - lendarios caem bem menos)
   function rollOnBet() {
     if (Math.random() >= DROP_CHANCE) return;
 
-    var item = ALL_ITEMS[Math.floor(Math.random() * ALL_ITEMS.length)];
+    var item = WEIGHTED_POOL[Math.floor(Math.random() * WEIGHTED_POOL.length)];
     var wasComplete = isSetComplete(item.char);
     var isNew = BZG.storage.grantCollectible(item.id);
-    if (!isNew) return; // ja tinha essa figurinha - sem toast, sem festa
+    if (!isNew) return; // ja tinha essa figurinha - sem festa
 
-    if (BZG.ui) BZG.ui.toast("🎴 Novo colecionável: " + item.icon + " " + item.name, "success");
+    var character = characterByKey(item.char);
+    var justCompleted = !wasComplete && isSetComplete(item.char);
+    if (justCompleted) BZG.storage.unlockCosmetic("avatars", character.avatar);
+    reveal(item, character, justCompleted);
+  }
 
-    if (!wasComplete && isSetComplete(item.char)) {
-      var character = characterByKey(item.char);
-      BZG.storage.unlockCosmetic("avatars", character.avatar);
-      if (BZG.ui) {
-        setTimeout(function () {
-          BZG.ui.toast("🏆 Álbum completo: " + character.name + "! Avatar " + character.avatar + " desbloqueado!", "success");
-        }, 600);
-      }
-      if (BZG.sounds && BZG.sounds.achievement) BZG.sounds.achievement();
+  // popup animado de "novo colecionavel" - bem mais chamativo que um toast.
+  // Nao bloqueia o jogo (overlay com pointer-events:none; so o card fecha ao clicar).
+  function reveal(item, character, justCompleted) {
+    if (!document.body) return;
+    var r = rarityFor(item);
+    var meta = rarityMeta(r);
+    var got = ownedCountFor(item.char);
+    var total = byCharacter(item.char).length;
+
+    var overlay = document.createElement("div");
+    overlay.className = "cr-overlay";
+    overlay.innerHTML =
+      '<div class="cr-card cr-' + r + (justCompleted ? " cr-complete" : "") + '">' +
+        '<div class="cr-badge">' + (justCompleted ? "🏆 Álbum completo!" : "Novo colecionável") + '</div>' +
+        '<div class="cr-sticker"><span class="cr-icon">' + item.icon + '</span><span class="cr-shine"></span></div>' +
+        '<div class="cr-rarity">' + meta.label + '</div>' +
+        '<div class="cr-name">' + BZG.ui.escapeHtml(item.name) + '</div>' +
+        '<div class="cr-album">' + character.avatar + ' ' + BZG.ui.escapeHtml(character.name) + ' · <strong>' + got + '/' + total + '</strong></div>' +
+        (justCompleted ? '<div class="cr-unlock">Avatar ' + character.avatar + ' desbloqueado!</div>' : '') +
+        '<div class="cr-hint">toque para fechar</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    requestAnimationFrame(function () { overlay.classList.add("show"); });
+
+    if (BZG.sounds) {
+      if (justCompleted && BZG.sounds.achievement) BZG.sounds.achievement();
+      else if (BZG.sounds.coin) BZG.sounds.coin();
     }
+    if ((justCompleted || r === "legendary" || r === "epic") && BZG.effects && BZG.effects.confetti) {
+      BZG.effects.confetti(window.innerWidth / 2, window.innerHeight * 0.42, justCompleted ? 110 : 70);
+    }
+
+    var life = justCompleted ? 3800 : 2600;
+    var timer = setTimeout(dismiss, life);
+    function dismiss() {
+      clearTimeout(timer);
+      overlay.classList.remove("show");
+      setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 350);
+    }
+    var card = overlay.querySelector(".cr-card");
+    if (card) card.addEventListener("click", dismiss);
   }
 
   return {
     DROP_CHANCE: DROP_CHANCE,
+    RARITY: RARITY,
+    rarityFor: rarityFor,
+    rarityMeta: rarityMeta,
     characters: characters,
     charactersByGroup: charactersByGroup,
     characterByKey: characterByKey,
