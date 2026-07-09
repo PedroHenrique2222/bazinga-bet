@@ -174,6 +174,42 @@
   to { box-shadow: inset 0 0 0 3px #ff8a00, 0 0 20px rgba(255, 170, 0, 0.75); }
 }
 
+/* wild travado no respin grudento: brilho eletrico constante */
+.ft-cell.locked {
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 214, 92, 0.55), rgba(255, 138, 0, 0.15) 70%);
+  animation: ft-cell-locked 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes ft-cell-locked {
+  from { box-shadow: inset 0 0 0 2px #ffe27a, 0 0 8px rgba(255, 200, 0, 0.4); }
+  to { box-shadow: inset 0 0 0 3px #ffb300, 0 0 22px rgba(255, 190, 0, 0.85); }
+}
+
+/* celula recem re-girada no respin: entra girando/desfocada */
+.ft-cell.reroll {
+  animation: ft-cell-reroll 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+@keyframes ft-cell-reroll {
+  0% { transform: translateY(-46%) scale(0.7); filter: blur(3px); opacity: 0.25; }
+  60% { filter: blur(0); opacity: 1; }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* banner enquanto os wilds re-giram */
+.ft-banner.respin {
+  background: linear-gradient(120deg, #6a1bd0, #ff8a00, #ffd400);
+  background-size: 220% 100%;
+  color: #fff;
+  animation: ft-banner-pop 0.35s cubic-bezier(0.2, 1.6, 0.4, 1), ft-respin-slide 1.1s linear infinite;
+  font-size: 16px;
+}
+
+@keyframes ft-respin-slide {
+  to { background-position: 220% 0; }
+}
+
 /* linhas de vitoria desenhadas por cima da grade */
 .ft-winlines {
   position: absolute;

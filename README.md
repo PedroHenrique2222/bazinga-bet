@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.13
+# 🎰 Bazinga BET — v1.14
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -23,8 +23,8 @@ BZG-BET/
 ├── games/                Todas as paginas de JOGO (com aposta) ficam aqui
 │   ├── crash.html, double.html, mines.html, tower.html, plinko.html,
 │   │   dice.html, hilo.html, roulette.html, blackjack.html,
-│   │   raspadinha.html, limbo.html, coinflip.html, horse.html
-│   └── bazinguinha.html, bonanza.html   (EM DESENVOLVIMENTO - ver abaixo)
+│   │   raspadinha.html, limbo.html, coinflip.html, horse.html, bazinguinha.html
+│   └── bonanza.html   (EM DESENVOLVIMENTO - ver abaixo)
 ├── minigames/            Minigames SEM aposta (nao mexem no saldo)
 │   ├── torre.html        Torre do CBPB_Gamer - empilhar blocos
 │   ├── arcoiris.html     Sequencia Arco-iris (com Dhani) - memoria, tipo Simon Says
@@ -103,12 +103,13 @@ Isso muda quando o modo multiplayer/ranking (planejado com Supabase) for ao ar: 
 | 📉 Limbo | Limbo | Escolha um alvo; se o resultado sorteado passar dele, você ganha | ~99% |
 | 🔋 Moeda da Pilha | Coinflip | Cara ou coroa, quase 2x | ~98% |
 | 🏇 Corrida BZG | Horse | Aposte num dos 6 corredores da equipe BZG; se ele vencer, **dobra a aposta (2x fixo)**, sem odds diferentes por corredor | ~96% |
+| 🐯 Bazinguinha | Slot (estilo Fortune Tiger) | 3×3, 5 linhas (3 horizontais + 2 diagonais). ⚡ é curinga. **Wild grudento**: caiu um ⚡, ele trava e os outros re-giram de graça; enquanto vier ⚡ novo, gira de novo. Tela cheia paga **×10** (máx 2500x) | ~95% |
 
 **Controles que valem pra todos os jogos de aposta** (centralizados em `layout.js`): apertar **Enter** num campo de valor já aposta/joga; os botões rápidos **½ / 2x / Máx** nunca deixam o valor passar do seu saldo; e o site **lembra o último valor apostado** em cada jogo (guardado por página no `localStorage`, chave `bzgBet:<caminho>`).
 
 ### 🚧 Em desenvolvimento (fora do ar)
 
-- 🐯 **Bazinguinha** e 💎 **Bazinga Bonanza** aparecem na sidebar e no lobby com o selo **"EM DESENVOLVIMENTO"**, sem link clicável. Os arquivos continuam no projeto (em `games/`) mas `layout.js` bloqueia o acesso direto pela URL e redireciona para o lobby com um aviso. Para reativar um dos dois: em `js/core/layout.js` e `js/pages/lobby.js`, troque a flag `dev: true` do item por `hot: true` (ou remova a flag).
+- 💎 **Bazinga Bonanza** aparece na sidebar e no lobby com o selo **"EM DESENVOLVIMENTO"**, sem link clicável. O arquivo continua no projeto (em `games/`) mas `layout.js` bloqueia o acesso direto pela URL e redireciona para o lobby com um aviso. Para reativar: em `js/core/layout.js` e `js/pages/lobby.js`, remova a flag `dev: true` do item (e o `data-dev="true"` do `<body>` da página).
 
 ### 🎥 Painel "ao vivo" do Crash e do Double
 
@@ -196,6 +197,12 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.14 (2026-07-09)
+- **🐯 Bazinguinha no ar** (saiu de "Em desenvolvimento"): virou um slot de verdade no estilo **Fortune Tiger** — 3×3, 5 linhas (3 horizontais + 2 diagonais), ⚡ curinga que substitui qualquer símbolo, e tela cheia do mesmo símbolo pagando **×10** (máx **2500x**).
+  - **Wild grudento com respin (mecânica nova)**: quando cai um ⚡, ele **trava no lugar** (brilho elétrico) e só os outros símbolos re-giram **de graça**; se a re-rolagem trouxer um ⚡ novo, ele também trava e gira de novo — encadeando até a tela encher. Cada respin tem sua própria animação (célula entra girando) e som. Ver `maybeRespin()`/`respinRound()` em `js/games/bazinguinha.js` e as regras `.ft-cell.locked` / `.ft-cell.reroll` / `.ft-banner.respin` em `css/games/bazinguinha.css`.
+  - **RTP calibrado por Monte Carlo** (6 milhões de giros): pagamentos 🎃1 / 🔋1.5 / 🥒2.5 / 🍰5 / 🍑12.5 / ⚡50 (por linha) com pesos 30/25/20/15/10/3 → **RTP ~95%**, respin dispara em ~23% dos giros, tela cheia ~1 em 10.000.
+  - **Ativação**: removido o `data-dev="true"` do `<body>` de `games/bazinguinha.html` e a flag `dev: true` dos itens da Bazinguinha em `js/core/layout.js` e `js/pages/lobby.js` (agora com selo **NOVO**). A paytable da página ganhou um bloco explicando o respin.
 
 ### v1.13 (2026-07-09)
 - **Figurinhas mais raras**: a chance de soltar um colecionável a cada aposta caiu de **15% para 5%** (`DROP_CHANCE` em `collectibles.js`) — some com a coleta 3× mais lenta, deixando a Coleção ainda mais valiosa de completar. A raridade por item (peso 12/5/2/1) continua igual.

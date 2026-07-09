@@ -1,19 +1,22 @@
-/* Bazinga BET - Bazinguinha v2: regras estilo Fortune Tiger
+/* Bazinga BET - Bazinguinha v3: regras estilo Fortune Tiger COM respin de wild grudento.
    3x3, 5 linhas fixas (3 horizontais + 2 diagonais), ⚡ WILD substitui tudo,
    tela cheia do mesmo simbolo multiplica o ganho por 10.
-   Pagamentos por linha calibrados por Monte Carlo (3M giros): RTP ~90%, max 2500x. */
+   Respin grudento: caiu >=1 wild? ele TRAVA e os outros simbolos re-giram;
+   enquanto uma re-rolagem trouxer wild NOVO, gira de novo (ate a tela encher).
+   Calibrado por Monte Carlo (4M giros): RTP ~95%, max 2500x. */
 (function () {
   var STRIP_LEN = 21;
   var COL_DURATIONS = [1100, 1500, 1950];
+  var MAX_RESPINS = 30; // trava de seguranca (na pratica quase nunca passa de 3-4)
 
   var SYMBOLS = [
-    { icon: "🎃", pay: 1, weight: 6 },
-    { icon: "🔋", pay: 1.5, weight: 5 },
-    { icon: "🥒", pay: 2.5, weight: 4 },
-    { icon: "🍰", pay: 5, weight: 3 },
-    { icon: "🍑", pay: 12.5, weight: 2 }
+    { icon: "🎃", pay: 1, weight: 30 },
+    { icon: "🔋", pay: 1.5, weight: 25 },
+    { icon: "🥒", pay: 2.5, weight: 20 },
+    { icon: "🍰", pay: 5, weight: 15 },
+    { icon: "🍑", pay: 12.5, weight: 10 }
   ];
-  var WILD = { icon: "⚡", pay: 50, weight: 1 };
+  var WILD = { icon: "⚡", pay: 50, weight: 3 };
   var ALL = SYMBOLS.concat([WILD]);
   var TOTALW = ALL.reduce(function (s, x) { return s + x.weight; }, 0);
   var PAY = {}; ALL.forEach(function (s) { PAY[s.icon] = s.pay; });
@@ -56,6 +59,35 @@
     var f = nonWild[0];
     if (nonWild.every(function (x) { return x === f; })) return PAY[f];
     return 0;
+  }
+
+  function countWild(grid) {
+    return grid.filter(function (x) { return x === "⚡"; }).length;
+  }
+
+  /* Redesenha a grade 3x3 estatica (mesmas colunas do giro), com marcadores
+     opcionais: winCells (celulas vencedoras), locked (wilds travados brilhando),
+     reroll (celulas que acabaram de re-girar, com animacao de troca). */
+  function renderStaticGrid(grid, opts) {
+    opts = opts || {};
+    var winCells = opts.winCells || {};
+    var reroll = opts.reroll || null;
+    gridEl.innerHTML = '<div class="ft-col"></div><div class="ft-col"></div><div class="ft-col"></div>';
+    for (var c = 0; c < 3; c++) {
+      var colEl = gridEl.children[c];
+      var html = "";
+      for (var r = 0; r < 3; r++) {
+        var idx = r * 3 + c;
+        var extra = "";
+        if (winCells[idx]) extra += " hit";
+        if (opts.locked && grid[idx] === "⚡") extra += " locked";
+        if (reroll && reroll.indexOf(idx) !== -1) extra += " reroll";
+        var cellHtml = cellHTML(grid[idx]);
+        if (extra) cellHtml = cellHtml.replace('class="ft-cell', 'class="ft-cell' + extra);
+        html += cellHtml;
+      }
+      colEl.innerHTML = '<div class="ft-strip">' + html + '</div>';
+    }
   }
 
   function cellHTML(icon) {
@@ -172,10 +204,55 @@
         if (t >= 1 && !done[c2]) { done[c2] = true; BZG.sounds.click(); }
         if (t < 1) allDone = false;
       }
-      if (allDone) finish(grid, bet);
+      if (allDone) maybeRespin(grid, bet);
       else requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+  }
+
+  /* Apos o giro cair: se ha wild(s) e a tela nao esta cheia, entra no respin
+     grudento - trava os wilds e re-gira o resto, encadeando enquanto surgir
+     wild novo. Quando parar, avalia o resultado em finish(). */
+  function maybeRespin(grid, bet) {
+    var wc = countWild(grid);
+    if (wc < 1 || wc >= 9) { finish(grid, bet); return; }
+    bannerEl.className = "ft-banner respin";
+    bannerEl.textContent = "⚡ WILD TRAVADO! Re-girando…";
+    setStatus("Wild grudento! Re-girando os outros símbolos…");
+    renderStaticGrid(grid, { locked: true });
+    BZG.sounds.roar();
+    var sp = BZG.modes.speed();
+    setTimeout(function () { respinRound(grid, bet, 1); }, 520 * sp);
+  }
+
+  function respinRound(grid, bet, round) {
+    var before = countWild(grid);
+    var changed = [];
+    var newWild = false;
+    for (var j = 0; j < 9; j++) {
+      if (grid[j] !== "⚡") {
+        grid[j] = pick();
+        changed.push(j);
+        if (grid[j] === "⚡") newWild = true;
+      }
+    }
+    var wc = countWild(grid);
+    renderStaticGrid(grid, { locked: true, reroll: changed });
+    BZG.sounds.click();
+
+    var sp = BZG.modes.speed();
+    var again = newWild && wc < 9 && round < MAX_RESPINS;
+    if (newWild) {
+      var gained = wc - before;
+      bannerEl.className = "ft-banner respin";
+      bannerEl.textContent = "⚡ +" + gained + " WILD! Re-girando…";
+      BZG.sounds.coin();
+      BZG.effects.flash(stageEl, "gold");
+    }
+    setTimeout(function () {
+      if (again) respinRound(grid, bet, round + 1);
+      else finish(grid, bet);
+    }, (newWild ? 720 : 560) * sp);
   }
 
   function finish(grid, bet) {
@@ -202,22 +279,8 @@
     var payout = Math.round(bet * totalPay);
     var won = payout > 0;
 
-    // grade final estatica com destaque nas celulas vencedoras
-    gridEl.innerHTML =
-      '<div class="ft-col-static c0"></div><div class="ft-col-static c1"></div><div class="ft-col-static c2"></div>';
-    // renderiza como colunas para manter o mesmo visual
-    for (var c = 0; c < 3; c++) {
-      var colEl = gridEl.children[c];
-      colEl.className = "ft-col";
-      var html = "";
-      for (var r = 0; r < 3; r++) {
-        var idx = r * 3 + c;
-        var cellHtml = cellHTML(grid[idx]);
-        if (winCells[idx]) cellHtml = cellHtml.replace('class="ft-cell', 'class="ft-cell hit');
-        html += cellHtml;
-      }
-      colEl.innerHTML = '<div class="ft-strip">' + html + '</div>';
-    }
+    // grade final estatica: celulas vencedoras piscam, wilds ficam realcados
+    renderStaticGrid(grid, { winCells: winCells, locked: true });
 
     // desenha as linhas vencedoras e acende os indicadores
     winlinesEl.innerHTML = winLines.map(function (l) {
