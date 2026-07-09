@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.12
+# 🎰 Bazinga BET — v1.13
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -130,7 +130,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
   - **🎪 Equipe BZG**: 9 personagens (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, **Pitoco**), **10 itens cada = 90**.
   - **🤝 Amigos dos Bazingas**: 4 personagens (Dhani, Shadow, CBPB_Gamer, Alien Jo — cada um também estrela um dos minigames sem aposta), **5 itens cada = 20**.
   - **110 colecionáveis no total.**
-- **Só uma forma de conseguir figurinhas: drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (15%) de soltar uma figurinha, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`). O Passe de Batalha **não dá mais figurinhas** — de propósito, a Coleção virou uma coleta lenta que depende só da sorte, pra dar valor a completar cada álbum.
+- **Só uma forma de conseguir figurinhas: drop 100% aleatório** — toda aposta, em **qualquer jogo**, tem uma chance pequena (5%) de soltar uma figurinha, sem nenhum vínculo com o jogo que você está jogando (ver evento `bzg:bet-recorded` → `collectibles.rollOnBet()` em `layout.js`). O Passe de Batalha **não dá mais figurinhas** — de propósito, a Coleção virou uma coleta lenta que depende só da sorte, pra dar valor a completar cada álbum.
 - **Raridade** (4 níveis, ver `RARITY`/`rarityFor()` em `collectibles.js`): cada figurinha é **Comum** (cinza), **Rara** (azul), **Épica** (roxa) ou **Lendária** (dourada) — derivada da posição no álbum (o último item de cada personagem é sempre o Lendário). O sorteio é **ponderado por raridade** (Comum peso 12, Rara 5, Épica 2, Lendária 1), então as Lendárias caem bem menos — e como completar o álbum exige a Lendária, a coleta é de propósito longa.
 - **Aviso de drop repaginado**: em vez de um toast simples, sai um **card animado no centro da tela** ("revelação") com a figurinha grande, um brilho passando por cima, a raridade colorida, o nome e o progresso do álbum daquele personagem; Épicas/Lendárias/álbum-completo ainda soltam confete. Não bloqueia o jogo (fecha sozinho ou ao tocar). Ver `reveal()` em `collectibles.js` e os estilos `.cr-*` em `style.css`.
 - **Completar o álbum de um personagem desbloqueia o avatar exclusivo dele** (o mesmo avatar usado pelo bot daquele personagem no painel ao vivo, quando aplicável) — com uma revelação especial "🏆 Álbum completo!".
@@ -196,6 +196,9 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.13 (2026-07-09)
+- **Figurinhas mais raras**: a chance de soltar um colecionável a cada aposta caiu de **15% para 5%** (`DROP_CHANCE` em `collectibles.js`) — some com a coleta 3× mais lenta, deixando a Coleção ainda mais valiosa de completar. A raridade por item (peso 12/5/2/1) continua igual.
 
 ### v1.12 (2026-07-09)
 - **Aviso de colecionável muito melhor**: o antigo toast virou um **card de revelação animado no centro da tela** — figurinha grande com brilho passando, raridade colorida, nome e progresso do álbum, confete nas melhores, e um card dourado especial pra "🏆 Álbum completo!". Não bloqueia o jogo (`pointer-events:none` no fundo; fecha sozinho ou ao tocar). Ver `reveal()` em `collectibles.js` + estilos `.cr-*` em `style.css`.

@@ -9,7 +9,7 @@
 window.BZG = window.BZG || {};
 
 BZG.collectibles = (function () {
-  var DROP_CHANCE = 0.15;
+  var DROP_CHANCE = 0.05;
 
   var CHARACTERS = [
     { key: "abobora", name: "BZG Abóbora", avatar: "🎃", game: "Plinko da Abóbora", group: "equipe" },
