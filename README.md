@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.14
+# 🎰 Bazinga BET — v1.15
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -17,6 +17,7 @@ BZG-BET/
 ├── profile.html          Perfil do jogador (avatar, cor do nome, titulo, temas, stats)
 ├── passe.html            Passe de Batalha (100 niveis, em 10 capitulos)
 ├── colecao.html          Colecao/album de figurinhas dos Bazingas
+├── ranking.html          Ranking online (Supabase) - saldo/recorde/nivel entre jogadores
 ├── settings.html         Configuracoes (som, tema, turbo, conta)
 ├── privacidade.html      Politica de Privacidade (acessivel sem conta, LGPD)
 ├── favicon.svg
@@ -59,6 +60,7 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 | `modes.js` | Modo Turbo (acelera as animações) |
 | `battlepass.js` | Regras do Passe de Batalha |
 | `collectibles.js` | Catálogo dos 110 colecionáveis (Equipe BZG + Amigos dos Bazingas), drop aleatório a cada aposta, recompensa por álbum completo |
+| `leaderboard.js` | Ranking online via Supabase (`BZG.leaderboard`). Login anônimo (sem e-mail) + apelido = o do cadastro + upsert do saldo/recorde/nível (tabela `leaderboard`) e do maior ganho por jogo (tabela `game_scores`). Roda em segundo plano em todas as páginas (o `layout.js` injeta o SDK sozinho fora da página de Ranking). A chave pública fica no topo do arquivo (segurança via RLS) |
 
 ---
 
@@ -91,10 +93,10 @@ Isso muda quando o modo multiplayer/ranking (planejado com Supabase) for ao ar: 
 | Jogo | Tema da equipe BZG | Como funciona | RTP aproximado |
 |---|---|---|---|
 | 🛶 Canoa Furada | Crash | Multiplicador sobe ao vivo, retire antes de "afundar" | ~96% |
-| 🎡 Double | — | Aposta em vermelho/preto/branco (branco paga 14x) | ~95% |
+| 🎡 Double | — | Aposta em vermelho/preto/branco (branco paga 14x) | ~93.3% (15 números, padrão Blaze) |
 | 🥒 Mines do Pikles | Mines | Revele células fugindo das bombas, cada acerto aumenta o multiplicador | ajustável pelo nº de bombas |
 | 🗑️ Lixeira do Linden | Tower | Suba 8 andares sem pisar na armadilha | até ~25x |
-| 🎃 Plinko da Abóbora | Plinko | Física real, várias bolinhas, 8/12/16 linhas, risco baixo/médio/alto | 90–99% conforme risco |
+| 🎃 Plinko da Abóbora | Plinko | Casa sorteada por RNG **binomial** (a mesma distribuição de um plinko físico), a bolinha é guiada até ela; 8/12/16 linhas, risco baixo/médio/alto | ~96–97% **exato** em toda combinação |
 | 🎲 Dado 616 | Dice | Escolha acima ou abaixo de um alvo | ~99% |
 | 🃏 HiLo do Panetone | HiLo | A próxima carta vem maior ou menor? Multiplicador acumula | ~98–99% |
 | 🎯 Roleta | Roulette | Roleta europeia (0–36) com mesa de apostas completa | ~97% (número cheio paga 36x) |
@@ -197,6 +199,17 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.15 (2026-07-10) — 🏆 Ranking online (multiplayer!) + odds mais justas + Passe mais difícil
+- **Ranking online OBRIGATÓRIO e automático** (`ranking.html` + `js/pages/ranking.js` + `css/pages/ranking.css`): primeira funcionalidade online do projeto. Todo jogador entra no ranking **automaticamente com o apelido do cadastro** (sem e-mail, sem senha, sem passo extra). Dois quadros:
+  - **Ranking geral** com 3 abas: 💰 Saldo agora, 📈 Recorde de saldo, ⭐ Nível.
+  - **Ranking por jogo** (seletor): o **maior ganho numa única aposta** em cada jogo de aposta, e o **recorde de pontos** em cada minigame (Torre/Arco-íris/Sombra/Fuga Alienígena).
+  - Medalhas 🥇🥈🥉 e destaque na sua própria linha ("VOCÊ").
+- **Backend: Supabase** (`js/core/leaderboard.js`, módulo `BZG.leaderboard`, SDK `@supabase/supabase-js` via CDN). **Login anônimo** por baixo dos panos (cada aparelho ganha um id próprio, só edita a própria linha — garantido por **RLS**). Duas tabelas: `leaderboard` (geral) e `game_scores` (por jogo). A chave pública fica no código de propósito (segurança via RLS). O jogo continua **100% salvo localmente**; o Supabase é só a vitrine, sincronizada em segundo plano em toda página (o `layout.js` injeta o SDK sozinho; offline, só o ranking não atualiza). Novo item **"🏆 Ranking"** na barra lateral.
+- **Odds auditadas e mais realistas** (RTP real de cada jogo conferido no código): a maioria já estava correta (Dado 99%, Blackjack 99,5%, HiLo/Moeda 98%, Roleta 97,3%, Mines/Tower 97%, Crash/Corrida 96%, Double **93,3%**, Raspadinha 90%). **Plinko reescrito**: antes o resultado saía da física e algumas tabelas passavam de **100% de RTP** em telas menores (brecha de farm) — agora a casa é sorteada por **RNG binomial** (a mesma distribuição de um plinko físico de verdade) e a bolinha é **guiada** até ela, dando **RTP exato ~96–97% em toda combinação, à prova de tamanho de tela**. Tabelas recalibradas em `js/games/plinko.js`.
+- **Anti-farm na recarga**: a recarga de saldo (manual e automática ao zerar) agora tem um **cooldown de 30s**. Sem isso dava pra apostar tudo num jogo de alta variância, zerar, recarregar de graça e repetir a jato até acertar um multiplicador gigante (farmando o ranking). A 1ª recarga é sempre imediata; as seguintes esperam. Ver `reloadCooldownLeft()` em `storage.js`.
+- **Passe de Batalha MUITO mais difícil de completar**: cada nível agora custa **2500 XP** (era 600) — zerar os 100 níveis pede **~BZ$ 2,5 milhões apostados** (era 600 mil). Ver `XP_PER_TIER` em `battlepass.js`.
+- **Reset geral do ranking**: com o novo esquema de tabelas, todos os placares começam do zero.
 
 ### v1.14 (2026-07-09)
 - **🐯 Bazinguinha no ar** (saiu de "Em desenvolvimento"): virou um slot de verdade no estilo **Fortune Tiger** — 3×3, 5 linhas (3 horizontais + 2 diagonais), ⚡ curinga que substitui qualquer símbolo, e tela cheia do mesmo símbolo pagando **×10** (máx **2500x**).

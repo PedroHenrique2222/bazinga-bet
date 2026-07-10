@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ranking — Bazinga BET</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <script src="js/core/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/pages/ranking.css" />
+</head>
+<body data-page="ranking" data-title="Ranking" data-icon="🏆">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main class="container">
+
+        <section class="panel rank-hero">
+          <div class="rank-hero-top">
+            <div>
+              <h1>🏆 Ranking Bazinga</h1>
+              <p>Todo jogador entra no ranking automaticamente com o apelido do cadastro. Compare seu saldo, seu recorde, seu nível e o seu maior ganho em cada jogo com os outros. Seu progresso continua salvo no seu aparelho — o ranking é só a vitrine.</p>
+            </div>
+          </div>
+          <div class="rank-me" id="rank-me">
+            <span class="rank-me-tag">Você:</span>
+            <strong class="rank-me-nick" id="rank-me-nick">—</strong>
+            <span class="rank-me-stats" id="rank-me-stats"></span>
+            <a class="btn btn--ghost btn--sm" href="profile.html">Trocar apelido</a>
+          </div>
+        </section>
+
+        <section class="panel rank-board-panel">
+          <h2 class="section-title">🌎 Ranking geral</h2>
+          <div class="rank-tabs">
+            <button class="rank-tab active" data-metric="balance">💰 Saldo agora</button>
+            <button class="rank-tab" data-metric="peak_balance">📈 Recorde</button>
+            <button class="rank-tab" data-metric="level">⭐ Nível</button>
+            <button class="rank-refresh" id="rank-refresh" title="Atualizar">🔄</button>
+          </div>
+          <div class="rank-list" id="rank-list">
+            <p class="rank-msg">Carregando ranking…</p>
+          </div>
+        </section>
+
+        <section class="panel rank-board-panel">
+          <h2 class="section-title">🎮 Ranking por jogo — maior ganho</h2>
+          <div class="rank-tabs">
+            <select id="rank-game-select" class="rank-select"></select>
+            <button class="rank-refresh" id="rank-game-refresh" title="Atualizar">🔄</button>
+          </div>
+          <div class="rank-list" id="rank-game-list">
+            <p class="rank-msg">Escolha um jogo.</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <script src="js/core/storage.js"></script>
+  <script src="js/core/sounds.js"></script>
+  <script src="js/core/ui.js"></script>
+  <script src="js/core/bots.js"></script>
+  <script src="js/core/layout.js"></script>
+  <script src="js/core/particles.js"></script>
+  <script src="js/core/effects.js"></script>
+  <script src="js/core/achievements.js"></script>
+  <script src="js/core/modes.js"></script>
+  <script src="js/core/battlepass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/core/leaderboard.js"></script>
+  <script src="js/pages/ranking.js"></script>
+</body>
+</html>

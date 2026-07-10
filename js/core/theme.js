@@ -2,6 +2,18 @@
    Cada "skin" tem uma base (dark/light) que dita os ajustes de contraste,
    e um id que troca a paleta de cores via data-skin. */
 (function () {
+  /* Reset de lancamento: quando este token muda (novo deploy), apaga TUDO do navegador
+     UMA vez - progresso, cadastro, preferencias, sessao do ranking - forcando todo
+     jogador a recomecar do zero. Roda antes de qualquer leitura de dados (theme.js e o
+     1o script de toda pagina). Pra fazer outro reset no futuro, basta trocar o token. */
+  try {
+    var RESET_TOKEN = "v1.15-launch";
+    if (localStorage.getItem("bzgResetToken") !== RESET_TOKEN) {
+      localStorage.clear();
+      localStorage.setItem("bzgResetToken", RESET_TOKEN);
+    }
+  } catch (e) {}
+
   var THEMES = {
     dark:   { name: "Escuro",       icon: "🌙", mode: "dark",  free: true },
     light:  { name: "Claro",        icon: "☀️", mode: "light", free: true },

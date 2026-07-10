@@ -9,27 +9,39 @@
   var AUTO_INTERVAL_MS = 140;
   var AUTO_MAX = 200;
 
-  /* leve atracao ao centro por tamanho do funil - calibrada por simulacao
-     (18k bolinhas) para a distribuicao dar retorno de ~90-99% em cada tabela */
-  var CENTER_PULL = { 8: 3.4, 12: 1.6, 16: 1.6 };
+  /* forca de atracao da bolinha para a CASA SORTEADA (ver binomialBucket): a fisica
+     e so o visual; o resultado e decidido por RNG binomial (justo e a prova de escala). */
+  var TARGET_PULL = { 8: 3.4, 12: 2.2, 16: 2.0 };
 
+  /* Tabelas calibradas para a distribuicao REAL do plinko (bucket ~ Binomial(linhas, 0.5)),
+     dando RTP ~96-97% em TODAS as combinacoes - independente do tamanho da tela.
+     (Antes eram calibradas "no olho" pela fisica, o que deixava algumas combinacoes
+     acima de 100% de RTP em telas menores - uma brecha de farm.) */
   var MULT_TABLES = {
     8: {
-      low: [5.6, 2.1, 1.1, 1, 0.5, 1, 1.1, 2.1, 5.6],
-      medium: [25, 4, 1.6, 0.8, 0.45, 0.8, 1.6, 4, 25],
-      high: [100, 7, 2, 0.35, 0.25, 0.35, 2, 7, 100]
+      low: [5.5, 2.1, 1.1, 0.98, 0.49, 0.98, 1.1, 2.1, 5.5],
+      medium: [19, 3.1, 1.2, 0.61, 0.34, 0.61, 1.2, 3.1, 19],
+      high: [52, 3.6, 1, 0.18, 0.13, 0.18, 1, 3.6, 52]
     },
     12: {
-      low: [8, 2.8, 1.7, 1.2, 1.05, 0.9, 0.5, 0.9, 1.05, 1.2, 1.7, 2.8, 8],
-      medium: [20, 5, 2.8, 1.4, 0.9, 0.7, 0.3, 0.7, 0.9, 1.4, 2.8, 5, 20],
-      high: [45, 7, 3.5, 1.8, 0.7, 0.3, 0.2, 0.3, 0.7, 1.8, 3.5, 7, 45]
+      low: [8.4, 3, 1.8, 1.3, 1.1, 0.95, 0.53, 0.95, 1.1, 1.3, 1.8, 3, 8.4],
+      medium: [23, 5.8, 3.3, 1.6, 1, 0.81, 0.35, 0.81, 1, 1.6, 3.3, 5.8, 23],
+      high: [62, 9.7, 4.9, 2.5, 0.97, 0.42, 0.28, 0.42, 0.97, 2.5, 4.9, 9.7, 62]
     },
     16: {
-      low: [12, 7, 2, 1.4, 1.4, 1.2, 1.1, 1, 0.5, 1, 1.1, 1.2, 1.4, 1.4, 2, 7, 12],
-      medium: [70, 25, 8, 4, 3, 1.5, 0.9, 0.4, 0.3, 0.4, 0.9, 1.5, 3, 4, 8, 25, 70],
-      high: [220, 40, 12, 6, 3, 1.5, 0.3, 0.2, 0.2, 0.2, 0.3, 1.5, 3, 6, 12, 40, 220]
+      low: [12, 6.9, 2, 1.4, 1.4, 1.2, 1.1, 0.98, 0.49, 0.98, 1.1, 1.2, 1.4, 1.4, 2, 6.9, 12],
+      medium: [76, 27, 8.7, 4.3, 3.2, 1.6, 0.97, 0.43, 0.32, 0.43, 0.97, 1.6, 3.2, 4.3, 8.7, 27, 76],
+      high: [296, 54, 16, 8.1, 4, 2, 0.4, 0.27, 0.27, 0.27, 0.4, 2, 4, 8.1, 16, 54, 296]
     }
   };
+
+  /* casa de destino ~ Binomial(linhas, 0.5): a MESMA distribuicao de um plinko fisico
+     de verdade (cada pino desvia 50% pra cada lado). E o que garante o RTP exato. */
+  function binomialBucket(n) {
+    var k = 0;
+    for (var i = 0; i < n; i++) if (Math.random() < 0.5) k++;
+    return k;
+  }
 
   var betInput, dropBtn, autoBtn, autoCountInput, statusEl, canvas, ctx,
       historyListEl, riskButtons, rowsButtons, stageEl;
@@ -213,17 +225,28 @@
     var SUBSTEPS = 2;
     var subDt = dt / SUBSTEPS;
 
-    var centerPull = CENTER_PULL[rows] || 1.6;
+    var basePull = TARGET_PULL[rows] || 2.0;
+    var playHeight = L.slotY - L.marginTop - 14;
+    var homeStartY = L.marginTop + playHeight * 0.72; // ultimos ~28%: "assenta" na casa certa
 
     for (var i = 0; i < balls.length; i++) {
       var ball = balls[i];
       ball.age = (ball.age || 0) + dt;
+      var targetX = slotX(ball.targetSlot != null ? ball.targetSlot : Math.round(rows / 2));
 
       for (var s = 0; s < SUBSTEPS; s++) {
         ball.vy = Math.min(ball.vy + GRAVITY * subDt, MAX_FALL_SPEED);
-        ball.vx += (L.centerX - ball.x) * centerPull * subDt;
+        // atracao suave (velocidade) para a casa sorteada durante toda a queda
+        ball.vx += (targetX - ball.x) * basePull * subDt;
         ball.x += ball.vx * subDt;
         ball.y += ball.vy * subDt;
+
+        // no trecho final, puxa a POSICAO direto para a casa sorteada, garantindo
+        // que a bolinha pouse exatamente onde o RNG decidiu (sem descolar do premio)
+        if (ball.y > homeStartY) {
+          var prog = Math.min(1, (ball.y - homeStartY) / (L.slotY - homeStartY));
+          ball.x += (targetX - ball.x) * prog * prog * 0.35;
+        }
 
         // colisao com pinos
         for (var p = 0; p < L.pegs.length; p++) {
@@ -284,8 +307,9 @@
     for (var li = landed.length - 1; li >= 0; li--) {
       var idx = landed[li];
       var b2 = balls[idx];
-      var k = Math.round(rows / 2 + (b2.x - layout.centerX) / layout.spacing);
-      k = Math.max(0, Math.min(rows, k));
+      // paga pela casa SORTEADA (RNG binomial); a fisica so trouxe a bolinha ate la
+      var k = b2.targetSlot != null ? b2.targetSlot
+        : Math.max(0, Math.min(rows, Math.round(rows / 2 + (b2.x - layout.centerX) / layout.spacing)));
       balls.splice(idx, 1);
       resolveBall(b2, k, now);
     }
@@ -375,7 +399,8 @@
       vy: 0,
       age: 0,
       stuckTime: 0,
-      bet: bet
+      bet: bet,
+      targetSlot: binomialBucket(rows)  // resultado sorteado; a fisica so guia ate ele
     });
     BZG.sounds.bet();
     updateControlsLock();

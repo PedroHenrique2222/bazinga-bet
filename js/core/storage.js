@@ -194,9 +194,20 @@ BZG.storage = (function () {
     return state.reloadBonus;
   }
 
+  // Anti-farm: cooldown entre recargas. Sem isso da pra apostar tudo num jogo de alta
+  // variancia, zerar, recarregar de graca e repetir a jato ate acertar um multiplicador
+  // gigante (farmando o ranking). A 1a recarga e sempre imediata; as seguintes esperam.
+  var RELOAD_COOLDOWN_MS = 30000;
+
+  function reloadCooldownLeft() {
+    var last = getState().lastReload || 0;
+    return Math.max(0, RELOAD_COOLDOWN_MS - (Date.now() - last));
+  }
+
   function resetBalance() {
     var state = getState();
     state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    state.lastReload = Date.now();
     trackPeak(state);
     saveState(state);
     return state.balance;
@@ -207,6 +218,7 @@ BZG.storage = (function () {
     var state = getState();
     state.stats.autoReloads = (state.stats.autoReloads || 0) + 1;
     state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    state.lastReload = Date.now();
     trackPeak(state);
     saveState(state);
     return state.balance;
@@ -247,6 +259,12 @@ BZG.storage = (function () {
     state.stats.bestMultiplier = Math.max(state.stats.bestMultiplier, entry.multiplier || 0);
     state.stats.maxBet = Math.max(state.stats.maxBet || 0, entry.bet);
     if (entry.won) state.stats.maxWin = Math.max(state.stats.maxWin || 0, entry.payout);
+
+    // maior ganho (payout) por jogo - usado no ranking POR JOGO
+    if (entry.won && entry.payout > 0) {
+      if (!state.gameBest) state.gameBest = {};
+      if (entry.payout > (state.gameBest[game] || 0)) state.gameBest[game] = entry.payout;
+    }
 
     // XP: 1 ponto a cada BZ$ 10 apostados
     state.profile.xp += entry.bet / 10;
@@ -479,11 +497,28 @@ BZG.storage = (function () {
     return true;
   }
 
+  /* ---------- Maior ganho por jogo (ranking por jogo) ---------- */
+
+  function getGameBest(game) {
+    return (getState().gameBest || {})[game] || 0;
+  }
+
+  function getAllGameBests() {
+    return Object.assign({}, getState().gameBest || {});
+  }
+
   /* ---------- Minigames sem aposta ---------- */
 
   function getMinigameBest(game) {
     var state = getState();
     return (state.minigames[game] && state.minigames[game].best) || 0;
+  }
+
+  function getAllMinigameBests() {
+    var mg = getState().minigames || {};
+    var out = {};
+    Object.keys(mg).forEach(function (g) { out[g] = mg[g].best || 0; });
+    return out;
   }
 
   // registra o resultado de uma rodada de minigame; so atualiza o recorde se for melhor
@@ -554,11 +589,15 @@ BZG.storage = (function () {
     getReloadAmount: getReloadAmount,
     addReloadBonus: addReloadBonus,
     autoReload: autoReload,
+    reloadCooldownLeft: reloadCooldownLeft,
     addXp: addXp,
     getCollectibles: getCollectibles,
     ownsCollectible: ownsCollectible,
     grantCollectible: grantCollectible,
+    getGameBest: getGameBest,
+    getAllGameBests: getAllGameBests,
     getMinigameBest: getMinigameBest,
+    getAllMinigameBests: getAllMinigameBests,
     reportMinigameScore: reportMinigameScore,
     hasAccount: hasAccount,
     getAccount: getAccount,

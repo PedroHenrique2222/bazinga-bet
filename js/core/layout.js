@@ -116,6 +116,11 @@ BZG.layout = (function () {
       '</nav>' +
       '<div class="sidebar-footer">' +
         '<div class="online-count"><span class="online-dot"></span><span id="online-count-value">—</span> online</div>' +
+        '<a class="nav-item' + (activePage === "ranking" ? " active" : "") + '" href="' + ROOT_PREFIX + 'ranking.html">' +
+          '<span class="nav-icon">🏆</span>' +
+          '<span class="nav-label">Ranking</span>' +
+          '<span class="nav-hot">NOVO</span>' +
+        '</a>' +
         '<a class="nav-item' + (activePage === "colecao" ? " active" : "") + '" href="' + ROOT_PREFIX + 'colecao.html">' +
           '<span class="nav-icon">🎴</span>' +
           '<span class="nav-label">Coleção</span>' +
@@ -205,6 +210,11 @@ BZG.layout = (function () {
     refreshTopbarStats();
 
     document.getElementById("reset-balance-btn").addEventListener("click", function () {
+      var cd = BZG.storage.reloadCooldownLeft();
+      if (cd > 0) {
+        BZG.ui.toast("⏳ Espere " + Math.ceil(cd / 1000) + "s para recarregar de novo.", "info");
+        return;
+      }
       var current = BZG.storage.getBalance();
       var reloadAmount = BZG.storage.getReloadAmount();
 
@@ -327,6 +337,42 @@ BZG.layout = (function () {
     });
   }
 
+  /* ---------- Ranking online em segundo plano ---------- */
+
+  function loadScriptOnce(src, done) {
+    var s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = function () { done && done(); };
+    s.onerror = function () { done && done(); }; // sem internet: falha silenciosa
+    document.head.appendChild(s);
+  }
+
+  // garante o SDK do Supabase + o modulo js/core/leaderboard.js carregados (na pagina
+  // de Ranking eles ja vem no HTML; nas outras, injeta aqui). cb roda quando prontos.
+  function ensureLeaderboardModule(cb) {
+    if (window.BZG && BZG.leaderboard) { cb(); return; }
+    function afterSdk() { loadScriptOnce(ROOT_PREFIX + "js/core/leaderboard.js", cb); }
+    if (window.supabase && window.supabase.createClient) afterSdk();
+    else loadScriptOnce("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2", afterSdk);
+  }
+
+  var lbSyncTimer = null;
+  function setupLeaderboardSync() {
+    if (!BZG.storage.hasAccount || !BZG.storage.hasAccount()) return;
+    ensureLeaderboardModule(function () {
+      if (!BZG.leaderboard || !BZG.leaderboard.isConfigured()) return;
+      BZG.leaderboard.sync(); // sincroniza ao abrir a pagina
+      document.addEventListener("bzg:bet-recorded", function () {
+        if (lbSyncTimer) clearTimeout(lbSyncTimer);
+        lbSyncTimer = setTimeout(function () { BZG.leaderboard.sync(); }, 8000);
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "hidden") BZG.leaderboard.sync();
+      });
+    });
+  }
+
   function init() {
     var body = document.body;
     var page = body.dataset.page || "";
@@ -354,11 +400,26 @@ BZG.layout = (function () {
     setInterval(updateOnlineCount, 5000);
 
     // sempre que o saldo muda (apos apostas, bonus etc.): recarrega sozinho se zerou, e checa conquistas
+    var pendingReloadTimer = null;
+    function doAutoReload() {
+      var amount = BZG.storage.autoReload();
+      BZG.ui.refreshBalance();
+      refreshTopbarStats();
+      BZG.ui.toast("💳 Saldo recarregado automaticamente: " + BZG.ui.formatMoney(amount), "info");
+    }
     document.addEventListener("bzg:balance-changed", function () {
       if (BZG.storage.getBalance() <= 0) {
-        var amount = BZG.storage.autoReload();
-        BZG.ui.refreshBalance();
-        BZG.ui.toast("💳 Seu saldo zerou! Recarregamos automaticamente: " + BZG.ui.formatMoney(amount), "info");
+        var cd = BZG.storage.reloadCooldownLeft();
+        if (cd <= 0) {
+          doAutoReload();
+        } else if (!pendingReloadTimer) {
+          // no cooldown: espera terminar e recarrega sozinho (freia o farm por variancia)
+          BZG.ui.toast("⏳ Saldo zerado. Recarga automática em " + Math.ceil(cd / 1000) + "s.", "info");
+          pendingReloadTimer = setTimeout(function () {
+            pendingReloadTimer = null;
+            if (BZG.storage.getBalance() <= 0) doAutoReload();
+          }, cd + 100);
+        }
       }
       refreshTopbarStats();
       if (BZG.achievements) BZG.achievements.check();
@@ -368,6 +429,11 @@ BZG.layout = (function () {
     document.addEventListener("bzg:bet-recorded", function () {
       if (BZG.collectibles) BZG.collectibles.rollOnBet();
     });
+
+    // Ranking online OBRIGATORIO em segundo plano: em toda pagina, garante o SDK do
+    // Supabase + o modulo do ranking carregados (sem travar a pagina) e sincroniza o
+    // saldo/recorde/nivel + o maior ganho de cada jogo. Offline, so nao sincroniza.
+    setupLeaderboardSync();
 
     // Atalho de teclado: apertar Enter num campo numerico (ex.: valor da aposta)
     // dispara o botao principal do jogo, pra apostar/jogar sem precisar clicar.

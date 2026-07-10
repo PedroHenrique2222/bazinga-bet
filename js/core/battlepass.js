@@ -5,8 +5,10 @@
 window.BZG = window.BZG || {};
 
 BZG.battlepass = (function () {
-  // Mais dificil de subir: cada nivel do passe custa mais XP que antes (era 400).
-  var XP_PER_TIER = 600;
+  // Completar o Passe agora e MUITO mais dificil: cada nivel custa 2500 XP (era 600).
+  // 100 niveis x 2500 = 250.000 XP = BZ$ 2.500.000 apostados pra zerar o passe
+  // (antes eram BZ$ 600.000). So chega ao fim quem joga MUITO.
+  var XP_PER_TIER = 2500;
   var TIER_PER_CHAPTER = 10; // precisa bater com js/pages/passe.js
 
   // bonus extra de recarga ao completar (resgatar) o ultimo nivel de um capitulo,
