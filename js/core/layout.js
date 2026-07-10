@@ -363,6 +363,7 @@ BZG.layout = (function () {
     ensureLeaderboardModule(function () {
       if (!BZG.leaderboard || !BZG.leaderboard.isConfigured()) return;
       BZG.leaderboard.sync(); // sincroniza ao abrir a pagina
+      mountLeaderboardWidget(); // mostra o ranking do contexto (lobby/jogo/minigame)
       document.addEventListener("bzg:bet-recorded", function () {
         if (lbSyncTimer) clearTimeout(lbSyncTimer);
         lbSyncTimer = setTimeout(function () { BZG.leaderboard.sync(); }, 8000);
@@ -371,6 +372,97 @@ BZG.layout = (function () {
         if (document.visibilityState === "hidden") BZG.leaderboard.sync();
       });
     });
+  }
+
+  /* Widget de ranking embutido: na pagina principal mostra o ranking GERAL (com abas),
+     em cada jogo o "maior ganho" daquele jogo, em cada minigame "quem chegou mais longe".
+     Injetado no fim do <main class="container"> - sem precisar editar cada pagina. */
+  var LBW_GAMES = {
+    crash: "🛶 Canoa Furada", double: "🎡 Double", mines: "🥒 Mines do Pikles",
+    tower: "🗑️ Lixeira do Linden", plinko: "🎃 Plinko da Abóbora", dice: "🎲 Dado 616",
+    hilo: "🃏 HiLo do Panetone", roulette: "🎯 Roleta", blackjack: "🍑 21 do Bogão",
+    raspadinha: "🎟️ Raspadinha", limbo: "📉 Limbo", coinflip: "🔋 Moeda da Pilha",
+    horse: "🏇 Corrida BZG", bazinguinha: "🐯 Bazinguinha"
+  };
+  var LBW_MINIGAMES = {
+    "torre-minigame": { key: "mg_torre", unit: "andares" },
+    "rainbow-minigame": { key: "mg_rainbow", unit: "rodadas" },
+    "shadow-minigame": { key: "mg_shadow", unit: "acertos" },
+    "alien-minigame": { key: "mg_alien", unit: "s" }
+  };
+
+  function lbwEsc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (m) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+    });
+  }
+
+  function mountLeaderboardWidget() {
+    var LB = BZG.leaderboard;
+    if (!LB || !LB.isConfigured()) return;
+    if (document.querySelector(".lbw")) return; // ja montado
+    var page = document.body.dataset.page || "";
+    var container = document.querySelector("main.container") || document.querySelector(".container");
+    if (!container) return;
+
+    var ctx;
+    if (page === "lobby") ctx = { general: true, title: "🏆 Ranking geral" };
+    else if (LBW_GAMES[page]) ctx = { gameKey: page, money: true, title: "🏆 Maior ganho — " + LBW_GAMES[page] };
+    else if (LBW_MINIGAMES[page]) ctx = { gameKey: LBW_MINIGAMES[page].key, unit: LBW_MINIGAMES[page].unit, title: "🏆 Quem chegou mais longe" };
+    else return; // outras paginas nao recebem widget
+
+    var tabsHTML = ctx.general
+      ? '<div class="lbw-tabs">' +
+          '<button class="lbw-tab active" data-m="balance">💰 Saldo</button>' +
+          '<button class="lbw-tab" data-m="peak_balance">📈 Recorde</button>' +
+          '<button class="lbw-tab" data-m="level">⭐ Nível</button>' +
+        '</div>'
+      : '';
+    var panel = document.createElement("section");
+    panel.className = "panel lbw bzg-fadein";
+    panel.innerHTML = '<h2 class="section-title">' + ctx.title + '</h2>' + tabsHTML +
+      '<div class="lbw-list"><p class="lbw-msg">Carregando…</p></div>' +
+      '<a class="lbw-more" href="' + ROOT_PREFIX + 'ranking.html">Ver ranking completo →</a>';
+    container.appendChild(panel);
+
+    var listEl = panel.querySelector(".lbw-list");
+    var myUuid = null;
+    var metric = "balance";
+
+    function fmtVal(row) {
+      if (ctx.general) return metric === "level" ? "Lv " + (row.level || 1) : BZG.ui.formatMoney(row[metric] || 0);
+      if (ctx.money) return BZG.ui.formatMoney(row.score || 0);
+      return (row.score || 0) + (ctx.unit ? " " + ctx.unit : "");
+    }
+    function render(rows) {
+      if (rows === null) { listEl.innerHTML = '<p class="lbw-msg">Ranking indisponível agora.</p>'; return; }
+      if (!rows.length) { listEl.innerHTML = '<p class="lbw-msg">Ninguém aqui ainda. Seja o primeiro! 👑</p>'; return; }
+      listEl.innerHTML = rows.slice(0, 8).map(function (row, i) {
+        var pos = i + 1;
+        var medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : ("#" + pos);
+        var me = myUuid && row.id === myUuid;
+        return '<div class="lbw-row' + (me ? " me" : "") + '">' +
+          '<span class="lbw-pos">' + medal + '</span>' +
+          '<span class="lbw-nick">' + lbwEsc(row.nickname || "Anônimo") + (me ? '<span class="lbw-you">VOCÊ</span>' : "") + '</span>' +
+          '<span class="lbw-val">' + fmtVal(row) + '</span>' +
+          '</div>';
+      }).join("");
+    }
+    function load() {
+      listEl.innerHTML = '<p class="lbw-msg">Carregando…</p>';
+      (ctx.general ? LB.fetchTop(metric, 10) : LB.fetchTopByGame(ctx.gameKey, 10)).then(render);
+    }
+    if (tabsHTML) {
+      panel.querySelectorAll(".lbw-tab").forEach(function (t) {
+        t.addEventListener("click", function () {
+          panel.querySelectorAll(".lbw-tab").forEach(function (x) { x.classList.remove("active"); });
+          t.classList.add("active");
+          metric = t.dataset.m;
+          load();
+        });
+      });
+    }
+    LB.myId().then(function (id) { myUuid = id; load(); });
   }
 
   function init() {

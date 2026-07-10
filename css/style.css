@@ -1971,3 +1971,49 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   .banner, .lobby-grid .game-card { animation: none; }
   .game-card:not(.game-card--dev):hover::after { animation: none; }
 }
+
+/* ---------- Widget de ranking embutido (lobby / jogos / minigames) ---------- */
+.lbw { margin-top: 18px; }
+.lbw-tabs { display: flex; gap: 6px; margin: 4px 0 12px; flex-wrap: wrap; }
+.lbw-tab {
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+.lbw-tab:hover { transform: translateY(-1px); }
+.lbw-tab.active { background: linear-gradient(120deg, var(--yellow), #ff8a00); color: #3a2400; border-color: transparent; }
+
+.lbw-list { display: flex; flex-direction: column; gap: 6px; }
+.lbw-msg { color: var(--text-muted); font-size: 13px; text-align: center; padding: 12px 0; margin: 0; }
+
+.lbw-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-alt);
+}
+.lbw-row.me {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary) inset;
+  background: linear-gradient(120deg, rgba(255, 200, 0, 0.10), var(--panel-alt));
+}
+.lbw-pos { min-width: 30px; text-align: center; font-weight: 900; font-size: 15px; color: var(--text-muted); }
+.lbw-nick { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lbw-you {
+  font-size: 9px; font-weight: 900; letter-spacing: 0.04em;
+  background: var(--primary); color: #3a2400;
+  padding: 1px 5px; border-radius: 999px; margin-left: 6px;
+}
+.lbw-val { font-weight: 900; font-size: 14px; color: var(--yellow-dark); white-space: nowrap; }
+:root[data-theme="dark"] .lbw-val { color: var(--yellow); }
+.lbw-more { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--primary); text-decoration: none; }
+.lbw-more:hover { text-decoration: underline; }

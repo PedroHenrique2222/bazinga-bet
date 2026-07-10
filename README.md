@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.15
+# 🎰 Bazinga BET — v1.16
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -199,6 +199,13 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.16 (2026-07-10) — Rankings embutidos em cada tela
+- **Widget de ranking em toda página** (injetado pelo `layout.js`, estilos `.lbw-*` em `style.css`): agora o ranking aparece no contexto de cada tela, sem precisar abrir a página de Ranking.
+  - **Página principal (lobby)**: o **ranking geral** com abas (💰 Saldo / 📈 Recorde / ⭐ Nível).
+  - **Cada jogo de aposta**: o ranking de **maior ganho** naquele jogo.
+  - **Cada minigame**: o ranking de **quem chegou mais longe** (recorde de pontos).
+  - Top 8, com medalhas, destaque na sua linha ("VOCÊ") e link "Ver ranking completo →". Não dispara novo reset (o token de lançamento não mudou).
 
 ### v1.15 (2026-07-10) — 🏆 Ranking online (multiplayer!) + odds mais justas + Passe mais difícil
 - **Ranking online OBRIGATÓRIO e automático** (`ranking.html` + `js/pages/ranking.js` + `css/pages/ranking.css`): primeira funcionalidade online do projeto. Todo jogador entra no ranking **automaticamente com o apelido do cadastro** (sem e-mail, sem senha, sem passo extra). Dois quadros:
