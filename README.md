@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.17
+# 🎰 Bazinga BET — v1.18
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -24,8 +24,8 @@ BZG-BET/
 ├── games/                Todas as paginas de JOGO (com aposta) ficam aqui
 │   ├── crash.html, double.html, mines.html, tower.html, plinko.html,
 │   │   dice.html, hilo.html, roulette.html, blackjack.html,
-│   │   raspadinha.html, limbo.html, coinflip.html, horse.html, bazinguinha.html
-│   └── bonanza.html   (EM DESENVOLVIMENTO - ver abaixo)
+│   │   raspadinha.html, limbo.html, coinflip.html, horse.html,
+│   │   bazinguinha.html, bonanza.html
 ├── minigames/            Minigames SEM aposta (nao mexem no saldo)
 │   ├── torre.html        Torre do CBPB_Gamer - empilhar blocos
 │   ├── arcoiris.html     Sequencia Arco-iris (com Dhani) - memoria, tipo Simon Says
@@ -106,12 +106,13 @@ Isso muda quando o modo multiplayer/ranking (planejado com Supabase) for ao ar: 
 | 🔋 Moeda da Pilha | Coinflip | Cara ou coroa, quase 2x | ~98% |
 | 🏇 Corrida BZG | Horse | Aposte num dos 6 corredores da equipe BZG; se ele vencer, **dobra a aposta (2x fixo)**, sem odds diferentes por corredor | ~96% |
 | 🐯 Bazinguinha | Slot (estilo Fortune Tiger) | 3×3, 5 linhas (3 horizontais + 2 diagonais). ⚡ é curinga. **Wild grudento**: caiu um ⚡, ele trava e os outros re-giram de graça; enquanto vier ⚡ novo, gira de novo. Tela cheia paga **×10** (máx 2500x) | ~95% |
+| 💎 Bazinga Bonanza | Slot (estilo Sweet Bonanza) | 6×5, **paga em qualquer lugar** (8+ iguais). Cascata, 🎇 bônus (4+ = 10 grátis), 💣 bombas de multiplicador que somam. Compra de grátis por 20x | ~94.8% |
 
 **Controles que valem pra todos os jogos de aposta** (centralizados em `layout.js`): apertar **Enter** num campo de valor já aposta/joga; os botões rápidos **½ / 2x / Máx** nunca deixam o valor passar do seu saldo; e o site **lembra o último valor apostado** em cada jogo (guardado por página no `localStorage`, chave `bzgBet:<caminho>`).
 
 ### 🚧 Em desenvolvimento (fora do ar)
 
-- 💎 **Bazinga Bonanza** aparece na sidebar e no lobby com o selo **"EM DESENVOLVIMENTO"**, sem link clicável. O arquivo continua no projeto (em `games/`) mas `layout.js` bloqueia o acesso direto pela URL e redireciona para o lobby com um aviso. Para reativar: em `js/core/layout.js` e `js/pages/lobby.js`, remova a flag `dev: true` do item (e o `data-dev="true"` do `<body>` da página).
+- **Nenhum!** A partir da v1.18 todos os jogos estão no ar (o último, Bazinga Bonanza, entrou). O mecanismo de "em desenvolvimento" continua disponível pra jogos futuros: marque o item com `dev: true` em `js/core/layout.js` e `js/pages/lobby.js` e coloque `data-dev="true"` no `<body>` da página — o `layout.js` esconde o link e bloqueia o acesso direto pela URL.
 
 ### 🎥 Painel "ao vivo" do Crash e do Double
 
@@ -121,7 +122,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 ## 🎫 Passe de Batalha
 
-- **100 níveis**, cada um custando **600 XP** (o XP é o mesmo do perfil: 1 XP a cada BZ$10 apostados) — são **60.000 XP** para zerar o passe.
+- **100 níveis**, cada um custando **2.500 XP** (o XP é o mesmo do perfil: 1 XP a cada BZ$10 apostados) — são **250.000 XP** para zerar o passe (= BZ$ 2,5 milhões apostados). De propósito: completar o passe é MUITO difícil (desde a v1.15).
 - **Organizado em 10 capítulos de 10 níveis, um por personagem**: o Capítulo 1 é dedicado a todos os **4 Amigos dos Bazingas** juntos (Dhani, Shadow, CBPB_Gamer, Alien Jo); os Capítulos 2–10 são um pra cada um dos **9 membros da Equipe BZG** (Abóbora, Panetone, Canoa Furada, 616, Pikles Gamer, Pilha Avulsa, Linden, Bogão, Pitoco) — ver `CHAPTERS` em `js/pages/passe.js` e `SPECIALS` em `js/core/battlepass.js`. Uma barra de navegação rápida no topo pula direto para qualquer capítulo.
 - **Todo nível dá uma recompensa cosmética específica** (nenhum nível "genérico", e **nenhuma figurinha** — a Coleção agora é só drop; ver `SPECIALS` em `battlepass.js`, cobre os 100 níveis 1 a 1): **56 avatares** (um pra cada personagem + dezenas de novos: 🦖🐳🦋🍕🎸🛸🪐🗿🏰🐬🐘 e mais), **15 cores de nome** (as 7 antigas + Aqua, Lava, Tóxico, Realeza, Pôr do Sol, Galáxia, Algodão Doce, Esmeralda), **10 temas extras** (os 6 antigos + Sangue, Oceano, Vulcão, Lavanda) e **18 títulos**, além do **Modo Turbo** (nível 30). As cores/temas/títulos novos foram adicionados junto (CSS `.bzg-name.color-*` e `:root[data-skin="*"]` em `style.css`, `THEMES` em `theme.js`, `TITLES`/`COLOR_LABELS` em `battlepass.js`).
 - **A única recarga do Passe vem do bônus de capítulo**: ao resgatar o último nível de qualquer um dos 10 capítulos (10, 20, 30... 100), o jogador ganha **+BZ$ 5.000 de recarga** — exatamente uma vez por capítulo, **+BZ$ 50.000 no total** ao zerar o passe inteiro. Nenhum outro nível dá recarga. Ver `CHAPTER_BONUS` em `battlepass.js`; cada capítulo mostra esse aviso no cabeçalho.
@@ -199,6 +200,9 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.18 (2026-07-11) — 💎 Bazinga Bonanza no ar (estilo Sweet Bonanza)
+- **💎 Bazinga Bonanza saiu de "Em desenvolvimento"** e virou um slot completo no estilo **Sweet Bonanza**, com os ícones do Bazinga: grade **6×5** que **paga em qualquer lugar** (8+ do mesmo símbolo, faixas 8-9 / 10-11 / 12+), **cascata/tumble** (vencedores explodem, novos caem, pode ganhar de novo no mesmo giro), **🎇 bônus** (4+ dispara 10 rodadas grátis, +5 no retrigger) e **💣 bombas de multiplicador** (somam e multiplicam o ganho do giro; chovem nas rodadas grátis). Tem **compra de rodadas grátis** por 20x. Calibrado por Monte Carlo (5M giros): **RTP ~94,8%**, disparo de grátis ~1 em 210. Visual "candy" roxo/rosa (`css/games/bonanza.css` reescrito) pra diferenciar do Bazinguinha. Agora **todos os jogos estão no ar** — a seção "Em desenvolvimento" ficou vazia. Ativação: removido `data-dev` do `<body>` e a flag `dev:true` em `layout.js`/`lobby.js`.
 
 ### v1.17 (2026-07-10) — Avatares no ranking, Panetone que sobe a recarga, otimização
 - **Ranking com a cara de cada jogador**: as linhas do ranking (na página de Ranking E nos widgets embutidos) agora mostram o **avatar (ícone)**, o **nome na cor desbloqueada** e o **título** de cada jogador. `leaderboard.js` sincroniza `avatar`/`name_color`/`title` e tem um `rowNameHTML(row)` que monta isso; reusa as classes globais `.bzg-name.color-*` / `.bzg-title` e a nova `.lb-avatar`. (Precisou de 3 colunas novas em cada tabela do Supabase.)

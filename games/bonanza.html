@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/games/bonanza.css" />
 </head>
-<body data-page="bonanza" data-title="Bazinga Bonanza" data-icon="💎" data-dev="true">
+<body data-page="bonanza" data-title="Bazinga Bonanza" data-icon="💎">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
@@ -33,18 +33,28 @@
             <button id="spin-btn" class="btn btn--primary" style="width:100%; margin-top:22px; padding:14px; font-size:16px;">
               Girar 💎
             </button>
+            <button id="buy-btn" class="btn btn--gold bonanza-buy">Comprar Grátis 🎇<small></small></button>
 
             <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
-              5 ou mais gemas iguais coladas (na horizontal ou vertical) pagam. Elas explodem, novas caem: é a cascata!
+              Sem linhas! <strong>8 ou mais</strong> símbolos iguais em <strong>qualquer lugar</strong> da grade pagam. Os vencedores explodem, novos caem (cascata) e você pode ganhar de novo no mesmo giro.
             </p>
 
             <div class="paytable">
-              <h2 class="section-title" style="margin-top:20px;">Cluster (gemas coladas)</h2>
-              <div class="paytable-row"><span>Cluster</span><strong>a partir de 5 gemas</strong></div>
-              <div class="paytable-row"><span>💎 diamante</span><strong>paga mais</strong></div>
-              <div class="paytable-row"><span>🔴 vermelho</span><strong>alto</strong></div>
-              <div class="paytable-row"><span>Cluster maior</span><strong>prêmio maior</strong></div>
-              <div class="paytable-row"><span>🔥 Febre do Ouro</span><strong>×2 a ×25</strong></div>
+              <h2 class="section-title" style="margin-top:20px;">Pagamentos (12+ iguais)</h2>
+              <div class="paytable-row"><span>💎</span><strong>12x</strong></div>
+              <div class="paytable-row"><span>🍰</span><strong>8x</strong></div>
+              <div class="paytable-row"><span>🍑</span><strong>5x</strong></div>
+              <div class="paytable-row"><span>🃏</span><strong>3x</strong></div>
+              <div class="paytable-row"><span>🎲</span><strong>2x</strong></div>
+              <div class="paytable-row"><span>🥒 / 🔋 / 🎃</span><strong>até 1.5x</strong></div>
+              <p style="color:var(--text-muted); font-size:12px; margin:8px 0 0;">8-9 e 10-11 iguais pagam menos. O prêmio é em cima da aposta total.</p>
+            </div>
+
+            <div class="paytable" style="margin-top:14px;">
+              <h2 class="section-title">🎇 Bônus & 💣 Multiplicadores</h2>
+              <div class="paytable-row"><span>🎇 4+ Bônus</span><strong>10 grátis</strong></div>
+              <div class="paytable-row"><span>💣 Bombas</span><strong>×2 até ×100</strong></div>
+              <p style="color:var(--text-muted); font-size:12px; margin:8px 0 0;">Nas rodadas grátis chovem bombas 💣 — todas somam e multiplicam o ganho do giro. Pegar 3+ 🎇 numa grátis dá +5 rodadas.</p>
             </div>
 
             <div class="history-list">
@@ -54,10 +64,7 @@
           </section>
 
           <section class="panel stage" id="bonanza-stage">
-            <div class="bonanza-meter" id="bonanza-meter">
-              <span class="bonanza-meter-label">🔥 Febre do Ouro</span>
-              <div class="bonanza-meter-bar"><div class="bonanza-meter-fill" id="bonanza-meter-fill"></div></div>
-            </div>
+            <div class="bonanza-free" id="bonanza-free"></div>
             <div class="bonanza-frame">
               <div class="bonanza-grid" id="bonanza-grid"></div>
               <div class="bonanza-banner" id="bonanza-banner"></div>

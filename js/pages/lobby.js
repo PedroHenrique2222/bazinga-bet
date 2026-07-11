@@ -4,7 +4,7 @@
 
   var GAME_CARDS = [
     { id: "bazinguinha", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: wild grudento com respin e tela cheia ×10!", badge: "NOVO" },
-    { id: "bonanza", href: "bonanza.html", icon: "💎", name: "Bazinga Bonanza", desc: "Cluster de gemas 8x8 com cascata e Febre do Ouro!", dev: true },
+    { id: "bonanza", href: "bonanza.html", icon: "💎", name: "Bazinga Bonanza", desc: "Estilo Sweet Bonanza: paga em qualquer lugar, cascata, bombas de multiplicador e rodadas grátis!", badge: "NOVO" },
     { id: "horse", href: "horse.html", icon: "🏇", name: "Corrida BZG", desc: "Aposte num corredor da equipe BZG. Se vencer, paga 2x!", badge: "NOVO" },
     { id: "crash", href: "crash.html", icon: "🛶", name: "Canoa Furada", desc: "Retire antes da canoa do BZG afundar.", live: "crash" },
     { id: "double", href: "double.html", icon: "🎡", name: "Double", desc: "Vermelho, preto ou branco (14x).", live: "double" },
