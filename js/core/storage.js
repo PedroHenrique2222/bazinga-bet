@@ -92,7 +92,17 @@ BZG.storage = (function () {
     return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
   }
 
+  // Cache do estado em memoria: antes, getState() re-lia o localStorage e refazia ~13
+  // merges a CADA chamada (e ela e chamada dezenas de vezes por acao). Agora parseia
+  // uma vez e reutiliza; saveState atualiza o cache e o evento "storage" invalida entre abas.
+  var cachedState = null;
+
   function getState() {
+    if (!cachedState) cachedState = loadStateRaw();
+    return cachedState;
+  }
+
+  function loadStateRaw() {
     var raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       var fresh = defaultState();
@@ -155,8 +165,16 @@ BZG.storage = (function () {
   }
 
   function saveState(state) {
+    cachedState = state;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
+
+  // outra aba mudou o save (ou deu clear): descarta o cache pra reler na proxima
+  try {
+    window.addEventListener("storage", function (e) {
+      if (!e || e.key === null || e.key === STORAGE_KEY) cachedState = null;
+    });
+  } catch (e) {}
 
   function getBalance() {
     return getState().balance;
@@ -197,7 +215,7 @@ BZG.storage = (function () {
   // Anti-farm: cooldown entre recargas. Sem isso da pra apostar tudo num jogo de alta
   // variancia, zerar, recarregar de graca e repetir a jato ate acertar um multiplicador
   // gigante (farmando o ranking). A 1a recarga e sempre imediata; as seguintes esperam.
-  var RELOAD_COOLDOWN_MS = 30000;
+  var RELOAD_COOLDOWN_MS = 10000;
 
   function reloadCooldownLeft() {
     var last = getState().lastReload || 0;
@@ -396,6 +414,8 @@ BZG.storage = (function () {
     };
   }
 
+  // Panetone diario: em vez de dinheiro na hora, AUMENTA o limite de recarga (reloadBonus).
+  // Jogar todo dia faz o piso de recarga subir - uma rede de seguranca que cresce.
   function claimBonus() {
     var state = getState();
     var today = todayKey();
@@ -405,10 +425,9 @@ BZG.storage = (function () {
     var amount = bonusAmountFor(newStreak);
     state.bonus.lastClaim = today;
     state.bonus.streak = newStreak;
-    state.balance += amount;
-    trackPeak(state);
+    state.reloadBonus = (state.reloadBonus || 0) + amount;
     saveState(state);
-    return { amount: amount, streak: newStreak };
+    return { amount: amount, streak: newStreak, reloadAmount: STARTING_BALANCE + state.reloadBonus };
   }
 
   /* ---------- Conquistas ---------- */

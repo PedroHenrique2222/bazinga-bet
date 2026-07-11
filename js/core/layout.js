@@ -315,7 +315,7 @@ BZG.layout = (function () {
         '<h2>Panetone diário</h2>' +
         '<p class="bonus-sub">Cortesia do <strong>BZG Panetone</strong> · dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
         '<div class="bonus-amount">+' + BZG.ui.formatMoney(info.amount) + '</div>' +
-        '<p class="bonus-hint">Volte amanhã para aumentar sua sequência e ganhar um panetone maior!</p>' +
+        '<p class="bonus-hint">Aumenta o seu <strong>limite de recarga</strong>! Cada dia de sequência sobe mais. Volte amanhã para um panetone maior.</p>' +
         '<button class="btn btn--gold" id="claim-bonus-btn" style="width:100%; padding:13px; font-size:16px; margin-top:6px;">Coletar 🍰</button>' +
       '</div>';
     document.body.appendChild(modal);
@@ -323,11 +323,12 @@ BZG.layout = (function () {
 
     document.getElementById("claim-bonus-btn").addEventListener("click", function () {
       var res = BZG.storage.claimBonus();
-      BZG.ui.refreshBalance();
-      document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
       if (res) {
         BZG.sounds.coin();
-        BZG.ui.toast("🎁 Bônus coletado: +" + BZG.ui.formatMoney(res.amount) + "!", "success");
+        BZG.ui.toast("🍰 Limite de recarga +" + BZG.ui.formatMoney(res.amount) + "! Agora recarrega " + BZG.ui.formatMoney(res.reloadAmount) + ".", "success");
+        // atualiza o tooltip do botao Recarregar com o novo valor
+        var rb = document.getElementById("reset-balance-btn");
+        if (rb) rb.title = "Recarrega o saldo para " + BZG.ui.formatMoney(res.reloadAmount);
         var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
         BZG.effects.confetti(cx, cy, 80);
       }
@@ -358,20 +359,32 @@ BZG.layout = (function () {
   }
 
   var lbSyncTimer = null;
+  function syncedRecently() {
+    try { return Date.now() - (Number(sessionStorage.getItem("bzgSyncTs")) || 0) < 20000; } catch (e) { return false; }
+  }
+  function markSynced() { try { sessionStorage.setItem("bzgSyncTs", String(Date.now())); } catch (e) {} }
+
   function setupLeaderboardSync() {
     if (!BZG.storage.hasAccount || !BZG.storage.hasAccount()) return;
-    ensureLeaderboardModule(function () {
-      if (!BZG.leaderboard || !BZG.leaderboard.isConfigured()) return;
-      BZG.leaderboard.sync(); // sincroniza ao abrir a pagina
-      mountLeaderboardWidget(); // mostra o ranking do contexto (lobby/jogo/minigame)
-      document.addEventListener("bzg:bet-recorded", function () {
-        if (lbSyncTimer) clearTimeout(lbSyncTimer);
-        lbSyncTimer = setTimeout(function () { BZG.leaderboard.sync(); }, 8000);
+    // adia pro navegador ficar ocioso: a pagina renderiza e fica interativa primeiro,
+    // depois o ranking carrega em segundo plano (o SDK do Supabase fica em cache do
+    // navegador entre paginas, entao so a 1a visita baixa de fato).
+    var start = function () {
+      ensureLeaderboardModule(function () {
+        if (!BZG.leaderboard || !BZG.leaderboard.isConfigured()) return;
+        if (!syncedRecently()) { BZG.leaderboard.sync(); markSynced(); } // evita re-upload em navegacao rapida
+        mountLeaderboardWidget(); // mostra o ranking do contexto (lobby/jogo/minigame)
+        document.addEventListener("bzg:bet-recorded", function () {
+          if (lbSyncTimer) clearTimeout(lbSyncTimer);
+          lbSyncTimer = setTimeout(function () { BZG.leaderboard.sync(); markSynced(); }, 8000);
+        });
+        document.addEventListener("visibilitychange", function () {
+          if (document.visibilityState === "hidden") { BZG.leaderboard.sync(); markSynced(); }
+        });
       });
-      document.addEventListener("visibilitychange", function () {
-        if (document.visibilityState === "hidden") BZG.leaderboard.sync();
-      });
-    });
+    };
+    if (window.requestIdleCallback) requestIdleCallback(start, { timeout: 2500 });
+    else setTimeout(start, 1200);
   }
 
   /* Widget de ranking embutido: na pagina principal mostra o ranking GERAL (com abas),
@@ -441,9 +454,10 @@ BZG.layout = (function () {
         var pos = i + 1;
         var medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : ("#" + pos);
         var me = myUuid && row.id === myUuid;
+        var nameHtml = BZG.leaderboard.rowNameHTML ? BZG.leaderboard.rowNameHTML(row) : lbwEsc(row.nickname || "Anônimo");
         return '<div class="lbw-row' + (me ? " me" : "") + '">' +
           '<span class="lbw-pos">' + medal + '</span>' +
-          '<span class="lbw-nick">' + lbwEsc(row.nickname || "Anônimo") + (me ? '<span class="lbw-you">VOCÊ</span>' : "") + '</span>' +
+          '<span class="lbw-nick">' + nameHtml + (me ? '<span class="lbw-you">VOCÊ</span>' : "") + '</span>' +
           '<span class="lbw-val">' + fmtVal(row) + '</span>' +
           '</div>';
       }).join("");

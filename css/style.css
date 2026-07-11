@@ -2007,7 +2007,11 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   background: linear-gradient(120deg, rgba(255, 200, 0, 0.10), var(--panel-alt));
 }
 .lbw-pos { min-width: 30px; text-align: center; font-weight: 900; font-size: 15px; color: var(--text-muted); }
-.lbw-nick { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lbw-nick { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px; overflow: hidden; }
+
+/* avatar (icone) do jogador nas linhas de ranking (widget e pagina de ranking) */
+.lb-avatar { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.lbw-nick .bzg-name, .rank-nick .bzg-name { overflow: hidden; text-overflow: ellipsis; }
 .lbw-you {
   font-size: 9px; font-weight: 900; letter-spacing: 0.04em;
   background: var(--primary); color: #3a2400;

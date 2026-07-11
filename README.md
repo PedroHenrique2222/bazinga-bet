@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.16
+# 🎰 Bazinga BET — v1.17
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -199,6 +199,14 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.17 (2026-07-10) — Avatares no ranking, Panetone que sobe a recarga, otimização
+- **Ranking com a cara de cada jogador**: as linhas do ranking (na página de Ranking E nos widgets embutidos) agora mostram o **avatar (ícone)**, o **nome na cor desbloqueada** e o **título** de cada jogador. `leaderboard.js` sincroniza `avatar`/`name_color`/`title` e tem um `rowNameHTML(row)` que monta isso; reusa as classes globais `.bzg-name.color-*` / `.bzg-title` e a nova `.lb-avatar`. (Precisou de 3 colunas novas em cada tabela do Supabase.)
+- **Panetone diário agora aumenta o limite de recarga**: em vez de dar dinheiro na hora, o bônus diário sobe o seu **piso de recarga** (`reloadBonus`) — jogar todo dia faz a sua rede de segurança crescer (dia 1 = +500 … dia 7+ = +5000). Ver `claimBonus()` em `storage.js` e o modal em `layout.js`.
+- **Recarga mais ágil**: cooldown da recarga de **30s → 10s**.
+- **Otimização geral**:
+  - `getState()` agora é **memoizado** — antes ele re-lia o `localStorage` e refazia ~13 merges a cada chamada (e é chamado dezenas de vezes por ação); agora parseia uma vez, `saveState` atualiza o cache e o evento `storage` invalida entre abas.
+  - O ranking online carrega em **`requestIdleCallback`** (a página fica interativa primeiro) e **não re-sincroniza** em navegação rápida (throttle de 20s via `sessionStorage`), cortando uploads redundantes a cada troca de página.
 
 ### v1.16 (2026-07-10) — Rankings embutidos em cada tela
 - **Widget de ranking em toda página** (injetado pelo `layout.js`, estilos `.lbw-*` em `style.css`): agora o ranking aparece no contexto de cada tela, sem precisar abrir a página de Ranking.

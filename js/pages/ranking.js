@@ -53,12 +53,12 @@
       (sub ? '<p class="rank-msg">' + esc(sub) + '</p>' : "") + '</div>';
   }
 
-  function rowHTML(pos, nickname, valueHtml, isMe, subHtml) {
+  function rowHTML(pos, nameHtml, valueHtml, isMe, subHtml) {
     var medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : ("#" + pos);
     return '<div class="rank-row' + (isMe ? " me" : "") + (pos <= 3 ? " top" : "") + '">' +
       '<div class="rank-pos">' + medal + '</div>' +
       '<div class="rank-info">' +
-        '<div class="rank-nick">' + esc(nickname || "Anônimo") +
+        '<div class="rank-nick">' + nameHtml +
           (isMe ? '<span class="rank-you">VOCÊ</span>' : "") + '</div>' +
           (subHtml ? '<div class="rank-sub">' + subHtml + '</div>' : "") +
       '</div>' +
@@ -73,7 +73,7 @@
       var sub = "💰 " + BZG.ui.formatMoney(row.balance || 0) +
         " · 📈 " + BZG.ui.formatMoney(row.peak_balance || 0) +
         " · ⭐ Lv " + (row.level || 1);
-      return rowHTML(i + 1, row.nickname, generalValue(row, currentMetric), myUuid && row.id === myUuid, sub);
+      return rowHTML(i + 1, LB.rowNameHTML(row), generalValue(row, currentMetric), myUuid && row.id === myUuid, sub);
     }).join("");
   }
 
@@ -81,7 +81,7 @@
     if (rows === null) { gameListEl.innerHTML = emptyState("🛠️", "Ranking indisponível agora.", "Tente atualizar."); return; }
     if (!rows.length) { gameListEl.innerHTML = emptyState("🎯", "Ninguém pontuou aqui ainda.", "Seja o primeiro a marcar no " + currentGame.label + "!"); return; }
     gameListEl.innerHTML = rows.map(function (row, i) {
-      return rowHTML(i + 1, row.nickname, gameValue(row.score), myUuid && row.id === myUuid, null);
+      return rowHTML(i + 1, LB.rowNameHTML(row), gameValue(row.score), myUuid && row.id === myUuid, null);
     }).join("");
   }
 

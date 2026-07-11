@@ -59,6 +59,30 @@ BZG.leaderboard = (function () {
     };
   }
 
+  // aparencia do jogador pra mostrar no ranking: avatar (icone), cor do nome, titulo (texto)
+  function cosmeticsOf() {
+    var prof = BZG.storage.getProfile ? BZG.storage.getProfile() : {};
+    var cos = BZG.storage.getCosmetics ? BZG.storage.getCosmetics() : {};
+    var title = "";
+    try { if (cos.title && BZG.battlepass) title = BZG.battlepass.titleLabel(cos.title) || ""; } catch (e) {}
+    return { avatar: prof.avatar || "😎", name_color: cos.nameColor || "default", title: title };
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (m) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+    });
+  }
+
+  // HTML do jogador a partir de uma linha do ranking: avatar + nome colorido + titulo
+  function rowNameHTML(row) {
+    var colorCls = row.name_color && row.name_color !== "default" ? " color-" + row.name_color : "";
+    var html = '<span class="lb-avatar">' + esc(row.avatar || "😎") + '</span>' +
+      '<span class="bzg-name' + colorCls + '">' + esc(row.nickname || "Anônimo") + '</span>';
+    if (row.title) html += '<span class="bzg-title">' + esc(row.title) + '</span>';
+    return html;
+  }
+
   /* sincroniza tudo: linha geral + maior ganho de cada jogo + recorde de cada minigame */
   function sync() {
     var c = getClient();
@@ -69,21 +93,23 @@ BZG.leaderboard = (function () {
       if (!user) return false;
       var now = new Date().toISOString();
       var s = generalStats();
+      var look = cosmeticsOf(); // { avatar, name_color, title }
       var jobs = [];
       jobs.push(c.from("leaderboard").upsert({
         id: user.id, nickname: nick,
         balance: s.balance, peak_balance: s.peak_balance, level: s.level,
+        avatar: look.avatar, name_color: look.name_color, title: look.title,
         updated_at: now
       }));
 
       var rows = [];
       var gb = BZG.storage.getAllGameBests();
       Object.keys(gb).forEach(function (g) {
-        if (gb[g] > 0) rows.push({ id: user.id, game: g, nickname: nick, score: Math.round(gb[g]), updated_at: now });
+        if (gb[g] > 0) rows.push({ id: user.id, game: g, nickname: nick, score: Math.round(gb[g]), avatar: look.avatar, name_color: look.name_color, title: look.title, updated_at: now });
       });
       var mb = BZG.storage.getAllMinigameBests();
       Object.keys(mb).forEach(function (g) {
-        if (mb[g] > 0) rows.push({ id: user.id, game: "mg_" + g, nickname: nick, score: Math.round(mb[g]), updated_at: now });
+        if (mb[g] > 0) rows.push({ id: user.id, game: "mg_" + g, nickname: nick, score: Math.round(mb[g]), avatar: look.avatar, name_color: look.name_color, title: look.title, updated_at: now });
       });
       if (rows.length) jobs.push(c.from("game_scores").upsert(rows, { onConflict: "id,game" }));
 
@@ -99,7 +125,7 @@ BZG.leaderboard = (function () {
     if (!c) return Promise.resolve(null);
     var col = metric === "peak_balance" ? "peak_balance" : (metric === "level" ? "level" : "balance");
     return c.from("leaderboard")
-      .select("id,nickname,balance,peak_balance,level")
+      .select("id,nickname,balance,peak_balance,level,avatar,name_color,title")
       .order(col, { ascending: false })
       .order("peak_balance", { ascending: false })
       .limit(limit || 100)
@@ -112,7 +138,7 @@ BZG.leaderboard = (function () {
     var c = getClient();
     if (!c) return Promise.resolve(null);
     return c.from("game_scores")
-      .select("id,nickname,score")
+      .select("id,nickname,score,avatar,name_color,title")
       .eq("game", gameKey)
       .order("score", { ascending: false })
       .limit(limit || 100)
@@ -135,6 +161,8 @@ BZG.leaderboard = (function () {
     hasNickname: hasNickname,
     ensureSession: ensureSession,
     generalStats: generalStats,
+    cosmeticsOf: cosmeticsOf,
+    rowNameHTML: rowNameHTML,
     sync: sync,
     fetchTop: fetchTop,
     fetchTopByGame: fetchTopByGame,
