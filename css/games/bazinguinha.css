@@ -34,23 +34,131 @@
   margin-top: -34px;
 }
 
-.ft-mascot {
-  font-size: 44px;
-  width: 68px;
-  height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ffe27a, #e8a20c);
-  border: 3px solid #e8b53a;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
-  animation: ft-mascot-bob 2.6s ease-in-out infinite;
+/* ===== Mascote: O Menor Quentão (desenhado em CSS) ===== */
+.mq-mascot {
+  position: relative;
+  width: 76px;
+  height: 72px;
+  will-change: transform;
+  transform-origin: 50% 85%;
+  animation: mq-idle 2.8s ease-in-out infinite;
+}
+.mq-head {
+  position: absolute;
+  left: 8px; top: 6px;
+  width: 60px; height: 58px;
+  border-radius: 52% 52% 50% 50%;
+  background: radial-gradient(circle at 36% 30%, #ffe37a, #ff9d1e 68%, #f57c0c);
+  border: 3px solid #b85c00;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), inset 0 -6px 10px rgba(170, 80, 0, 0.35);
+  z-index: 2;
+}
+/* óculos escuros (dois vidros + ponte/hastes) */
+.mq-shades {
+  position: absolute;
+  left: 50%; top: 42%;
+  transform: translate(-50%, -50%);
+  width: 46px; height: 15px;
+  display: flex; gap: 5px;
+  align-items: center; justify-content: center;
+}
+.mq-shades::before {
+  content: "";
+  position: absolute;
+  left: -5px; right: -5px; top: 50%;
+  height: 4px; background: #141418;
+  transform: translateY(-50%);
+  border-radius: 2px; z-index: -1;
+}
+.mq-shades b {
+  width: 18px; height: 14px;
+  background: linear-gradient(150deg, #24242c 42%, #4c4c5a);
+  border: 2px solid #0b0b0f;
+  border-radius: 5px;
+  position: relative;
+}
+.mq-shades b::after {
+  content: "";
+  position: absolute; left: 3px; top: 2px;
+  width: 6px; height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 3px; transform: rotate(-20deg);
+}
+/* boca confiante */
+.mq-mouth {
+  position: absolute;
+  left: 50%; top: 63%;
+  transform: translateX(-50%);
+  width: 20px; height: 9px;
+  border: 3px solid #7a3200;
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+}
+/* bracinhos abertos */
+.mq-arm {
+  position: absolute;
+  top: 38px;
+  width: 20px; height: 6px;
+  background: #1b1b20;
+  border-radius: 4px;
+  z-index: 1;
+}
+.mq-arm--l { left: -7px; transform: rotate(26deg); transform-origin: right center; }
+.mq-arm--r { right: -7px; transform: rotate(-26deg); transform-origin: left center; }
+
+@keyframes mq-idle {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-5px) rotate(3deg); }
 }
 
-@keyframes ft-mascot-bob {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-4px) rotate(3deg); }
+/* reações do mascote aos giros */
+.mq-mascot.happy { animation: mq-happy 0.6s ease; }
+@keyframes mq-happy {
+  0% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-14px) scale(1.12) rotate(6deg); }
+  70% { transform: translateY(0) scale(1.05) rotate(-4deg); }
+  100% { transform: translateY(0) scale(1); }
+}
+.mq-mascot.hype { animation: mq-hype 0.95s ease; }
+@keyframes mq-hype {
+  0% { transform: translateY(0) scale(1) rotate(0); }
+  25% { transform: translateY(-24px) scale(1.22) rotate(-14deg); }
+  50% { transform: translateY(0) scale(1.15) rotate(360deg); }
+  75% { transform: translateY(-12px) scale(1.12) rotate(350deg); }
+  100% { transform: translateY(0) scale(1) rotate(360deg); }
+}
+.mq-mascot.sad { animation: mq-sad 0.7s ease; }
+@keyframes mq-sad {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  30% { transform: translateY(3px) rotate(-8deg); }
+  60% { transform: translateY(3px) rotate(8deg); }
+}
+/* aura de calor quando empolgado (o "quentão") */
+.mq-mascot.hype::before, .mq-mascot.happy::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 140, 0, 0.55), transparent 70%);
+  z-index: 0;
+  animation: mq-aura 0.7s ease forwards;
+}
+@keyframes mq-aura {
+  from { opacity: 0.9; transform: scale(0.55); }
+  to { opacity: 0; transform: scale(1.5); }
+}
+
+.mq-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffd400;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  margin-top: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mq-mascot, .mq-mascot.happy, .mq-mascot.hype, .mq-mascot.sad { animation: none; }
 }
 
 .ft-title {
@@ -136,6 +244,37 @@
   font-size: calc(var(--ftcell) * 0.52);
   flex-shrink: 0;
   position: relative;
+}
+
+/* motion blur enquanto o rolo gira (removido ao parar) */
+.ft-strip.blur { filter: blur(1.3px); }
+
+/* flash rapido quando a coluna para (sem mexer no layout) */
+.ft-col.bump { animation: ft-col-bump 0.3s ease; }
+@keyframes ft-col-bump {
+  0% { filter: brightness(1.6); }
+  100% { filter: brightness(1); }
+}
+
+/* brilho que varre a celula vencedora */
+.ft-cell.hit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.55) 50%, transparent 68%);
+  transform: translateX(-130%);
+  animation: ft-cell-gleam 1s ease 0.1s infinite;
+  pointer-events: none;
+}
+@keyframes ft-cell-gleam {
+  0% { transform: translateX(-130%); }
+  55%, 100% { transform: translateX(130%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ft-strip.blur { filter: none; }
+  .ft-col.bump { animation: none; }
+  .ft-cell.hit::after { animation: none; opacity: 0; }
 }
 
 /* WILD estilo Fortune Tiger: simbolo + faixa "WILD" */

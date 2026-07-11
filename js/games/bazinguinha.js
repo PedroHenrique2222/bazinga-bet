@@ -39,7 +39,14 @@
   ];
 
   var betInput, statusEl, historyListEl, gridEl, stageEl, stripEls,
-      bannerEl, barBalanceEl, barBetEl, barWinEl, spinBtn, minusBtn, plusBtn, winlinesEl, lineDots;
+      bannerEl, barBalanceEl, barBetEl, barWinEl, spinBtn, minusBtn, plusBtn, winlinesEl, lineDots, mascotEl;
+
+  // reação do mascote (O Menor Quentão): "happy" | "hype" | "sad" | null (repouso)
+  function reactMascot(state) {
+    if (!mascotEl) return;
+    mascotEl.classList.remove("happy", "hype", "sad");
+    if (state) { void mascotEl.offsetWidth; mascotEl.classList.add(state); }
+  }
 
   var spinning = false;
   var BET_STEPS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
@@ -186,7 +193,9 @@
     var distances = [];
     for (var c = 0; c < 3; c++) {
       distances.push(buildStrip(stripEls[c], [grid[c], grid[3 + c], grid[6 + c]]));
+      stripEls[c].classList.add("blur"); // motion blur enquanto gira
     }
+    reactMascot(null); // volta o mascote ao repouso ao começar
 
     var start = performance.now();
     var lastTicks = [0, 0, 0];
@@ -201,7 +210,13 @@
         var cellH = distances[c2] / (STRIP_LEN - 3);
         var crossed = Math.floor((distances[c2] * eased) / cellH);
         if (crossed > lastTicks[c2] && t < 1) { if (c2 === 0) BZG.sounds.tick(); lastTicks[c2] = crossed; }
-        if (t >= 1 && !done[c2]) { done[c2] = true; BZG.sounds.click(); }
+        if (t >= 1 && !done[c2]) {
+          done[c2] = true;
+          BZG.sounds.click();
+          stripEls[c2].classList.remove("blur");       // tira o blur ao parar
+          var col = stripEls[c2].parentElement;         // flash de "quique" na coluna
+          if (col) { col.classList.remove("bump"); void col.offsetWidth; col.classList.add("bump"); }
+        }
         if (t < 1) allDone = false;
       }
       if (allDone) maybeRespin(grid, bet);
@@ -248,6 +263,7 @@
       bannerEl.textContent = "⚡ +" + gained + " WILD! Re-girando…";
       BZG.sounds.coin();
       BZG.effects.flash(stageEl, "gold");
+      reactMascot("happy"); // O Menor Quentão se anima a cada wild novo
     }
     setTimeout(function () {
       if (again) respinRound(grid, bet, round + 1);
@@ -301,6 +317,7 @@
 
     if (won) {
       barWinEl.textContent = BZG.ui.formatMoney(payout);
+      var bigWin = fullScreen || totalPay >= 15 || payout >= 25000;
       if (fullScreen) {
         bannerEl.className = "ft-banner fullscreen";
         bannerEl.textContent = "💥 TELA CHEIA! Ganho ×10 — " + BZG.ui.formatMoney(payout);
@@ -309,20 +326,22 @@
       } else {
         bannerEl.className = "ft-banner win";
         bannerEl.textContent = "Ganho " + BZG.ui.formatMoney(payout);
-        if (totalPay >= 15 || payout >= 25000) {
+        if (bigWin) {
           BZG.sounds.roar();
           BZG.effects.bigWin(payout, totalPay);
         }
       }
+      reactMascot(bigWin ? "hype" : "happy"); // O Menor Quentão comemora
       setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)!");
-      BZG.ui.toast("🐯 +" + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)", "success");
+      BZG.ui.toast("🔥 +" + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)", "success");
       BZG.sounds.win();
       BZG.effects.flash(stageEl, "gold");
       var rect = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, totalPay >= 10 ? 110 : 55);
     } else {
       bannerEl.className = "ft-banner";
-      bannerEl.textContent = "Quase! Gire de novo 🐯";
+      bannerEl.textContent = "Quase! Gire de novo 🔥";
+      reactMascot("sad"); // O Menor Quentão fica de nariz torto
       setStatus("Não formou linha. Tente outra vez!");
       BZG.sounds.lose();
     }
@@ -356,6 +375,7 @@
     plusBtn = document.getElementById("ft-plus");
     winlinesEl = document.getElementById("ft-winlines");
     lineDots = Array.prototype.slice.call(document.querySelectorAll(".ft-line-dot"));
+    mascotEl = document.getElementById("mq-mascot");
 
     // grade inicial aleatoria
     for (var c = 0; c < 3; c++) {

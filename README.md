@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.18
+# 🎰 Bazinga BET — v1.19
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.19 (2026-07-11) — 🔥 Bazinguinha: mascote O Menor Quentão + novas animações
+- **Mascote novo: O Menor Quentão** (personagem do Arthur, desenhado 100% em **CSS** — cabeça amarela, óculos escuros, bracinhos), no topo da máquina da Bazinguinha. Ele **reage aos giros**: pula e gira feliz na vitória (`hype` na tela cheia / grandes prêmios, `happy` nas vitórias e a cada wild novo do respin), fica de nariz torto na derrota (`sad`), com aura de calor. Ver `.mq-*` em `css/games/bazinguinha.css` e `reactMascot()` em `js/games/bazinguinha.js`.
+- **Novas animações no slot**: os rolos ganham **motion blur** enquanto giram, um **flash de "quique"** quando cada coluna para, e as células vencedoras têm um **brilho que varre** por cima. Pesquisa do Fortune Tiger (Jogo do Tigrinho) confirmou que a mecânica da Bazinguinha já é fiel (3×3, 5 linhas, wild grudento com respin, tela cheia ×10, máx 2500x, RTP ~95% vs 96,81% do original).
+- **Otimização**: todas as animações usam só `transform`/`opacity`/`filter` (aceleradas por GPU) e respeitam `prefers-reduced-motion`; a página já se beneficia do carregamento do ranking em tempo ocioso (v1.17).
 
 ### v1.18 (2026-07-11) — 💎 Bazinga Bonanza no ar (estilo Sweet Bonanza)
 - **💎 Bazinga Bonanza saiu de "Em desenvolvimento"** e virou um slot completo no estilo **Sweet Bonanza**, com os ícones do Bazinga: grade **6×5** que **paga em qualquer lugar** (8+ do mesmo símbolo, faixas 8-9 / 10-11 / 12+), **cascata/tumble** (vencedores explodem, novos caem, pode ganhar de novo no mesmo giro), **🎇 bônus** (4+ dispara 10 rodadas grátis, +5 no retrigger) e **💣 bombas de multiplicador** (somam e multiplicam o ganho do giro; chovem nas rodadas grátis). Tem **compra de rodadas grátis** por 20x. Calibrado por Monte Carlo (5M giros): **RTP ~94,8%**, disparo de grátis ~1 em 210. Visual "candy" roxo/rosa (`css/games/bonanza.css` reescrito) pra diferenciar do Bazinguinha. Agora **todos os jogos estão no ar** — a seção "Em desenvolvimento" ficou vazia. Ativação: removido `data-dev` do `<body>` e a flag `dev:true` em `layout.js`/`lobby.js`.
