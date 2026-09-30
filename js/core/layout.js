@@ -320,6 +320,13 @@ BZG.layout = (function () {
       '</div>';
     document.body.appendChild(modal);
     requestAnimationFrame(function () { modal.classList.add("show"); });
+    // o valor do bonus sobe contando enquanto o card entra
+    var amountEl = modal.querySelector(".bonus-amount");
+    if (BZG.motion && amountEl) {
+      BZG.motion.countUp(0, info.amount, BZG.motion.dur(0.9), function (v) {
+        amountEl.textContent = "+" + BZG.ui.formatMoney(v);
+      });
+    }
 
     document.getElementById("claim-bonus-btn").addEventListener("click", function () {
       var res = BZG.storage.claimBonus();

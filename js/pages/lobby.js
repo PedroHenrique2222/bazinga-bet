@@ -20,6 +20,15 @@
     { id: "roulette", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x." }
   ];
 
+  // fala do dono de cada jogo no balaozinho que aparece no hover do card
+  var QUIPS = {
+    bazinguinha: "Solta o tigrinho! 🐯", bonanza: "Vem chuva de doce aí! 🍬", horse: "Aposta no mais rápido! 🏇",
+    crash: "Rema antes de afundar! 🛶", double: "Vermelho, preto… ou branco? 🎡", mines: "Cuidado com as bombas da horta! 🥒",
+    tower: "Sobe que o lixo aguenta! 🗑️", plinko: "Solta a abóbora! 🎃", dice: "Soldado 616 pronto pra rolar! 🎲",
+    hilo: "Maior ou menor? Confia! 🍰", coinflip: "Cara ou coroa? ⚡", blackjack: "Duvido ganhar do Bogão! 🍑",
+    raspadinha: "Raspa que é sorte! 🎟️", limbo: "Mais alto, mais alto! 📈", roulette: "Façam suas apostas! 🎯"
+  };
+
   /* ---------- Banner rotativo ---------- */
 
   function initBanner() {
@@ -78,9 +87,10 @@
   function renderGameCards() {
     var grid = document.getElementById("games-grid");
     if (!grid) return;
-    grid.innerHTML = GAME_CARDS.map(function (card) {
+    grid.innerHTML = GAME_CARDS.map(function (card, i) {
+      var order = ' style="--i:' + i + '"'; // atraso da entrada em cascata
       if (card.dev) {
-        return '<div class="game-card game-card--dev" title="Em desenvolvimento">' +
+        return '<div class="game-card game-card--dev"' + order + ' title="Em desenvolvimento">' +
           '<span class="card-badge card-badge--dev">EM DESENVOLVIMENTO</span>' +
           '<div class="icon">' + card.icon + '</div>' +
           '<h2>' + card.name + '</h2>' +
@@ -89,11 +99,13 @@
       }
       var liveInfo = card.live ? '<div class="card-live"><span class="last-result">' + lastResultHTML(card) + '</span></div>' : "";
       var badge = card.badge ? '<span class="card-badge">' + card.badge + '</span>' : "";
-      return '<a class="game-card" href="' + GAMES_DIR + card.href + '">' +
+      // no hover a descricao da lugar a fala do personagem, no mesmo espaco (sem vazar do card)
+      var quip = QUIPS[card.id] ? '<span class="card-quip">' + QUIPS[card.id] + '</span>' : "";
+      return '<a class="game-card" href="' + GAMES_DIR + card.href + '"' + order + '>' +
         badge +
         '<div class="icon">' + card.icon + '</div>' +
         '<h2>' + card.name + '</h2>' +
-        '<p>' + card.desc + '</p>' +
+        '<div class="card-say"><p>' + card.desc + '</p>' + quip + '</div>' +
         liveInfo +
         '</a>';
     }).join("");

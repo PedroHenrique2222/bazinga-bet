@@ -222,10 +222,7 @@
       if (won) {
         setStatus("Caiu " + number + " (" + colorLabel(color) + ")! Você ganhou " + BZG.ui.formatMoney(payout) + ".");
         BZG.ui.toast("Caiu " + colorLabel(color) + "! +" + BZG.ui.formatMoney(payout), "success");
-        BZG.sounds.win();
-        BZG.effects.flash(stageEl, "gold");
-        var rect = stageEl.getBoundingClientRect();
-        BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, mult >= 14 ? 100 : 60);
+        BZG.effects.win({ amount: payout, mult: mult, from: stageEl, stage: stageEl });
       } else {
         setStatus("Caiu " + number + " (" + colorLabel(color) + "). Você perdeu " + BZG.ui.formatMoney(userBet.amount) + ".");
         BZG.ui.toast("Caiu " + colorLabel(color) + ". Você perdeu a aposta.", "error");

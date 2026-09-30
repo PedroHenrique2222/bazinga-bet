@@ -291,11 +291,7 @@
       winEl.textContent = "Ganho " + BZG.ui.formatMoney(payout) + " (" + effMult.toFixed(2) + "x)";
       setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("💎 +" + BZG.ui.formatMoney(payout) + " (" + effMult.toFixed(2) + "x)", "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, big ? 120 : 55);
-      if (effMult >= 20 || payout >= 25000) BZG.effects.bigWin(payout, effMult);
+      BZG.effects.win({ amount: payout, mult: effMult, from: stageEl, stage: stageEl });
     } else {
       winEl.className = "bonanza-win";
       winEl.textContent = isBuyRound ? "A compra não retornou desta vez..." : "Sem 8 iguais... gire de novo!";

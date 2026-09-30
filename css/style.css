@@ -1334,82 +1334,249 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   margin: 0 0 18px;
 }
 
-/* ---------- Big Win overlay ---------- */
+/* ---------- Comemoracao de vitoria (v1.21) - ver BZG.effects.win em js/core/effects.js ---------- */
 
-.bigwin-overlay {
+/* saldo do topo: brilha enquanto conta e "pulsa" a cada moeda que chega */
+#balance-value { font-variant-numeric: tabular-nums; }
+.balance-box { transition: box-shadow 0.3s ease, border-color 0.3s ease; }
+.balance-box.balance-up {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.16), 0 0 28px rgba(255, 204, 0, 0.45);
+}
+.balance-box.balance-up #balance-value { text-shadow: 0 0 12px rgba(255, 204, 0, 0.75); }
+.balance-box.balance-hit { animation: balance-hit 0.22s ease-out; }
+@keyframes balance-hit {
+  40% { transform: scale(1.07); }
+}
+
+/* moeda que voa ate o saldo (posicionada pelo GSAP) */
+.bw-coin {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  z-index: 1004;
+  pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fff6c2 0 16%, #ffd84d 34%, #e0a800 68%, #9c6a00 100%);
+  box-shadow: inset 0 0 0 2px rgba(120, 70, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.35);
+  will-change: transform;
+}
+
+/* "+BZ$ 1.234" subindo nas vitorias comuns */
+.bw-float {
+  position: fixed;
+  z-index: 1004;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--yellow);
+  text-shadow: 0 2px 0 #3a2400, 0 0 16px rgba(255, 204, 0, 0.6);
+  transform: translate(-50%, -50%);
+  animation: bw-float 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.bw-float.big { font-size: 30px; }
+@keyframes bw-float {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
+  15% { opacity: 1; transform: translate(-50%, -60%) scale(1.08); }
+  30% { transform: translate(-50%, -70%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -190%) scale(1); }
+}
+
+/* tela de vitoria: Grande (t1) -> Mega (t2) -> BAZINGA! (t3) */
+.bw-overlay {
+  --tier: #ffcc00;
+  --tier-2: #ff8a00;
+  --tier-glow: rgba(255, 204, 0, 0.35);
   position: fixed;
   inset: 0;
-  z-index: 1001;
+  z-index: 1002;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
+.bw-overlay.show { opacity: 1; }
+.bw-overlay.hide { opacity: 0; transition-duration: 0.35s; }
+.bw-overlay.t2 { --tier: #ffd84d; --tier-2: #ff3d7f; --tier-glow: rgba(255, 61, 127, 0.38); }
+.bw-overlay.t3 { --tier: #fff3b0; --tier-2: #ff2d3a; --tier-glow: rgba(255, 45, 58, 0.5); }
 
-.bigwin-overlay.show {
-  opacity: 1;
-}
-
-.bigwin-rays {
+.bw-backdrop {
   position: absolute;
-  width: 200vmax;
-  height: 200vmax;
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(255, 204, 0, 0.14) 0deg 8deg,
-    transparent 8deg 16deg
-  );
-  animation: bigwin-spin 9s linear infinite;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, rgba(48, 30, 0, 0.6) 0%, rgba(6, 6, 10, 0.9) 58%, rgba(0, 0, 0, 0.96) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.bw-overlay.lite .bw-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+.bw-rays {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 180vmax;
+  height: 180vmax;
+  margin: -90vmax 0 0 -90vmax;
+  background: repeating-conic-gradient(from 0deg, var(--tier-glow) 0deg 6deg, transparent 6deg 18deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+  mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+  opacity: 0.8;
+  animation: bw-spin 24s linear infinite;
+}
+.bw-overlay.t2 .bw-rays { animation-duration: 16s; opacity: 0.9; }
+.bw-overlay.t3 .bw-rays { animation-duration: 9s; opacity: 1; }
+@keyframes bw-spin { to { transform: rotate(360deg); } }
+
+.bw-rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-@keyframes bigwin-spin {
-  to { transform: rotate(360deg); }
-}
-
-.bigwin-content {
+.bw-stage {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  padding: 0 16px;
   text-align: center;
-  transform: scale(0.5);
-  transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
 
-.bigwin-overlay.show .bigwin-content {
-  transform: scale(1);
+/* personagem do jogo + balao de fala */
+.bw-host {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
+.bw-medal {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a2a08, #120d04 70%);
+  border: 3px solid var(--tier);
+  box-shadow: 0 0 0 6px rgba(255, 204, 0, 0.12), 0 0 40px var(--tier-glow), inset 0 0 18px rgba(255, 204, 0, 0.25);
+  animation: bw-bob 2.4s ease-in-out infinite;
+}
+.bw-avatar {
+  font-size: 46px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+@keyframes bw-bob { 50% { transform: translateY(-6px); } }
 
-.bigwin-title {
-  font-size: clamp(40px, 9vw, 88px);
+.bw-bubble {
+  position: relative;
+  max-width: 220px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1a1206;
+  text-align: left;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.bw-bubble::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  margin-top: -7px;
+  border: 7px solid transparent;
+  border-left: 0;
+  border-right-color: rgba(255, 255, 255, 0.96);
+}
+.bw-bubble strong {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a6a00;
+}
+.bw-bubble span { font-size: 16px; font-weight: 800; }
+
+/* titulo em ouro metalico com um brilho que varre */
+.bw-title { line-height: 1; }
+.bw-title-text {
+  display: inline-block;
+  padding: 0 0.12em;
+  font-size: clamp(38px, 8.5vw, 84px);
   font-weight: 900;
   font-style: italic;
-  letter-spacing: -1px;
-  color: var(--yellow);
-  -webkit-text-stroke: 3px #14100a;
-  text-shadow: 0 6px 0 #14100a, 0 0 40px rgba(255, 204, 0, 0.7);
-  animation: bigwin-pump 0.5s ease-in-out infinite alternate;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  background:
+    linear-gradient(110deg, transparent 42%, rgba(255, 255, 255, 0.9) 50%, transparent 58%),
+    linear-gradient(180deg, #fffbe6 0%, var(--tier) 38%, #e09a00 62%, #fff1b0 80%, #b77900 100%);
+  background-size: 250% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 4px 0 #2a1a00) drop-shadow(0 0 24px var(--tier-glow));
+  animation: bw-shine 2.4s ease-in-out infinite;
+}
+.bw-overlay.t3 .bw-title-text { font-size: clamp(50px, 11vw, 112px); }
+@keyframes bw-shine {
+  0% { background-position: 160% 0, 0 0; }
+  60%, 100% { background-position: -60% 0, 0 0; }
 }
 
-@keyframes bigwin-pump {
-  from { transform: scale(1); }
-  to { transform: scale(1.06); }
-}
-
-.bigwin-amount {
-  font-size: clamp(24px, 5vw, 44px);
+.bw-amount {
+  margin-top: 10px;
+  font-size: clamp(30px, 6.5vw, 58px);
   font-weight: 900;
+  font-variant-numeric: tabular-nums;
   color: #fff;
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-  margin-top: 6px;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 30px var(--tier-glow);
+}
+.bw-amount.done { animation: bw-settle 0.5s ease-out; }
+@keyframes bw-settle { 40% { transform: scale(1.12); } }
+
+.bw-mult {
+  margin-top: 10px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: clamp(15px, 2.6vw, 20px);
+  font-weight: 900;
+  color: #1a1206;
+  background: linear-gradient(120deg, var(--tier), var(--tier-2));
+  box-shadow: 0 0 20px var(--tier-glow);
 }
 
-.bigwin-mult {
-  font-size: clamp(18px, 3.5vw, 28px);
-  font-weight: 800;
-  color: var(--red);
-  margin-top: 4px;
-  text-shadow: 0 0 18px rgba(255, 45, 58, 0.6);
+.bw-hint {
+  margin-top: 22px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  animation: bw-blink 1.6s ease-in-out infinite;
+}
+@keyframes bw-blink { 50% { opacity: 0.35; } }
+
+@media (max-width: 560px) {
+  .bw-host { flex-direction: column; gap: 8px; }
+  .bw-medal { width: 64px; height: 64px; }
+  .bw-avatar { font-size: 34px; }
+  .bw-bubble { text-align: center; }
+  .bw-bubble::before { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bw-rays, .bw-medal, .bw-hint, .bw-title-text, .balance-box.balance-hit { animation: none; }
 }
 
 /* ---------- Conquistas ---------- */
@@ -1955,20 +2122,12 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
 /* entrada suave no lobby (so opacidade: nao mexe em transform, entao nao
    atrapalha o hover dos cards nem o posicionamento de canvas nos jogos) */
 @keyframes bzg-fadein { from { opacity: 0; } to { opacity: 1; } }
-.banner, .lobby-grid .game-card { animation: bzg-fadein 0.5s ease both; }
-.lobby-grid .game-card:nth-child(1) { animation-delay: 0.03s; }
-.lobby-grid .game-card:nth-child(2) { animation-delay: 0.06s; }
-.lobby-grid .game-card:nth-child(3) { animation-delay: 0.09s; }
-.lobby-grid .game-card:nth-child(4) { animation-delay: 0.12s; }
-.lobby-grid .game-card:nth-child(5) { animation-delay: 0.15s; }
-.lobby-grid .game-card:nth-child(6) { animation-delay: 0.18s; }
-.lobby-grid .game-card:nth-child(7) { animation-delay: 0.21s; }
-.lobby-grid .game-card:nth-child(8) { animation-delay: 0.24s; }
-.lobby-grid .game-card:nth-child(n+9) { animation-delay: 0.27s; }
+.banner { animation: bzg-fadein 0.5s ease both; }
+/* cards do lobby: entrada em cascata na secao MICRO-INTERACOES (v1.22), no fim do arquivo */
 
 /* respeita quem pediu menos animacao no sistema */
 @media (prefers-reduced-motion: reduce) {
-  .banner, .lobby-grid .game-card { animation: none; }
+  .banner { animation: none; }
   .game-card:not(.game-card--dev):hover::after { animation: none; }
 }
 
@@ -2021,3 +2180,233 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
 :root[data-theme="dark"] .lbw-val { color: var(--yellow); }
 .lbw-more { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--primary); text-decoration: none; }
 .lbw-more:hover { text-decoration: underline; }
+
+/* ==================== MICRO-INTERACOES E NAVEGACAO (v1.22) ==================== */
+/* ver js/core/micro.js (ondinha, inclinacao dos cards, faixa de conquista) */
+
+/* fundo de brasas: o canvas agora e desenhado em resolucao retina, entao o tamanho
+   na tela precisa ser fixado aqui */
+#bg-particles { width: 100%; height: 100%; }
+
+/* ---------- Transicao entre paginas (View Transitions, Chrome/Edge/Safari) ----------
+   Topo e menu ficam parados; so o conteudo sai subindo e o novo entra. Navegador sem
+   suporte (ex.: Firefox) so troca de pagina como antes. */
+@view-transition { navigation: auto; }
+.topbar { view-transition-name: bzg-topbar; }
+.sidebar { view-transition-name: bzg-sidebar; }
+main.container { view-transition-name: bzg-main; }
+::view-transition-group(bzg-topbar),
+::view-transition-group(bzg-sidebar),
+::view-transition-old(bzg-topbar),
+::view-transition-new(bzg-topbar),
+::view-transition-old(bzg-sidebar),
+::view-transition-new(bzg-sidebar) { animation: none; }
+::view-transition-old(bzg-main) { animation: vt-out 0.16s ease-in both; }
+::view-transition-new(bzg-main) { animation: vt-in 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 0.2s; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(16px); } }
+
+/* ---------- Botoes: ondinha de toque ---------- */
+.btn { position: relative; overflow: hidden; }
+.btn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 60%);
+  transform: scale(0);
+  animation: btn-ripple 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.btn--ghost .btn-ripple { background: radial-gradient(circle, rgba(255, 204, 0, 0.28) 0%, rgba(255, 204, 0, 0) 60%); }
+@keyframes btn-ripple {
+  to { transform: scale(1); opacity: 0; }
+}
+.btn--gold:hover:not(:disabled) { box-shadow: 0 6px 24px var(--yellow-glow); }
+
+/* ---------- Saldo: piscada vermelha quando a aposta desconta ---------- */
+.balance-box.balance-down #balance-value { animation: balance-down 0.45s ease; }
+@keyframes balance-down {
+  0% { color: var(--red); transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+/* ---------- Lobby: cards em cascata, inclinacao 3D e fala do personagem ---------- */
+/* entrada usa as propriedades translate/scale (separadas de transform) pra nao brigar
+   com o hover; "backwards" solta o card assim que a entrada termina */
+.lobby-grid .game-card {
+  animation: card-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+@keyframes card-in {
+  from { opacity: 0; translate: 0 22px; scale: 0.96; }
+}
+
+.game-card.is-tilting {
+  transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-5px);
+  transition: transform 0.12s ease-out, border-color 0.2s ease, box-shadow 0.2s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 220, 120, 0.11), transparent 50%), var(--panel);
+}
+.game-card .icon { transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease; }
+
+.card-say { display: grid; width: 100%; }
+.card-say > * { grid-area: 1 / 1; transition: opacity 0.22s ease, translate 0.22s ease; }
+.card-quip {
+  align-self: center;
+  opacity: 0;
+  translate: 0 6px;
+  font-size: 13px;
+  font-weight: 800;
+  font-style: italic;
+  color: var(--yellow-dark);
+}
+:root[data-theme="dark"] .card-quip { color: var(--yellow); }
+@media (hover: hover) {
+  .game-card:not(.game-card--dev):hover .card-say p { opacity: 0; translate: 0 -6px; }
+  .game-card:not(.game-card--dev):hover .card-quip { opacity: 1; translate: 0 0; }
+}
+
+/* banner do lobby: o personagem flutua e o texto entra junto com o slide */
+.banner-emoji { animation: banner-float 3.2s ease-in-out infinite; }
+@keyframes banner-float {
+  50% { translate: 0 -8px; rotate: 3deg; }
+}
+.banner-slide .banner-copy { transition: opacity 0.5s ease 0.1s, translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s; }
+.banner-slide:not(.active) .banner-copy { opacity: 0; translate: -18px 0; }
+
+/* ---------- Menu lateral ---------- */
+.nav-icon { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.nav-item:hover .nav-icon { transform: scale(1.18) rotate(-6deg); }
+.nav-item.active .nav-icon { filter: drop-shadow(0 0 6px rgba(255, 204, 0, 0.55)); }
+
+/* ---------- Modais: entrada em mola ---------- */
+.modal-card {
+  transform: translateY(26px) scale(0.9);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.34, 1.45, 0.64, 1), opacity 0.25s ease;
+}
+.modal-backdrop.show .modal-card { transform: none; opacity: 1; }
+.modal-backdrop.show .bonus-gift { animation: gift-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s backwards, bonus-bounce 1.2s ease-in-out 0.8s infinite; }
+@keyframes gift-pop {
+  from { transform: scale(0.2) rotate(-30deg); opacity: 0; }
+}
+.bonus-amount { font-variant-numeric: tabular-nums; }
+
+/* ---------- Toasts: deslizam, barra de tempo, pilha que fecha suave ---------- */
+#toast-container { align-items: flex-end; }
+.toast {
+  position: relative;
+  overflow: hidden;
+  max-width: min(340px, calc(100vw - 40px));
+  cursor: pointer;
+  transform: translateX(28px) scale(0.98);
+  transition: transform 0.4s cubic-bezier(0.2, 1.2, 0.3, 1), opacity 0.25s ease,
+              max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease;
+}
+.toast--visible { transform: none; }
+.toast--leaving {
+  opacity: 0;
+  transform: translateX(34px);
+  max-height: 0 !important;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: -10px; /* fecha o gap da pilha */
+}
+.toast-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--yellow);
+  opacity: 0.7;
+  transform-origin: left;
+  animation: toast-bar linear forwards;
+}
+.toast--success .toast-bar { background: var(--green); }
+.toast--error .toast-bar { background: var(--red); }
+@keyframes toast-bar { to { transform: scaleX(0); } }
+
+/* ---------- Faixa de conquista desbloqueada ---------- */
+.achv-banner {
+  position: fixed;
+  top: 74px;
+  left: 50%;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 12px 22px 12px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(120deg, rgba(28, 20, 4, 0.96), rgba(16, 16, 22, 0.96));
+  border: 1px solid rgba(255, 204, 0, 0.55);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 30px rgba(255, 204, 0, 0.22);
+  overflow: hidden;
+  transform: translate(-50%, -160%);
+  opacity: 0;
+  transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease;
+}
+.achv-banner.show { transform: translate(-50%, 0); opacity: 1; }
+.achv-banner.hide { transform: translate(-50%, -160%); opacity: 0; transition-duration: 0.35s; }
+.achv-banner::after { /* brilho que varre uma vez */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+.achv-banner.show::after { animation: achv-sweep 1.1s ease 0.35s; }
+@keyframes achv-sweep { to { left: 130%; } }
+.achv-banner-medal {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 24px;
+  background: radial-gradient(circle at 35% 30%, #3a2a08, #120d04 70%);
+}
+.achv-banner-medal::before { /* anel dourado girando */
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: conic-gradient(var(--yellow), #ff8a00, #fff1b0, var(--yellow));
+  -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%);
+  mask: radial-gradient(circle, transparent 62%, #000 64%);
+  animation: bw-spin 2.4s linear infinite;
+}
+.achv-banner.show .achv-banner-medal span { animation: gift-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards; }
+.achv-banner-text { min-width: 0; }
+.achv-banner-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+.achv-banner-name { font-size: 16px; font-weight: 900; }
+.achv-banner-desc { font-size: 12.5px; color: rgba(255, 255, 255, 0.65); }
+
+@media (max-width: 560px) {
+  .achv-banner { top: 64px; padding-right: 16px; }
+  .achv-banner-desc { display: none; }
+}
+
+/* ---------- Quem pediu menos movimento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  .lobby-grid .game-card, .banner-emoji, .achv-banner-medal::before, .modal-backdrop.show .bonus-gift { animation: none; }
+  .game-card.is-tilting { transform: translateY(-5px); }
+  .toast, .modal-card, .achv-banner { transition-duration: 0.01s; }
+}

@@ -484,10 +484,7 @@
     actionBtn.textContent = "Retirou em " + formatMult(mult);
     setStatus("Você retirou em " + formatMult(mult) + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
     BZG.ui.toast("Retirou em " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-    BZG.sounds.win();
-    BZG.effects.flash(stageEl, "gold");
-    var rect = multiplierEl.getBoundingClientRect();
-    BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);
+    BZG.effects.win({ amount: payout, mult: mult, from: multiplierEl, stage: stageEl });
   }
 
   function queueBet() {

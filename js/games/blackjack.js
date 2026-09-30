@@ -266,17 +266,11 @@
     if (outcome === "blackjack") {
       setStatus("BLACKJACK! Você ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("🃏 Blackjack! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 100);
+      BZG.effects.win({ amount: payout, mult: mult, from: stageEl, stage: stageEl });
     } else if (outcome === "win") {
       setStatus("Você venceu com " + detail + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Venceu! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect2 = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect2.left + rect2.width / 2, rect2.top + rect2.height / 2, 55);
+      BZG.effects.win({ amount: payout, mult: mult, from: stageEl, stage: stageEl });
     } else if (outcome === "push") {
       setStatus("Empate em " + detail + ". Sua aposta foi devolvida.");
       BZG.ui.toast("Empate. Aposta devolvida.", "info");
