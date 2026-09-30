@@ -304,10 +304,7 @@
     if (won && profit >= 0) {
       setStatus("Caiu " + n + " (" + colorLabel + ")! Você recebeu " + BZG.ui.formatMoney(totalReturn) + " (+" + BZG.ui.formatMoney(profit) + ").");
       BZG.ui.toast("Caiu " + n + "! +" + BZG.ui.formatMoney(totalReturn), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, totalReturn >= total * 10 ? 110 : 60);
+      BZG.effects.win({ amount: totalReturn, mult: totalReturn / total, from: stageEl, stage: stageEl });
     } else if (won) {
       setStatus("Caiu " + n + " (" + colorLabel + "). Você recuperou " + BZG.ui.formatMoney(totalReturn) + " de " + BZG.ui.formatMoney(total) + ".");
       BZG.ui.toast("Caiu " + n + ". Retorno parcial: " + BZG.ui.formatMoney(totalReturn), "info");

@@ -214,10 +214,7 @@
     if (won) {
       setStatus("Você chegou ao nível " + currentLevel + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Colheu em " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = multiplierEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);
+      BZG.effects.win({ amount: payout, mult: mult, from: multiplierEl, stage: stageEl });
     } else {
       setStatus("Você caiu na armadilha do nível " + (currentLevel + 1) + " e perdeu " + BZG.ui.formatMoney(currentBet) + ".");
       BZG.ui.toast("Armadilha! Você perdeu a aposta.", "error");

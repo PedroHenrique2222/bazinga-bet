@@ -182,7 +182,10 @@ BZG.collectibles = (function () {
     var character = characterByKey(item.char);
     var justCompleted = !wasComplete && isSetComplete(item.char);
     if (justCompleted) BZG.storage.unlockCosmetic("avatars", character.avatar);
-    reveal(item, character, justCompleted);
+    // se a tela de vitoria estiver aberta, o popup espera ela fechar (nao se sobrepoem)
+    function show() { reveal(item, character, justCompleted); }
+    if (BZG.effects && BZG.effects.afterCelebration) setTimeout(function () { BZG.effects.afterCelebration(show); }, 0);
+    else show();
   }
 
   // popup animado de "novo colecionavel" - bem mais chamativo que um toast.

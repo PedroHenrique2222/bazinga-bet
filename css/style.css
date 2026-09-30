@@ -1334,82 +1334,249 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   margin: 0 0 18px;
 }
 
-/* ---------- Big Win overlay ---------- */
+/* ---------- Comemoracao de vitoria (v1.21) - ver BZG.effects.win em js/core/effects.js ---------- */
 
-.bigwin-overlay {
+/* saldo do topo: brilha enquanto conta e "pulsa" a cada moeda que chega */
+#balance-value { font-variant-numeric: tabular-nums; }
+.balance-box { transition: box-shadow 0.3s ease, border-color 0.3s ease; }
+.balance-box.balance-up {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.16), 0 0 28px rgba(255, 204, 0, 0.45);
+}
+.balance-box.balance-up #balance-value { text-shadow: 0 0 12px rgba(255, 204, 0, 0.75); }
+.balance-box.balance-hit { animation: balance-hit 0.22s ease-out; }
+@keyframes balance-hit {
+  40% { transform: scale(1.07); }
+}
+
+/* moeda que voa ate o saldo (posicionada pelo GSAP) */
+.bw-coin {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  z-index: 1004;
+  pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fff6c2 0 16%, #ffd84d 34%, #e0a800 68%, #9c6a00 100%);
+  box-shadow: inset 0 0 0 2px rgba(120, 70, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.35);
+  will-change: transform;
+}
+
+/* "+BZ$ 1.234" subindo nas vitorias comuns */
+.bw-float {
+  position: fixed;
+  z-index: 1004;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--yellow);
+  text-shadow: 0 2px 0 #3a2400, 0 0 16px rgba(255, 204, 0, 0.6);
+  transform: translate(-50%, -50%);
+  animation: bw-float 1.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.bw-float.big { font-size: 30px; }
+@keyframes bw-float {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
+  15% { opacity: 1; transform: translate(-50%, -60%) scale(1.08); }
+  30% { transform: translate(-50%, -70%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -190%) scale(1); }
+}
+
+/* tela de vitoria: Grande (t1) -> Mega (t2) -> BAZINGA! (t3) */
+.bw-overlay {
+  --tier: #ffcc00;
+  --tier-2: #ff8a00;
+  --tier-glow: rgba(255, 204, 0, 0.35);
   position: fixed;
   inset: 0;
-  z-index: 1001;
+  z-index: 1002;
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
+.bw-overlay.show { opacity: 1; }
+.bw-overlay.hide { opacity: 0; transition-duration: 0.35s; }
+.bw-overlay.t2 { --tier: #ffd84d; --tier-2: #ff3d7f; --tier-glow: rgba(255, 61, 127, 0.38); }
+.bw-overlay.t3 { --tier: #fff3b0; --tier-2: #ff2d3a; --tier-glow: rgba(255, 45, 58, 0.5); }
 
-.bigwin-overlay.show {
-  opacity: 1;
-}
-
-.bigwin-rays {
+.bw-backdrop {
   position: absolute;
-  width: 200vmax;
-  height: 200vmax;
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(255, 204, 0, 0.14) 0deg 8deg,
-    transparent 8deg 16deg
-  );
-  animation: bigwin-spin 9s linear infinite;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, rgba(48, 30, 0, 0.6) 0%, rgba(6, 6, 10, 0.9) 58%, rgba(0, 0, 0, 0.96) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.bw-overlay.lite .bw-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+.bw-rays {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 180vmax;
+  height: 180vmax;
+  margin: -90vmax 0 0 -90vmax;
+  background: repeating-conic-gradient(from 0deg, var(--tier-glow) 0deg 6deg, transparent 6deg 18deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+  mask-image: radial-gradient(circle, #000 0%, transparent 55%);
+  opacity: 0.8;
+  animation: bw-spin 24s linear infinite;
+}
+.bw-overlay.t2 .bw-rays { animation-duration: 16s; opacity: 0.9; }
+.bw-overlay.t3 .bw-rays { animation-duration: 9s; opacity: 1; }
+@keyframes bw-spin { to { transform: rotate(360deg); } }
+
+.bw-rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-@keyframes bigwin-spin {
-  to { transform: rotate(360deg); }
-}
-
-.bigwin-content {
+.bw-stage {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 100%;
+  padding: 0 16px;
   text-align: center;
-  transform: scale(0.5);
-  transition: transform 0.4s cubic-bezier(0.2, 1.4, 0.4, 1);
 }
 
-.bigwin-overlay.show .bigwin-content {
-  transform: scale(1);
+/* personagem do jogo + balao de fala */
+.bw-host {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
+.bw-medal {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a2a08, #120d04 70%);
+  border: 3px solid var(--tier);
+  box-shadow: 0 0 0 6px rgba(255, 204, 0, 0.12), 0 0 40px var(--tier-glow), inset 0 0 18px rgba(255, 204, 0, 0.25);
+  animation: bw-bob 2.4s ease-in-out infinite;
+}
+.bw-avatar {
+  font-size: 46px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+@keyframes bw-bob { 50% { transform: translateY(-6px); } }
 
-.bigwin-title {
-  font-size: clamp(40px, 9vw, 88px);
+.bw-bubble {
+  position: relative;
+  max-width: 220px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #1a1206;
+  text-align: left;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.bw-bubble::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  margin-top: -7px;
+  border: 7px solid transparent;
+  border-left: 0;
+  border-right-color: rgba(255, 255, 255, 0.96);
+}
+.bw-bubble strong {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a6a00;
+}
+.bw-bubble span { font-size: 16px; font-weight: 800; }
+
+/* titulo em ouro metalico com um brilho que varre */
+.bw-title { line-height: 1; }
+.bw-title-text {
+  display: inline-block;
+  padding: 0 0.12em;
+  font-size: clamp(38px, 8.5vw, 84px);
   font-weight: 900;
   font-style: italic;
-  letter-spacing: -1px;
-  color: var(--yellow);
-  -webkit-text-stroke: 3px #14100a;
-  text-shadow: 0 6px 0 #14100a, 0 0 40px rgba(255, 204, 0, 0.7);
-  animation: bigwin-pump 0.5s ease-in-out infinite alternate;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  background:
+    linear-gradient(110deg, transparent 42%, rgba(255, 255, 255, 0.9) 50%, transparent 58%),
+    linear-gradient(180deg, #fffbe6 0%, var(--tier) 38%, #e09a00 62%, #fff1b0 80%, #b77900 100%);
+  background-size: 250% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 4px 0 #2a1a00) drop-shadow(0 0 24px var(--tier-glow));
+  animation: bw-shine 2.4s ease-in-out infinite;
+}
+.bw-overlay.t3 .bw-title-text { font-size: clamp(50px, 11vw, 112px); }
+@keyframes bw-shine {
+  0% { background-position: 160% 0, 0 0; }
+  60%, 100% { background-position: -60% 0, 0 0; }
 }
 
-@keyframes bigwin-pump {
-  from { transform: scale(1); }
-  to { transform: scale(1.06); }
-}
-
-.bigwin-amount {
-  font-size: clamp(24px, 5vw, 44px);
+.bw-amount {
+  margin-top: 10px;
+  font-size: clamp(30px, 6.5vw, 58px);
   font-weight: 900;
+  font-variant-numeric: tabular-nums;
   color: #fff;
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6);
-  margin-top: 6px;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 30px var(--tier-glow);
+}
+.bw-amount.done { animation: bw-settle 0.5s ease-out; }
+@keyframes bw-settle { 40% { transform: scale(1.12); } }
+
+.bw-mult {
+  margin-top: 10px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: clamp(15px, 2.6vw, 20px);
+  font-weight: 900;
+  color: #1a1206;
+  background: linear-gradient(120deg, var(--tier), var(--tier-2));
+  box-shadow: 0 0 20px var(--tier-glow);
 }
 
-.bigwin-mult {
-  font-size: clamp(18px, 3.5vw, 28px);
-  font-weight: 800;
-  color: var(--red);
-  margin-top: 4px;
-  text-shadow: 0 0 18px rgba(255, 45, 58, 0.6);
+.bw-hint {
+  margin-top: 22px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  animation: bw-blink 1.6s ease-in-out infinite;
+}
+@keyframes bw-blink { 50% { opacity: 0.35; } }
+
+@media (max-width: 560px) {
+  .bw-host { flex-direction: column; gap: 8px; }
+  .bw-medal { width: 64px; height: 64px; }
+  .bw-avatar { font-size: 34px; }
+  .bw-bubble { text-align: center; }
+  .bw-bubble::before { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bw-rays, .bw-medal, .bw-hint, .bw-title-text, .balance-box.balance-hit { animation: none; }
 }
 
 /* ---------- Conquistas ---------- */

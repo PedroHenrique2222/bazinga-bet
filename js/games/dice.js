@@ -139,10 +139,7 @@
     if (won) {
       setStatus("Rolou " + result.toFixed(2) + "! Você ganhou " + BZG.ui.formatMoney(payout) + ".");
       BZG.ui.toast("Rolou " + result.toFixed(2) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = resultEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, mult >= 10 ? 90 : 55);
+      BZG.effects.win({ amount: payout, mult: mult, from: resultEl, stage: stageEl });
     } else {
       setStatus("Rolou " + result.toFixed(2) + ". Você perdeu " + BZG.ui.formatMoney(bet) + ".");
       BZG.ui.toast("Rolou " + result.toFixed(2) + ". Você perdeu a aposta.", "error");

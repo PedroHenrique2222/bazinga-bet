@@ -322,22 +322,14 @@
         bannerEl.className = "ft-banner fullscreen";
         bannerEl.textContent = "💥 TELA CHEIA! Ganho ×10 — " + BZG.ui.formatMoney(payout);
         BZG.sounds.roar();
-        BZG.effects.bigWin(payout, totalPay);
       } else {
         bannerEl.className = "ft-banner win";
         bannerEl.textContent = "Ganho " + BZG.ui.formatMoney(payout);
-        if (bigWin) {
-          BZG.sounds.roar();
-          BZG.effects.bigWin(payout, totalPay);
-        }
       }
       reactMascot(bigWin ? "hype" : "happy"); // O Menor Quentão comemora
       setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)!");
       BZG.ui.toast("🔥 +" + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)", "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, totalPay >= 10 ? 110 : 55);
+      BZG.effects.win({ amount: payout, mult: totalPay, from: stageEl, stage: stageEl });
     } else {
       bannerEl.className = "ft-banner";
       bannerEl.textContent = "Quase! Gire de novo 🔥";
