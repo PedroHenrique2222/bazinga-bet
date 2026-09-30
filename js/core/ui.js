@@ -31,13 +31,19 @@ BZG.ui = (function () {
     if (balanceHolds > 0 || balanceTarget === null) return;
     var to = balanceTarget;
     if (balanceCounter) balanceCounter.cancel();
+    var box = document.querySelector(".balance-box");
     if (shownBalance === null || to <= shownBalance || !BZG.motion) {
+      // desconto (aposta): instantaneo, com uma piscada vermelha no valor
+      if (box && shownBalance !== null && to < shownBalance) {
+        box.classList.remove("balance-down");
+        void box.offsetWidth;
+        box.classList.add("balance-down");
+      }
       shownBalance = to;
       paintBalance(to);
       return;
     }
     var from = shownBalance;
-    var box = document.querySelector(".balance-box");
     if (box) {
       box.classList.remove("balance-up");
       void box.offsetWidth;
@@ -79,22 +85,44 @@ BZG.ui = (function () {
     };
   }
 
+  /* Toast: entra deslizando, mostra uma barrinha do tempo restante e, ao sair, a pilha
+     fecha o espaco suavemente. No maximo 4 na tela (o mais antigo sai primeiro). */
+  var TOAST_MS = 2600;
+  var TOAST_MAX = 4;
+
+  function dismissToast(el) {
+    if (el._leaving) return;
+    el._leaving = true;
+    clearTimeout(el._timer);
+    el.style.maxHeight = el.offsetHeight + "px";
+    void el.offsetWidth;
+    el.classList.remove("toast--visible");
+    el.classList.add("toast--leaving");
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 320);
+  }
+
   function toast(message, type) {
     var container = document.getElementById("toast-container");
     if (!container) return;
+    var live = Array.prototype.filter.call(container.children, function (c) { return !c._leaving; });
+    while (live.length >= TOAST_MAX) dismissToast(live.shift());
+
     var el = document.createElement("div");
     el.className = "toast toast--" + (type || "info");
+    el.setAttribute("role", "status");
     el.textContent = message;
+    var bar = document.createElement("span");
+    bar.className = "toast-bar";
+    bar.style.animationDuration = TOAST_MS + "ms";
+    el.appendChild(bar);
+    el.addEventListener("click", function () { dismissToast(el); });
     container.appendChild(el);
     requestAnimationFrame(function () {
       el.classList.add("toast--visible");
     });
-    setTimeout(function () {
-      el.classList.remove("toast--visible");
-      setTimeout(function () {
-        if (el.parentNode) el.parentNode.removeChild(el);
-      }, 300);
-    }, 2600);
+    el._timer = setTimeout(function () { dismissToast(el); }, TOAST_MS);
   }
 
   /* Mantido por compatibilidade: o layout.js agora cuida do cabecalho */

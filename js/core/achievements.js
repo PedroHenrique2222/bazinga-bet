@@ -248,7 +248,12 @@ BZG.achievements = (function () {
         if (BZG.storage.unlockAchievement(a.id)) novos.push(a);
       }
     });
+    // faixa de conquista (micro.js enfileira e espera a tela de vitoria); sem ela, o toast antigo
     novos.forEach(function (a, i) {
+      if (BZG.micro && BZG.micro.achievement) {
+        setTimeout(function () { BZG.micro.achievement(a); }, 400);
+        return;
+      }
       setTimeout(function () {
         if (BZG.ui) BZG.ui.toast("🏆 Conquista: " + a.icon + " " + a.name, "success");
         if (BZG.sounds && BZG.sounds.achievement) BZG.sounds.achievement();

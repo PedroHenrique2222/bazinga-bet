@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.21
+# 🎰 Bazinga BET — v1.22
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -57,7 +57,8 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 | `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador, **saldo do topo com contador animado** (`refreshBalance` / `holdBalance`) |
 | `bots.js` | Só gera os "outros jogadores" simulados no painel ao vivo do Crash e do Double (ver seção própria) |
 | `motion.js` | **Kit de animação** (`BZG.motion`): carrega o GSAP via CDN, `dur()` (respeita Turbo e "reduzir movimento"), `lite()` (aparelho fraco → menos partículas), contador `countUp()` |
-| `particles.js` / `effects.js` | Fundo de brasas; confete, flash de tela e a **comemoração de vitória única do site**: `BZG.effects.win({ amount, mult, from, stage })` — todo jogo chama isso quando o jogador ganha |
+| `micro.js` | **Micro-interações** (`BZG.micro`): ondinha de toque nos botões, inclinação 3D + reflexo nos cards do lobby, faixa de **conquista desbloqueada** (fila, espera a tela de vitória) |
+| `particles.js` / `effects.js` | Fundo de brasas (3 camadas de profundidade, paralaxe com o mouse); confete, flash de tela e a **comemoração de vitória única do site**: `BZG.effects.win({ amount, mult, from, stage })` — todo jogo chama isso quando o jogador ganha |
 | `achievements.js` | Lista de conquistas + verificação automática |
 | `modes.js` | Modo Turbo (acelera as animações) |
 | `battlepass.js` | Regras do Passe de Batalha |
@@ -203,6 +204,27 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.22 (2026-09-30) — ✨ Reforma das animações, fase 2: navegação e micro-interações
+- **Transição entre páginas** (View Transitions, CSS puro): ao trocar de página, o topo e o menu ficam parados e só o conteúdo sai subindo e o novo entra. Chrome, Edge e Safari; no Firefox troca como antes. Desligada com "reduzir movimento".
+- **Lobby**:
+  - Cards entram em **cascata**.
+  - No mouse, **inclinam em 3D** e um reflexo segue o cursor (`js/core/micro.js`).
+  - No hover, a descrição dá lugar à **fala do personagem dono do jogo** (ex.: Canoa: "Rema antes de afundar!"; frases em `QUIPS`, `js/pages/lobby.js`).
+  - O emoji do banner flutua e o texto entra junto com cada slide.
+- **Botões**: ondinha de toque saindo do ponto clicado, em todos os `.btn`.
+- **Saldo**: quando a aposta desconta, o valor dá uma **piscada vermelha**; os ganhos continuam subindo contando (v1.21).
+- **Toasts**:
+  - Entram deslizando e têm uma **barrinha do tempo restante**.
+  - Fecham com um clique.
+  - No máximo 4 na tela; o mais antigo sai primeiro e a pilha fecha o espaço suavemente.
+- **Conquistas**: o toast "🏆 Conquista" virou uma **faixa dourada** que desce no topo, com medalha, anel girando e brilho. Várias conquistas entram em fila, e a faixa espera a tela de vitória fechar.
+- **Modais**: entrada em mola. No **Panetone diário**, o bolo aparece com um "pop" e o valor sobe contando.
+- **Menu lateral**: o ícone dá um pulinho no hover e brilha no item ativo.
+- **Fundo de brasas reescrito**:
+  - 3 camadas de profundidade (longe: pequenas e lentas; perto: maiores e com brilho).
+  - Leve paralaxe com o mouse e nitidez retina.
+  - Metade das brasas em aparelho fraco; parado com "reduzir movimento".
 
 ### v1.21 (2026-09-30) — 🏆 Reforma das animações, fase 1: vitórias
 Primeira fase da reforma geral das animações (estilo **cassino premium**: interface calma, explosão nas vitórias).
