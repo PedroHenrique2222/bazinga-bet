@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.19
+# 🎰 Bazinga BET — v1.20
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,9 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.20 (2026-09-30) — 🔌 Supabase sempre ligado
+- **Keep-alive do ranking**: o plano gratuito do Supabase pausa o projeto depois de ~7 dias sem uso (foi o que derrubou o ranking). Novo workflow `.github/workflows/supabase-keepalive.yml` faz uma leitura na tabela `leaderboard` **a cada 3 dias** pelo GitHub Actions. A URL e a chave pública são lidas direto de `js/core/leaderboard.js` (um lugar só pra atualizar). Se o Supabase não responder, o workflow falha e o GitHub avisa por e-mail. Ele também se reativa a cada execução, pra o GitHub não desligar o agendamento em repositório sem commits por 60 dias. Dá pra rodar na hora em **Actions → Supabase keep-alive → Run workflow**.
 
 ### v1.19 (2026-07-11) — 🔥 Bazinguinha: mascote O Menor Quentão + novas animações
 - **Mascote novo: O Menor Quentão** (personagem do Arthur, desenhado 100% em **CSS** — cabeça amarela, óculos escuros, bracinhos), no topo da máquina da Bazinguinha. Ele **reage aos giros**: pula e gira feliz na vitória (`hype` na tela cheia / grandes prêmios, `happy` nas vitórias e a cada wild novo do respin), fica de nariz torto na derrota (`sad`), com aura de calor. Ver `.mq-*` em `css/games/bazinguinha.css` e `reactMascot()` em `js/games/bazinguinha.js`.
