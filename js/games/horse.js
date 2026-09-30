@@ -157,11 +157,7 @@
     if (won) {
       setStatus("🏆 " + HORSES[winner].name + " venceu! +" + BZG.ui.formatMoney(payout));
       BZG.ui.toast("Seu corredor venceu! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var r = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, 60);
-      if (payout >= 25000) BZG.effects.bigWin(payout, PAYOUT);
+      BZG.effects.win({ amount: payout, mult: PAYOUT, from: stageEl, stage: stageEl });
     } else {
       setStatus("Venceu " + HORSES[winner].name + ". Não foi dessa vez.");
       BZG.sounds.lose();

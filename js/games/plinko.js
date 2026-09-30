@@ -338,10 +338,7 @@
 
     if (mult >= 10) {
       BZG.ui.toast("💥 " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var rect = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height * 0.7, 80);
+      BZG.effects.win({ amount: payout, mult: mult, from: stageEl, stage: stageEl });
     } else if (won) {
       BZG.sounds.click();
     } else {

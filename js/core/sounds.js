@@ -293,8 +293,79 @@ BZG.sounds = (function () {
     });
   }
 
+  /* ---------- Sons da comemoracao de vitoria (v1.21) ---------- */
+
+  // ruido filtrado com varredura de frequencia: "whoosh" de entrada da tela de vitoria
+  function whoosh(delay) {
+    if (!sfxOn) return;
+    try {
+      var audioCtx = getContext();
+      var dur = 0.45;
+      var start = audioCtx.currentTime + (delay || 0);
+      var buffer = audioCtx.createBuffer(1, Math.floor(audioCtx.sampleRate * dur), audioCtx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+      var src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+      var filt = audioCtx.createBiquadFilter();
+      filt.type = "bandpass";
+      filt.Q.value = 1.2;
+      filt.frequency.setValueAtTime(300, start);
+      filt.frequency.exponentialRampToValueAtTime(3200, start + dur * 0.7);
+      var g = audioCtx.createGain();
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(0.13, start + dur * 0.35);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
+      src.start(start);
+    } catch (e) {}
+  }
+
+  // tique do contador; progress 0..1 sobe o tom conforme o premio cresce
+  var lastCountTick = 0;
+  function countTick(progress) {
+    var now = Date.now();
+    if (now - lastCountTick < 55) return;
+    lastCountTick = now;
+    tone(900 + (progress || 0) * 900, 0.03, "triangle", 0, 0.035);
+  }
+
+  // moeda chegando no saldo (i = ordem, pra variar o tom)
+  function coinLand(i) {
+    var f = 1500 + ((i || 0) % 6) * 110;
+    tone(f, 0.05, "sine", 0, 0.05);
+    tone(f * 1.5, 0.04, "sine", 0.02, 0.025);
+  }
+
+  // entrada/subida de nivel da tela de vitoria: acorde mais alto e mais cheio a cada nivel
+  var TIER_CHORDS = [
+    [392, 493.88, 587.33, 783.99],             // Grande Vitoria (Sol maior)
+    [440, 554.37, 659.25, 880, 1108.73],       // Mega Vitoria (La maior)
+    [523.25, 659.25, 783.99, 1046.5, 1318.51]  // BAZINGA! (Do maior, oitava acima)
+  ];
+  function tierUp(tier) {
+    var chord = TIER_CHORDS[Math.max(0, Math.min(2, (tier || 1) - 1))];
+    chord.forEach(function (f, i) {
+      tone(f, 0.5 + i * 0.05, "sine", i * 0.045, 0.12);
+      tone(f * 2, 0.3, "triangle", i * 0.045 + 0.01, 0.035);
+    });
+    tone(chord[0] / 2, 0.6, "sawtooth", 0, 0.05); // base grave
+    if (tier >= 3) roar();
+  }
+
+  // fecho quando o contador termina
+  function winSettle() {
+    tone(1046.5, 0.18, "sine", 0, 0.1);
+    tone(1567.98, 0.3, "sine", 0.08, 0.09);
+  }
+
   return {
     tone: tone,
+    whoosh: whoosh,
+    countTick: countTick,
+    coinLand: coinLand,
+    tierUp: tierUp,
+    winSettle: winSettle,
     click: click,
     bet: bet,
     win: win,

@@ -111,11 +111,7 @@
     if (won) {
       setStatus("Saiu " + fmtMult(mult) + " (>= " + fmtMult(target) + ")! +" + BZG.ui.formatMoney(payout));
       BZG.ui.toast("Saiu " + fmtMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var r = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, target >= 10 ? 90 : 50);
-      if (payout >= 25000 || target >= 25) BZG.effects.bigWin(payout, target);
+      BZG.effects.win({ amount: payout, mult: target, from: stageEl, stage: stageEl });
     } else {
       setStatus("Saiu " + fmtMult(mult) + ". Precisava de " + fmtMult(target) + ".");
       BZG.sounds.lose();

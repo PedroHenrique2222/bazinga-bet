@@ -83,11 +83,7 @@
       resultEl.textContent = "Deu " + label + "! +" + BZG.ui.formatMoney(payout);
       setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Deu " + label + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.sounds.coin();
-      BZG.effects.flash(stageEl, "gold");
-      var r = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, 50);
+      BZG.effects.win({ amount: payout, mult: PAYOUT, from: coinEl, stage: stageEl });
     } else {
       resultEl.className = "coin-result lose";
       resultEl.textContent = "Deu " + label + ". Não foi dessa vez.";

@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.20
+# 🎰 Bazinga BET — v1.21
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -20,6 +20,7 @@ BZG-BET/
 ├── ranking.html          Ranking online (Supabase) - saldo/recorde/nivel entre jogadores
 ├── settings.html         Configuracoes (som, tema, turbo, conta)
 ├── privacidade.html      Politica de Privacidade (acessivel sem conta, LGPD)
+├── lab.html              Laboratorio de animacoes (fora do menu) - dispara as comemoracoes sem apostar
 ├── favicon.svg
 ├── games/                Todas as paginas de JOGO (com aposta) ficam aqui
 │   ├── crash.html, double.html, mines.html, tower.html, plinko.html,
@@ -53,9 +54,10 @@ Cada jogo é só HTML + CSS + JS puro, sem build. Uma página em `games/` ou `mi
 | `layout.js` | Monta a sidebar e a topbar (com o card de perfil e os mini-campos de Nível/Recorde/Maior Prêmio) em toda página; **também é o "porteiro"**: exige cadastro antes de liberar qualquer página, e bloqueia acesso direto aos jogos em desenvolvimento; calcula os prefixos de pasta (`games/`, `minigames/`, raiz) dinamicamente |
 | `theme.js` | Sistema de temas (dark/light + 10 temas extras desbloqueáveis no Passe) |
 | `sounds.js` | Efeitos sonoros gerados por código (Web Audio API, 100% local) + música ambiente (vídeo do YouTube em loop, escondido — única parte do site que depende de internet) |
-| `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador |
+| `ui.js` | Formatação de dinheiro, toasts (avisos), nome colorido do jogador, **saldo do topo com contador animado** (`refreshBalance` / `holdBalance`) |
 | `bots.js` | Só gera os "outros jogadores" simulados no painel ao vivo do Crash e do Double (ver seção própria) |
-| `particles.js` / `effects.js` | Confete, flash de tela, animação de "Big Win" |
+| `motion.js` | **Kit de animação** (`BZG.motion`): carrega o GSAP via CDN, `dur()` (respeita Turbo e "reduzir movimento"), `lite()` (aparelho fraco → menos partículas), contador `countUp()` |
+| `particles.js` / `effects.js` | Fundo de brasas; confete, flash de tela e a **comemoração de vitória única do site**: `BZG.effects.win({ amount, mult, from, stage })` — todo jogo chama isso quando o jogador ganha |
 | `achievements.js` | Lista de conquistas + verificação automática |
 | `modes.js` | Modo Turbo (acelera as animações) |
 | `battlepass.js` | Regras do Passe de Batalha |
@@ -183,6 +185,7 @@ Não precisa instalar nada: baixe o projeto e dê **duplo-clique em `index.html`
 ## 🛠️ Tecnologia
 
 - HTML + CSS + JavaScript puro — sem frameworks, sem build, sem servidor
+- **Animações com GSAP** (carregado via CDN em segundo plano por `js/core/motion.js`). Se o CDN não carregar, as comemorações continuam funcionando, só sem a entrada animada e sem as moedas voando até o saldo
 - Persistência via `localStorage` (uma chave única `bazingaBetState`, mais `bzgTheme`/`bzgMusic`/`bzgSfx`)
 - Efeitos sonoros gerados por código com Web Audio API (sem arquivos de áudio) — 100% local
 - **Música de fundo**: um vídeo do YouTube tocando em loop, escondido (só o áudio, sem player visível na tela) via YouTube IFrame API — ver `js/core/sounds.js`. É a **única parte do site que depende de internet**; sem conexão, ela simplesmente não toca e o resto do site continua funcionando normalmente. Como todo autoplay com som, só começa a tocar depois do primeiro clique/tecla do jogador (mesma regra de navegadores que já valia antes).
@@ -200,6 +203,18 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.21 (2026-09-30) — 🏆 Reforma das animações, fase 1: vitórias
+Primeira fase da reforma geral das animações (estilo **cassino premium**: interface calma, explosão nas vitórias).
+- **Comemoração única pra todo o site**: os 15 jogos agora chamam `BZG.effects.win({ amount, mult, from, stage })` em vez de cada um montar som + flash + confete + big win do seu jeito. A intensidade sai do multiplicador:
+  - **< 10x**: "+BZ$" subindo de onde a vitória aconteceu, moedas voando em arco até o saldo (mais moedas quanto maior o ganho) e confete a partir de 2x.
+  - **≥ 10x**: nova **tela de vitória em 3 níveis** — **Grande Vitória** (10x) → **Mega Vitória** (25x) → **BAZINGA!** (50x). O prêmio sobe num contador que passa por cada nível (cada um tem o seu trecho na tela, com acorde próprio, tremida e rajada de moedas), título em ouro metálico com brilho, raios girando, **chuva de moedas girando em 3D** (canvas) e o **personagem dono do jogo** entrando em cena com um balão de fala (Canoa no Crash, Pikles no Mines, O Menor Quentão na Bazinguinha, Pitoco nos demais). **Um toque pula** pro valor final; outro fecha (Esc/Enter/Espaço também). Ao fechar, as moedas voam até o saldo.
+  - Substitui o antigo overlay "BIG WIN!" e os critérios soltos de cada jogo (ex.: prêmio ≥ BZ$ 25.000); agora vale só o multiplicador.
+- **Saldo do topo com contador**: ganhos sobem contando (com brilho dourado), descontos de aposta continuam instantâneos. O contador espera as moedas chegarem (`BZG.ui.holdBalance()`), e cada moeda que chega dá um "tique" no saldo.
+- **Sons sincronizados** (`sounds.js`): `whoosh` na entrada, `countTick` com o tom subindo conforme o contador, `coinLand` pra cada moeda, `tierUp(1-3)` com acorde maior a cada nível (o BAZINGA! tem rugido) e `winSettle` no fim.
+- **Novo kit de animação `js/core/motion.js`** com GSAP via CDN: `dur()` aplica o **Turbo** e o **"reduzir movimento"** do sistema em todas as animações novas; `lite()` detecta aparelho fraco/celular e corta partículas pela metade e o blur de fundo.
+- O popup de **colecionável** agora espera a tela de vitória fechar antes de aparecer (não se sobrepõem mais).
+- **`lab.html`** (fora do menu): laboratório pra disparar cada comemoração sem apostar, escolhendo aposta e personagem — o saldo muda só na tela.
 
 ### v1.20 (2026-09-30) — 🔌 Supabase sempre ligado
 - **Keep-alive do ranking**: o plano gratuito do Supabase pausa o projeto depois de ~7 dias sem uso (foi o que derrubou o ranking). Novo workflow `.github/workflows/supabase-keepalive.yml` faz uma leitura na tabela `leaderboard` **a cada 3 dias** pelo GitHub Actions. A URL e a chave pública são lidas direto de `js/core/leaderboard.js` (um lugar só pra atualizar). Se o Supabase não responder, o workflow falha e o GitHub avisa por e-mail. Ele também se reativa a cada execução, pra o GitHub não desligar o agendamento em repositório sem commits por 60 dias. Dá pra rodar na hora em **Actions → Supabase keep-alive → Run workflow**.

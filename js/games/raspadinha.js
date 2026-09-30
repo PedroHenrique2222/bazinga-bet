@@ -238,11 +238,7 @@
       resultEl.textContent = "🎉 " + mult + "x! +" + BZG.ui.formatMoney(payout);
       setStatus("Você achou 3 " + prize.sym + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Raspadinha premiada! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.effects.flash(stageEl, "gold");
-      var r = stageEl.getBoundingClientRect();
-      BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, mult >= 20 ? 100 : 55);
-      if (payout >= 25000 || mult >= 50) BZG.effects.bigWin(payout, mult);
+      BZG.effects.win({ amount: payout, mult: mult, from: stageEl, stage: stageEl });
     } else {
       resultEl.className = "rasp-result lose";
       resultEl.textContent = "Sem prêmio dessa vez.";
