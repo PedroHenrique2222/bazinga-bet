@@ -311,7 +311,7 @@ BZG.storage = (function () {
     saveState(state);
     // avisa quem quiser reagir a uma aposta especifica (ex.: drop de colecionavel),
     // separado do bzg:balance-changed generico (que tambem dispara em recarga/bonus)
-    document.dispatchEvent(new CustomEvent("bzg:bet-recorded", { detail: { game: game } }));
+    document.dispatchEvent(new CustomEvent("bzg:bet-recorded", { detail: { game: game, won: !!entry.won, payout: entry.payout, multiplier: entry.multiplier || 0, bet: entry.bet } }));
     return state;
   }
 
