@@ -132,15 +132,15 @@
     if (userBet) {
       var profile = BZG.storage.getProfile();
       cols[userBet.color].push(
-        '<div class="bet-row is-user"><span class="avatar">' + profile.avatar + '</span>' +
-        '<span class="name">' + profile.nickname + ' (você)</span>' +
+        '<div class="bet-row is-user"><span class="avatar">' + esc(profile.avatar) + '</span>' +
+        '<span class="name">' + esc(profile.nickname) + ' (você)</span>' +
         '<span class="bet-amount">' + BZG.ui.formatMoney(userBet.amount) + '</span></div>'
       );
       sums[userBet.color] += userBet.amount;
     }
     if (live) others.forEach(function (o) {
-      if (o.r !== liveRound || !o.bet || !cols[o.pick]) return;
-      var colorCls = o.color && o.color !== "default" ? " bzg-name color-" + esc(o.color) : "";
+      if (o.r !== liveRound || !o.bet || ["red", "black", "white"].indexOf(o.pick) === -1) return;
+      var colorCls = BZG.ui.safeColorClass(o.color) ? " bzg-name " + BZG.ui.safeColorClass(o.color) : "";
       cols[o.pick].push(
         '<div class="bet-row is-real"><span class="avatar">' + esc(o.avatar) + '</span>' +
         '<span class="name' + colorCls + '">' + esc(o.nick) + '<span class="real-tag" title="Jogador ao vivo"></span></span>' +

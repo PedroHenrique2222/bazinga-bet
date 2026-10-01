@@ -38,13 +38,13 @@
   }
 
   function generalValue(row, metric) {
-    if (metric === "level") return "Lv " + (row.level || 1);
+    if (metric === "level") return "Lv " + (Math.round(Number(row.level)) || 1);
     return BZG.ui.formatMoney(row[metric] || 0);
   }
 
   function gameValue(score) {
     if (currentGame.money) return BZG.ui.formatMoney(score || 0);
-    return (score || 0) + (currentGame.unit ? " " + currentGame.unit : "");
+    return (Math.round(Number(score)) || 0) + (currentGame.unit ? " " + currentGame.unit : "");
   }
 
   function emptyState(icon, title, sub) {
@@ -72,7 +72,7 @@
     listEl.innerHTML = rows.map(function (row, i) {
       var sub = "💰 " + BZG.ui.formatMoney(row.balance || 0) +
         " · 📈 " + BZG.ui.formatMoney(row.peak_balance || 0) +
-        " · ⭐ Lv " + (row.level || 1);
+        " · ⭐ Lv " + (Math.round(Number(row.level)) || 1);
       return rowHTML(i + 1, LB.rowNameHTML(row), generalValue(row, currentMetric), myUuid && row.id === myUuid, sub);
     }).join("");
   }

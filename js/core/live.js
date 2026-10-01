@@ -10,11 +10,12 @@
 window.BZG = window.BZG || {};
 
 BZG.live = (function () {
-  var SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
   var ROOT = (function () {
     var s = document.currentScript && document.currentScript.src;
     return s ? s.replace(/js\/core\/live\.js.*$/, "") : "";
   })();
+  // copia local da biblioteca (v1.35: nada de CDN de terceiros)
+  var SDK_URL = ROOT + "js/vendor/supabase-2.117.2.js";
 
   /* ---------- sorteio fixo por rodada ---------- */
 

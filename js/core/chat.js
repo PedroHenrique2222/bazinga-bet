@@ -71,7 +71,8 @@ BZG.chat = (function () {
 
   function msgHTML(m) {
     var mine = BZG.live && m.user_id && m.user_id === BZG.live.myId();
-    var color = m.name_color && m.name_color !== "default" ? " color-" + esc(m.name_color) : "";
+    var color = BZG.ui.safeColorClass(m.name_color);
+    if (color) color = " " + color;
     var av = BZG.ui && BZG.ui.avatarHTML ? BZG.ui.avatarHTML(m.avatar || "😎") : esc(m.avatar || "😎");
     return '<div class="chat-msg' + (mine ? " is-me" : "") + '">' +
       '<span class="chat-av" aria-hidden="true">' + av + '</span>' +

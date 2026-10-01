@@ -348,7 +348,7 @@ BZG.layout = (function () {
     if (window.BZG && BZG.leaderboard) { cb(); return; }
     function afterSdk() { loadScriptOnce(ROOT_PREFIX + "js/core/leaderboard.js", cb); }
     if (window.supabase && window.supabase.createClient) afterSdk();
-    else loadScriptOnce("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2", afterSdk);
+    else loadScriptOnce(ROOT_PREFIX + "js/vendor/supabase-2.117.2.js", afterSdk); // copia local (v1.35)
   }
 
   var lbSyncTimer = null;
@@ -436,9 +436,9 @@ BZG.layout = (function () {
     var metric = "balance";
 
     function fmtVal(row) {
-      if (ctx.general) return metric === "level" ? "Lv " + (row.level || 1) : BZG.ui.formatMoney(row[metric] || 0);
-      if (ctx.money) return BZG.ui.formatMoney(row.score || 0);
-      return (row.score || 0) + (ctx.unit ? " " + ctx.unit : "");
+      if (ctx.general) return metric === "level" ? "Lv " + (Math.round(Number(row.level)) || 1) : BZG.ui.formatMoney(Number(row[metric]) || 0);
+      if (ctx.money) return BZG.ui.formatMoney(Number(row.score) || 0);
+      return (Math.round(Number(row.score)) || 0) + (ctx.unit ? " " + ctx.unit : "");
     }
     function render(rows) {
       if (rows === null) { listEl.innerHTML = '<p class="lbw-msg">Ranking indisponível agora.</p>'; return; }
