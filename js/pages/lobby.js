@@ -35,30 +35,60 @@
     { id: "roulette", color: "#8a1c1c", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x." }
   ];
 
-  /* ---------- Banner rotativo ---------- */
+  /* ---------- Banner rotativo ----------
+     Um slide por jogo, com a capa ilustrada (assets/capas). Troca sozinho a cada
+     5s, pausa com o mouse em cima, tem setas e da pra arrastar no celular. */
+
+  function bannerTag(card) {
+    if (card.live) return '<span class="banner-badge banner-badge--live">AO VIVO</span>';
+    if (card.badge) return '<span class="banner-badge">' + card.badge + '</span>';
+    return "";
+  }
 
   function initBanner() {
     var banner = document.getElementById("banner");
-    if (!banner) return;
-    var slides = Array.prototype.slice.call(banner.querySelectorAll(".banner-slide"));
+    var track = document.getElementById("banner-track");
+    if (!banner || !track) return;
     var dotsWrap = document.getElementById("banner-dots");
+
+    track.innerHTML = GAME_CARDS.map(function (card, i) {
+      var cover = COVERS_DIR + card.id + ".webp";
+      var icon = BZG.icons && BZG.icons.has(card.id) ? BZG.icons.tile(card.id, 34) : card.icon;
+      return '<a class="banner-slide' + (i === 0 ? " active" : "") + '" href="' + GAMES_DIR + card.href + '" ' +
+        'style="--card-c:' + card.color + '" aria-label="' + card.name + '"' + (i === 0 ? "" : ' tabindex="-1"') + '>' +
+        '<img class="banner-bg" src="' + cover + '" alt="" aria-hidden="true" loading="' + (i < 2 ? "eager" : "lazy") + '" onerror="this.remove()">' +
+        '<div class="banner-copy">' +
+          '<div class="banner-kicker">' + icon + bannerTag(card) + '</div>' +
+          '<h2>' + card.name + '</h2>' +
+          '<p>' + card.desc + '</p>' +
+          '<span class="btn btn--gold banner-cta">Jogar agora</span>' +
+        '</div>' +
+        '<img class="banner-art" src="' + cover + '" alt="" loading="' + (i < 2 ? "eager" : "lazy") + '" onerror="this.remove()">' +
+        '</a>';
+    }).join("");
+
+    var slides = Array.prototype.slice.call(track.children);
     var current = 0;
     var timer = null;
 
+    dotsWrap.innerHTML = "";
     slides.forEach(function (_, i) {
       var dot = document.createElement("button");
+      dot.type = "button";
       dot.className = "banner-dot" + (i === 0 ? " active" : "");
-      dot.addEventListener("click", function () {
-        goTo(i);
-        restart();
-      });
+      dot.setAttribute("aria-label", "Mostrar " + GAME_CARDS[i].name);
+      dot.addEventListener("click", function () { goTo(i); restart(); });
       dotsWrap.appendChild(dot);
     });
     var dots = Array.prototype.slice.call(dotsWrap.children);
 
     function goTo(index) {
-      current = index % slides.length;
-      slides.forEach(function (s, i) { s.classList.toggle("active", i === current); });
+      current = (index + slides.length) % slides.length;
+      slides.forEach(function (s, i) {
+        var on = i === current;
+        s.classList.toggle("active", on);
+        if (on) s.removeAttribute("tabindex"); else s.setAttribute("tabindex", "-1");
+      });
       dots.forEach(function (d, i) { d.classList.toggle("active", i === current); });
     }
 
@@ -66,6 +96,22 @@
       if (timer) clearInterval(timer);
       timer = setInterval(function () { goTo(current + 1); }, 5000);
     }
+
+    document.getElementById("banner-prev").addEventListener("click", function () { goTo(current - 1); restart(); });
+    document.getElementById("banner-next").addEventListener("click", function () { goTo(current + 1); restart(); });
+    banner.addEventListener("mouseenter", function () { if (timer) clearInterval(timer); });
+    banner.addEventListener("mouseleave", restart);
+
+    // arrastar para os lados no celular troca de jogo (sem abrir o jogo sem querer)
+    var startX = null, dragged = false;
+    banner.addEventListener("pointerdown", function (e) { startX = e.clientX; dragged = false; });
+    banner.addEventListener("pointerup", function (e) {
+      if (startX === null) return;
+      var dx = e.clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 40) { dragged = true; goTo(current + (dx < 0 ? 1 : -1)); restart(); }
+    });
+    track.addEventListener("click", function (e) { if (dragged) { e.preventDefault(); dragged = false; } });
 
     restart();
   }

@@ -6,7 +6,10 @@
    re-dispara +5. 💣 Bomba de multiplicador: nao forma ganho, mas no fim de um giro com
    ganho, TODAS as bombas na tela somam seus valores e multiplicam o ganho do giro.
    Compra de bonus: 20x a aposta compra 10 rodadas gratis na hora.
-   Pagamentos calibrados por Monte Carlo (5M giros): RTP ~95%, disparo de gratis ~1 em 210. */
+   Pagamentos calibrados por Monte Carlo (5M giros): RTP ~95%, disparo de gratis ~1 em 210.
+   v3 (visual): palco imersivo estilo Pragmatic - cenario, logo, mascote (Estrela-Bonus),
+   botao de girar redondo, barra de saldo/ganho e imagens opcionais do Codex
+   (assets/bonanza/) que entram sozinhas quando existirem. A matematica nao mudou. */
 (function () {
   var COLS = 6, ROWS = 5, N = COLS * ROWS;
   var SCALE = 0.972;   // ajuste fino global do RTP
@@ -37,12 +40,15 @@
   var auto = null; // giro automatico (autospin.js)
 
   var betInput, spinBtn, buyBtn, statusEl, historyListEl, gridEl, bannerEl, winEl, stageEl, freeEl;
+  var balEl, logoEl, mascotEl, mascotBody, bubbleEl;
 
   // estado da rodada em andamento
   var curBet = 0, curCost = 0, totalWin = 0, freeLeft = 0, isBuyRound = false;
+  var inFree = false; // dentro das rodadas gratis (inclusive a ultima, quando freeLeft ja e 0)
 
   function spd(ms) { return ms * BZG.modes.speed(); }
   function setStatus(t) { statusEl.textContent = t; }
+  function fmt(v) { return BZG.ui.formatMoney(v); }
 
   function pickSym() {
     var r = Math.random() * TOTALW;
@@ -108,16 +114,34 @@
 
   function scatterPay(sc) { var key = sc >= 6 ? 6 : sc; return SCAT_PAY[key] || SCAT_PAY[6]; }
 
-  /* simbolo desenhado (icons.js) de cada emoji; sem icons.js, mostra o emoji */
+  /* ---------- simbolos: imagem do Codex (se existir) > SVG desenhado > emoji ---------- */
   var SYM_ART = { "💎": "s-diamante", "🍰": "s-bolo", "🍑": "s-pessego", "🃏": "s-carta", "🎲": "s-dado",
     "🥒": "s-picles", "🔋": "s-pilha", "🎃": "s-abobora", "🎇": "s-bonus", "💣": "bomba" };
+  var IMG_DIR = "../assets/bonanza/";
+  var SYM_IMG = { "💎": "sym-diamante", "🍰": "sym-bolo", "🍑": "sym-pessego", "🃏": "sym-carta", "🎲": "sym-dado",
+    "🥒": "sym-picles", "🔋": "sym-pilha", "🎃": "sym-abobora", "🎇": "sym-bonus", "💣": "sym-bomba" };
+  var SCENE_IMG = { fundo: IMG_DIR + "fundo.webp", logo: IMG_DIR + "logo.webp",
+    mascote: IMG_DIR + "mascote.webp", vitoria: IMG_DIR + "mascote-vitoria.webp" };
+  var imgSym = {};      // emoji -> caminho da imagem que carregou
+  var imgScene = {};    // fundo/logo/mascote/vitoria -> true se carregou
+  var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
   function symArt(icon, size) {
+    if (imgSym[icon]) return '<img class="sym-img" src="' + imgSym[icon] + '" alt="" draggable="false">';
     return BZG.icons && SYM_ART[icon] ? BZG.icons.art(SYM_ART[icon], size || 64) : icon;
   }
+  function symInline(icon) {
+    return '<span class="sym-inline" data-sym="' + icon + '">' + symArt(icon, 22) + '</span>';
+  }
   function symbolizeText(el) {
-    if (!BZG.icons) return;
-    Object.keys(SYM_ART).forEach(function (emo) {
-      el.innerHTML = el.innerHTML.split(emo).join('<span class="sym-inline">' + symArt(emo, 22) + '</span>');
+    var html = el.innerHTML;
+    Object.keys(SYM_ART).forEach(function (emo) { html = html.split(emo).join(symInline(emo)); });
+    el.innerHTML = html;
+  }
+  // quando as imagens chegam depois, troca os simbolos pequenos (tabela, contador...)
+  function refreshInlineSyms() {
+    Array.prototype.forEach.call(document.querySelectorAll(".sym-inline[data-sym]"), function (el) {
+      el.innerHTML = symArt(el.getAttribute("data-sym"), 22);
     });
   }
 
@@ -132,13 +156,31 @@
   }
 
   /* "+BZ$ X" que sobe de dentro da grade a cada cascata */
-  function floatWin(amount) {
+  function floatWin(amount, cls) {
     if (!(amount > 0)) return;
     var el = document.createElement("div");
-    el.className = "bonanza-float";
-    el.textContent = "+" + BZG.ui.formatMoney(amount);
+    el.className = "bonanza-float" + (cls ? " " + cls : "");
+    el.textContent = "+" + fmt(amount);
     gridEl.parentElement.appendChild(el);
-    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1300);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1400);
+  }
+
+  /* estouro de brilho em cima de cada celula (vencedores ou bombas). Fica na moldura,
+     fora da celula, para nao encolher junto com o simbolo que explode. */
+  function burst(selector, cls) {
+    if (reduceMotion) return;
+    var frame = gridEl.parentElement;
+    var gx = gridEl.offsetLeft, gy = gridEl.offsetTop;
+    var made = [];
+    Array.prototype.forEach.call(gridEl.querySelectorAll(selector), function (g) {
+      var b = document.createElement("i");
+      b.className = "bz-burst" + (cls ? " " + cls : "");
+      b.style.cssText = "left:" + (gx + g.offsetLeft) + "px;top:" + (gy + g.offsetTop) + "px;width:" +
+        g.offsetWidth + "px;height:" + g.offsetHeight + "px";
+      frame.appendChild(b);
+      made.push(b);
+    });
+    setTimeout(function () { made.forEach(function (b) { if (b.parentNode) b.parentNode.removeChild(b); }); }, 650);
   }
 
   /* opts.drop: giro novo, tudo cai de cima (coluna por coluna, de baixo pra cima).
@@ -166,22 +208,111 @@
   }
 
   function showBanner(text, cls) {
+    bannerEl.innerHTML = "";
     bannerEl.textContent = text;
     bannerEl.className = "bonanza-banner" + (cls ? " " + cls : "");
     void bannerEl.offsetWidth;
     bannerEl.classList.add("show");
   }
+  // banner com simbolo desenhado na frente do texto (ex.: compra)
+  function showBannerSym(icon, text, cls) {
+    showBanner("", cls);
+    bannerEl.innerHTML = '<span class="bz-banner-sym">' + symArt(icon, 64) + '</span>' + text;
+  }
 
-  function updateFreeUI() {
-    if (freeLeft > 0) {
+  /* ---------- mascote (Estrela-Bonus) ---------- */
+  var cheerTimer = null, bubbleTimer = null;
+  function renderMascot() {
+    if (!mascotBody) return;
+    if (imgScene.mascote) {
+      mascotBody.innerHTML = '<img class="bz-mascot-img" src="' + SCENE_IMG.mascote + '" alt="" draggable="false">' +
+        (imgScene.vitoria ? '<img class="bz-mascot-img bz-mascot-img--win" src="' + SCENE_IMG.vitoria + '" alt="" draggable="false">' : "");
+      mascotEl.classList.add("has-img");
+      mascotEl.classList.toggle("has-win", !!imgScene.vitoria);
+    } else {
+      mascotBody.innerHTML = BZG.icons ? BZG.icons.art("s-bonus", 240) : "🎇";
+    }
+  }
+  function showBubble(text) {
+    if (!bubbleEl || !text) return;
+    bubbleEl.textContent = text;
+    bubbleEl.classList.remove("show");
+    void bubbleEl.offsetWidth;
+    bubbleEl.classList.add("show");
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(function () { bubbleEl.classList.remove("show"); }, 1700);
+  }
+  // nivel 0 = pulinho (cada cascata), 1 = comemora, 2 = comemora muito (vitoria grande)
+  function mascotCheer(level, text) {
+    if (!mascotEl) return;
+    mascotEl.classList.remove("hop", "cheer", "cheer-big");
+    void mascotEl.offsetWidth;
+    mascotEl.classList.add(level >= 1 ? "cheer" : "hop");
+    if (level >= 2) mascotEl.classList.add("cheer-big");
+    clearTimeout(cheerTimer);
+    cheerTimer = setTimeout(function () { mascotEl.classList.remove("hop", "cheer", "cheer-big"); }, level >= 1 ? 1800 : 650);
+    showBubble(text);
+  }
+
+  /* ---------- contador de ganho na barra (sobe contando) ---------- */
+  var shownWin = 0, countRaf = 0;
+  function setWinText(v, tail) { winEl.innerHTML = fmt(v) + (tail || ""); }
+  function countWin(target, tail) {
+    cancelAnimationFrame(countRaf);
+    var from = shownWin;
+    var box = winEl.parentElement;
+    if (target > from && box) { box.classList.remove("bump"); void box.offsetWidth; box.classList.add("bump"); }
+    if (reduceMotion || target <= from) { shownWin = target; setWinText(target, tail); return; }
+    var dur = spd(700), start = 0;
+    function frame(now) {
+      if (!start) start = now;
+      var p = Math.min(1, (now - start) / dur);
+      var e = 1 - Math.pow(1 - p, 3);
+      shownWin = Math.round(from + (target - from) * e);
+      if (p < 1) { winEl.textContent = fmt(shownWin); countRaf = requestAnimationFrame(frame); }
+      else { shownWin = target; setWinText(target, tail); }
+    }
+    countRaf = requestAnimationFrame(frame);
+  }
+  function resetWin() {
+    cancelAnimationFrame(countRaf);
+    shownWin = 0;
+    winEl.className = "bonanza-win";
+    setWinText(0);
+  }
+
+  function refreshBar() {
+    if (balEl) balEl.textContent = fmt(BZG.storage.getBalance());
+  }
+
+  /* ---------- contador das rodadas gratis ---------- */
+  var freeShown = -1;
+  // extra = ganho (em x da aposta) das cascatas do giro atual, que ainda nao entrou em totalWin
+  function updateFreeUI(extra) {
+    if (inFree) {
       stageEl.classList.add("free-mode");
       freeEl.style.display = "";
-      var soFar = Math.round(curBet * totalWin * SCALE);
-      freeEl.innerHTML = '<span class="sym-inline">' + symArt("🎇", 22) + '</span> Rodadas grátis: <b>' + freeLeft + '</b>' +
-        (soFar > 0 ? ' · Ganho: <b>' + BZG.ui.formatMoney(soFar) + '</b>' : "");
+      if (!freeEl.querySelector(".bz-free-num")) {
+        freeEl.innerHTML =
+          '<span class="bz-free-label">' + symInline("🎇") + ' Rodadas grátis</span>' +
+          '<b class="bz-free-num"></b>' +
+          '<span class="bz-free-total">Ganho total <b></b></span>';
+        freeShown = -1;
+      }
+      var numEl = freeEl.querySelector(".bz-free-num");
+      if (freeShown !== freeLeft) {
+        numEl.textContent = freeLeft;
+        numEl.classList.remove("bump");
+        void numEl.offsetWidth;
+        numEl.classList.add("bump");
+        freeShown = freeLeft;
+      }
+      freeEl.querySelector(".bz-free-total b").textContent = fmt(Math.round(curBet * (totalWin + (extra || 0)) * SCALE));
     } else {
       stageEl.classList.remove("free-mode");
       freeEl.style.display = "none";
+      freeEl.innerHTML = "";
+      freeShown = -1;
     }
   }
 
@@ -189,8 +320,9 @@
     var payoutSoFar = Math.round(curBet * totalWin * SCALE);
     if (payoutSoFar > 0) {
       winEl.className = "bonanza-win" + (totalWin * SCALE >= 10 ? " big" : "");
-      winEl.textContent = "Ganho: " + BZG.ui.formatMoney(payoutSoFar) + " (" + (totalWin * SCALE).toFixed(2) + "x)";
+      countWin(payoutSoFar);
     }
+    if (inFree) updateFreeUI();
   }
 
   function renderHistory() {
@@ -201,7 +333,7 @@
       return '<div class="history-row">' +
         '<span class="tag ' + tagClass + '">' + tagText + '</span>' +
         '<span>' + (e.detail || "") + '</span>' +
-        '<span>' + BZG.ui.formatMoney(e.payout) + '</span>' +
+        '<span>' + fmt(e.payout) + '</span>' +
         '</div>';
     }).join("") || '<p style="color:var(--text-muted); font-size:13px;">Nenhum giro ainda.</p>';
   }
@@ -235,16 +367,20 @@
         var w = accWin;
         if (st.sc >= TRIGGER_MIN) w += scatterPay(st.sc);
         if (w > 0 && st.bomb > 0) {
-          // as bombas acendem, explodem e o ganho multiplica com tremor
+          // as bombas giram, acendem, explodem e o ganho multiplica com tremor
           Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.bomb"), function (b) { b.classList.add("boom"); });
           BZG.sounds.bombExplode();
           setTimeout(function () {
             w *= st.bomb;
+            Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.bomb"), function (b) { b.classList.remove("boom"); b.classList.add("blast"); });
+            burst(".gem.bomb", "bz-burst--bomb");
             showBanner("×" + st.bomb, "mult");
+            mascotCheer(1, "×" + st.bomb + "!");
             BZG.effects.shake(stageEl);
             BZG.effects.flash(stageEl, "gold");
-            floatWin(Math.round(curBet * (w - accWin) * SCALE));
-            onDone(w, st.sc);
+            floatWin(Math.round(curBet * (w - accWin) * SCALE), "mult");
+            // segura o "xN" na tela antes do proximo giro cair por cima (so tempo, nao muda o valor)
+            setTimeout(function () { onDone(w, st.sc); }, spd(650));
           }, spd(650));
           return;
         }
@@ -255,11 +391,14 @@
       markWinners(ev.remove);
       BZG.sounds.pegHit();
       floatWin(Math.round(curBet * ev.pay * SCALE));
+      mascotCheer(0);
       winEl.className = "bonanza-win counting";
-      winEl.textContent = "Ganho: " + BZG.ui.formatMoney(Math.round(curBet * (totalWin + accWin) * SCALE));
+      countWin(Math.round(curBet * (totalWin + accWin) * SCALE));
+      if (inFree) updateFreeUI(accWin);
       setTimeout(function () {
         // vencedores explodem antes de sumir
         Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.win"), function (g) { g.classList.add("pop"); });
+        burst(".gem.win");
       }, spd(360));
       setTimeout(function () {
         var falls = tumble(ev.remove, pBomb, st);
@@ -277,6 +416,7 @@
     document.getElementById("bet-half").disabled = lock;
     document.getElementById("bet-double").disabled = lock;
     document.getElementById("bet-max").disabled = lock;
+    stageEl.classList.toggle("is-spinning", lock);
   }
 
   function doRound(isBuy) {
@@ -286,7 +426,7 @@
     if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return false; }
     var cost = isBuy ? bet * BUY_MULT : bet;
     if (cost > balance) {
-      BZG.ui.toast(isBuy ? "A compra custa " + BZG.ui.formatMoney(cost) + " (20x). Saldo insuficiente." : "Você não tem saldo suficiente.", "error");
+      BZG.ui.toast(isBuy ? "A compra custa " + fmt(cost) + " (20x). Saldo insuficiente." : "Você não tem saldo suficiente.", "error");
       return false;
     }
 
@@ -296,14 +436,14 @@
     curCost = cost;
     totalWin = 0;
     freeLeft = 0;
+    inFree = false;
     lockUI(true);
-    winEl.textContent = "";
-    winEl.className = "bonanza-win";
+    resetWin();
     setStatus(isBuy ? "Comprando rodadas grátis..." : "Girando...");
     BZG.sounds.bet();
 
     if (isBuy) {
-      showBanner("COMPRA! 🎇", "free");
+      showBannerSym("🎇", "COMPRA!", "free");
       BZG.sounds.jackpot();
       setTimeout(function () { startFreeSpins(FREE_SPINS); }, spd(700));
     } else {
@@ -311,7 +451,7 @@
         totalWin += w;
         showRunningWin();
         if (sc >= TRIGGER_MIN) {
-          showBanner("🎇 RODADAS GRÁTIS!", "free");
+          showBanner("RODADAS GRÁTIS!", "free");
           BZG.sounds.jackpot();
           setTimeout(function () { startFreeSpins(FREE_SPINS); }, spd(900));
         } else {
@@ -319,19 +459,27 @@
         }
       });
     }
+    return true;
   }
 
   function startFreeSpins(count) {
     freeLeft = count;
+    inFree = true;
+    // transicao de clima: o cenario escurece/acende e uma onda de luz passa pelo palco
+    stageEl.classList.remove("free-enter");
+    void stageEl.offsetWidth;
+    stageEl.classList.add("free-enter");
+    setTimeout(function () { stageEl.classList.remove("free-enter"); }, 1500);
+    mascotCheer(1, "GRÁTIS!");
     updateFreeUI();
     setTimeout(nextFreeSpin, spd(500));
   }
 
   function nextFreeSpin() {
-    if (freeLeft <= 0) { updateFreeUI(); finishRound(); return; }
+    if (freeLeft <= 0) { finishRound(); return; }
     freeLeft--;
     updateFreeUI();
-    setStatus("Rodada grátis! Faltam " + (freeLeft + 1));
+    setStatus(freeLeft > 0 ? "Rodada grátis! Restam " + freeLeft : "Última rodada grátis!");
     runSpin(P_BOMB_FREE, function (w, sc) {
       totalWin += w;
       showRunningWin();
@@ -339,6 +487,7 @@
         freeLeft += RETRIGGER_ADD;
         updateFreeUI();
         showBanner("+" + RETRIGGER_ADD + " GRÁTIS!", "free");
+        mascotCheer(1, "+" + RETRIGGER_ADD + "!");
         BZG.sounds.jackpot();
         setTimeout(nextFreeSpin, spd(750));
       } else {
@@ -352,8 +501,8 @@
     var effMult = curCost > 0 ? payout / curCost : 0; // multiplicador sobre o custo (base OU compra)
     var won = payout > 0;
 
-    stageEl.classList.remove("free-mode");
-    freeEl.style.display = "none";
+    inFree = false;
+    updateFreeUI();
 
     BZG.storage.recordBet("bonanza", {
       bet: curCost, multiplier: effMult, payout: payout, won: won,
@@ -362,21 +511,25 @@
     BZG.ui.refreshBalance();
     document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     renderHistory();
+    refreshBar();
 
     if (won) {
       var big = effMult >= 10;
       winEl.className = "bonanza-win" + (big ? " big" : "");
-      winEl.textContent = "Ganho " + BZG.ui.formatMoney(payout) + " (" + effMult.toFixed(2) + "x)";
-      setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + "!");
-      BZG.ui.toast("💎 +" + BZG.ui.formatMoney(payout) + " (" + effMult.toFixed(2) + "x)", "success");
+      countWin(payout, ' <small>' + effMult.toFixed(2) + 'x</small>');
+      setStatus("Você ganhou " + fmt(payout) + "!");
+      BZG.ui.toast("💎 +" + fmt(payout) + " (" + effMult.toFixed(2) + "x)", "success");
       BZG.sounds.win();
       BZG.effects.flash(stageEl, "gold");
+      // abaixo de 1x o jogador recebeu menos do que apostou: so um pulinho, sem "BOA!"
+      if (effMult >= 1) mascotCheer(big ? 2 : 1, effMult >= 50 ? "BAZINGA!" : (effMult >= 5 ? "UAU!" : "BOA!"));
+      else mascotCheer(0);
       var rect = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, big ? 120 : 55);
       if (effMult >= 20 || payout >= 25000) BZG.effects.bigWin(payout, effMult);
     } else {
       winEl.className = "bonanza-win";
-      winEl.textContent = isBuyRound ? "A compra não retornou desta vez..." : "Sem 8 iguais... gire de novo!";
+      setWinText(0);
       setStatus(isBuyRound ? "As rodadas grátis não pagaram desta vez." : "Nenhum símbolo com 8+. Tente outra vez!");
       BZG.sounds.lose();
     }
@@ -396,7 +549,67 @@
   function updateBuyLabel() {
     if (!buyBtn) return;
     var bet = Math.round(Number(betInput.value)) || 0;
-    buyBtn.innerHTML = '<span class="buy-title">Comprar Grátis <span class="sym-inline">' + symArt("🎇", 22) + '</span></span><small>' + BZG.ui.formatMoney(bet * BUY_MULT) + " (20x)</small>";
+    buyBtn.innerHTML =
+      '<span class="bz-buy-icon">' + symArt("🎇", 64) + '</span>' +
+      '<span class="buy-title">Comprar bônus</span>' +
+      '<span class="bz-buy-sub">10 grátis · 20x</span>' +
+      '<small>' + fmt(bet * BUY_MULT) + '</small>';
+  }
+
+  /* tabela de pagamentos montada a partir de SYMBOLS (sempre igual a matematica) */
+  function buildPaytable() {
+    var box = document.getElementById("bonanza-paytable");
+    if (!box) return;
+    box.innerHTML = SYMBOLS.map(function (s) {
+      return '<div class="bz-pay-card">' + symInline(s.icon) +
+        '<dl>' +
+        '<div><dt>12+</dt><dd>' + s.pay[2] + 'x</dd></div>' +
+        '<div><dt>10-11</dt><dd>' + s.pay[1] + 'x</dd></div>' +
+        '<div><dt>8-9</dt><dd>' + s.pay[0] + 'x</dd></div>' +
+        '</dl></div>';
+    }).join("");
+  }
+
+  /* brilhinhos subindo no cenario (so transform/opacity) */
+  function makeSparkles() {
+    var box = document.getElementById("bonanza-sparkles");
+    if (!box) return;
+    var html = "";
+    for (var i = 0; i < 18; i++) {
+      var s = (3 + Math.random() * 6).toFixed(1);
+      html += '<i style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (12 + Math.random() * 84).toFixed(1) +
+        '%;width:' + s + 'px;height:' + s + 'px;animation-delay:-' + (Math.random() * 9).toFixed(2) +
+        's;animation-duration:' + (6 + Math.random() * 6).toFixed(2) + 's"></i>';
+    }
+    box.innerHTML = html;
+  }
+
+  /* imagens do Codex: tenta carregar; o que existir substitui o desenho em CSS/SVG */
+  function loadImages() {
+    if (!BZG.assets) return;
+    var symPath = {}, paths = [];
+    Object.keys(SYM_IMG).forEach(function (emo) { symPath[emo] = IMG_DIR + SYM_IMG[emo] + ".webp"; paths.push(symPath[emo]); });
+    Object.keys(SCENE_IMG).forEach(function (k) { paths.push(SCENE_IMG[k]); });
+    BZG.assets.preload(paths, function (ok) {
+      Object.keys(SCENE_IMG).forEach(function (k) { imgScene[k] = !!ok[SCENE_IMG[k]]; });
+      if (imgScene.fundo) {
+        stageEl.querySelector(".bz-scene-img").style.backgroundImage = 'url("' + SCENE_IMG.fundo + '")';
+        stageEl.classList.add("has-bg");
+      }
+      if (imgScene.logo && logoEl) {
+        logoEl.innerHTML = '<img src="' + SCENE_IMG.logo + '" alt="" draggable="false">';
+        logoEl.classList.add("has-img");
+      }
+      if (imgScene.mascote) renderMascot();
+      var anySym = false;
+      Object.keys(symPath).forEach(function (emo) { if (ok[symPath[emo]]) { imgSym[emo] = symPath[emo]; anySym = true; } });
+      if (anySym) {
+        stageEl.classList.add("has-sym-img");
+        refreshInlineSyms();
+        updateBuyLabel();
+        if (!spinning) renderGrid({});
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -410,25 +623,54 @@
     winEl = document.getElementById("bonanza-win");
     stageEl = document.getElementById("bonanza-stage");
     freeEl = document.getElementById("bonanza-free");
+    balEl = document.getElementById("bonanza-balance");
+    logoEl = document.getElementById("bonanza-logo");
+    mascotEl = document.getElementById("bonanza-mascot");
+    mascotBody = document.getElementById("bonanza-mascot-body");
+    bubbleEl = document.getElementById("bonanza-bubble");
 
-    // grade inicial de enfeite (sem bombas/scatter contando)
+    // grade inicial de enfeite (sem bombas/scatter contando), caindo na entrada
     var st0 = { sc: 0, bomb: 0 };
     fillGrid(0, st0);
-    renderGrid({});
+    renderGrid({ drop: true });
     if (freeEl) freeEl.style.display = "none";
+    renderMascot();
+    makeSparkles();
+    buildPaytable();
     BZG.ui.refreshBalance();
+    refreshBar();
+    resetWin();
     renderHistory();
     updateBuyLabel();
+    document.addEventListener("bzg:balance-changed", refreshBar);
 
     spinBtn.addEventListener("click", function () { if (auto) auto.stop(); doRound(false); });
     if (buyBtn) buyBtn.addEventListener("click", function () { if (auto) auto.stop(); doRound(true); });
     var autoEl = document.getElementById("autospin");
     if (autoEl && BZG.autospin) auto = BZG.autospin.create(autoEl, function () { return doRound(false); });
     Array.prototype.forEach.call(document.querySelectorAll(".paytable-row span, .paytable .section-title, .paytable p"), symbolizeText);
-    spinBtn.textContent = "Girar";
     betInput.addEventListener("input", updateBuyLabel);
+    // Enter no valor da aposta = girar. O atalho global (layout.js) procura um .btn--primary,
+    // que o botao redondo deste palco nao usa; trata aqui e nao deixa o evento subir.
+    betInput.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (!spinBtn.disabled) spinBtn.click();
+    });
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
     document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+
+    // botao (i): leva para as regras e abre a tabela de pagamentos
+    var infoBtn = document.getElementById("bonanza-info-btn");
+    if (infoBtn) infoBtn.addEventListener("click", function () {
+      var box = document.getElementById("bonanza-paytable-box");
+      if (box) box.open = true;
+      var info = document.getElementById("bonanza-info");
+      if (info) info.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    });
+
+    loadImages();
   });
 })();
