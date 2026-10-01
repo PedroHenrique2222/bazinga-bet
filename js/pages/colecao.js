@@ -14,7 +14,7 @@
       var rlabel = BZG.collectibles.rarityMeta(r).label;
       if (has) {
         return '<div class="col-slot col-slot--owned rarity-' + r + '" title="' + BZG.ui.escapeHtml(it.name) + ' · ' + rlabel + '">' +
-          '<span class="col-slot-icon">' + it.icon + '</span>' +
+          '<span class="col-slot-icon">' + BZG.collectibles.iconHTML(it) + '</span>' +
           '<span class="col-slot-name">' + BZG.ui.escapeHtml(it.name) + '</span>' +
           '<span class="col-slot-rarity">' + rlabel + '</span>' +
           '</div>';
@@ -52,7 +52,7 @@
       var it = ITEM_BY_ID[e.id];
       if (!it) return "";
       var r = BZG.collectibles.rarityFor(it);
-      return '<div class="col-recent-item rarity-' + r + '" title="' + BZG.ui.escapeHtml(it.name) + '">' + it.icon + '</div>';
+      return '<div class="col-recent-item rarity-' + r + '" title="' + BZG.ui.escapeHtml(it.name) + '">' + BZG.collectibles.iconHTML(it) + '</div>';
     }).join("");
   }
 

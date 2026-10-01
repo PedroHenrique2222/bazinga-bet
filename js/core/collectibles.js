@@ -130,6 +130,14 @@ BZG.collectibles = (function () {
   }
   function rarityMeta(r) { return RARITY[r] || RARITY.common; }
 
+  /* imagem da figurinha (assets/colecao/<id>.webp, gerada pelo Codex); se nao
+     carregar, volta para o emoji do item */
+  var ROOT = /\/(games|minigames)\//.test(location.pathname) ? "../" : "";
+  function iconHTML(item) {
+    return '<img class="col-img" src="' + ROOT + 'assets/colecao/' + item.id + '.webp" alt="" loading="lazy" decoding="async" ' +
+      'onerror="var s=document.createElement(\'span\');s.textContent=this.dataset.emoji;this.replaceWith(s);" data-emoji="' + item.icon + '">';
+  }
+
   // pool ponderada por raridade pro sorteio do drop (lendarios repetem menos)
   var WEIGHTED_POOL = [];
   ALL_ITEMS.forEach(function (it) {
@@ -199,7 +207,7 @@ BZG.collectibles = (function () {
     overlay.innerHTML =
       '<div class="cr-card cr-' + r + (justCompleted ? " cr-complete" : "") + '">' +
         '<div class="cr-badge">' + (justCompleted ? "🏆 Álbum completo!" : "Novo colecionável") + '</div>' +
-        '<div class="cr-sticker"><span class="cr-icon">' + item.icon + '</span><span class="cr-shine"></span></div>' +
+        '<div class="cr-sticker"><span class="cr-icon">' + iconHTML(item) + '</span><span class="cr-shine"></span></div>' +
         '<div class="cr-rarity">' + meta.label + '</div>' +
         '<div class="cr-name">' + BZG.ui.escapeHtml(item.name) + '</div>' +
         '<div class="cr-album">' + character.avatar + ' ' + BZG.ui.escapeHtml(character.name) + ' · <strong>' + got + '/' + total + '</strong></div>' +
@@ -237,6 +245,7 @@ BZG.collectibles = (function () {
     RARITY: RARITY,
     rarityFor: rarityFor,
     rarityMeta: rarityMeta,
+    iconHTML: iconHTML,
     characters: characters,
     charactersByGroup: charactersByGroup,
     characterByKey: characterByKey,

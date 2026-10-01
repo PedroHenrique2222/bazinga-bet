@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.30
+# 🎰 Bazinga BET — v1.31
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,12 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.31 (2026-10-01) — 🔇 Sem música de fundo, figurinhas e vitórias com imagem
+- **Música de fundo removida**: saem o player do YouTube, o botão de música da topbar e os controles de música em Configurações (`startMusic`/`toggleMusic` etc. viram funções vazias). A moldura `app.html` (que só existia para a música não parar) deixou de ser usada: as páginas abrem direto de novo e links antigos `app.html#<página>` redirecionam para a página.
+- **Figurinhas da Coleção com imagem**: `BZG.collectibles.iconHTML(item)` usa `assets/colecao/<id>.webp` (110 imagens a caminho pelo Codex, prompt em `docs/codex-colecao-bigwin.md`) no álbum, nas recentes e na revelação; sem a imagem, mostra o emoji.
+- **Grandes vitórias com arte**: o Big Win mostra `assets/bigwin/grande|mega|bazinga.webp` atrás do título de cada nível (some se não existir).
+- **Ícone da aba** novo (`assets/logo/icone.webp`) em todas as páginas.
 
 ### v1.30 (2026-10-01) — 🔊 Áudio novo, Bonanza na caverna, Bazinguinha com os itens dos Bazingas
 - **Áudio refeito (tudo sintetizado, sem arquivos)**: `sounds.js` ganhou um motor novo (compressor + limitador, reverb leve, envelopes, ruído filtrado, variação de tom, limite de vozes e de frequência nos ticks, nada antes da 1ª interação, pausa com a aba escondida). Todas as funções antigas continuam e soam melhor.

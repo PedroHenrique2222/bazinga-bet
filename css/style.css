@@ -2685,3 +2685,20 @@ body[style*="--game-c"] .game-layout .stage { --game-c: inherit; }
 .logo-img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45)); transition: transform 0.2s ease; }
 .logo-card.has-img:hover { box-shadow: none; }
 .logo-card.has-img:hover .logo-img { transform: scale(1.04) rotate(-1deg); }
+/* figurinha revelada em imagem (Codex) */
+.cr-icon .col-img { width: 150px; height: 150px; object-fit: contain; display: block; }
+/* arte de comemoracao do Big Win (atras do titulo) */
+.bw-art {
+  position: absolute;
+  left: 50%;
+  top: calc(40px + 4vh);
+  width: min(78vw, 820px);
+  max-height: 62vh;
+  object-fit: contain;
+  transform: translateX(-50%);
+  pointer-events: none;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5));
+  animation: bw-art-in 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes bw-art-in { from { opacity: 0; transform: translateX(-50%) scale(0.6); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .bw-art { animation: none; } }

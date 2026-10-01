@@ -83,26 +83,17 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    var musicToggle = document.getElementById("toggle-music");
     var sfxToggle = document.getElementById("toggle-sfx");
 
-    setupVolume("vol-music", "vol-music-val", BZG.sounds.getMusicVolume, BZG.sounds.setMusicVolume);
     // previa sonora ao mexer nos efeitos (o motor limita a frequencia)
     setupVolume("vol-sfx", "vol-sfx-val", BZG.sounds.getSfxVolume, BZG.sounds.setSfxVolume, function () {
       if (BZG.sounds.preview) BZG.sounds.preview();
     });
 
-    syncToggle(musicToggle, BZG.sounds.isMusicEnabled());
     syncToggle(sfxToggle, BZG.sounds.isSfxEnabled());
     refreshSummaries();
     renderThemeGrid();
     renderTurbo();
-
-    musicToggle.addEventListener("click", function () {
-      var on = BZG.sounds.toggleMusic();
-      syncToggle(musicToggle, on);
-      BZG.sounds.click();
-    });
 
     sfxToggle.addEventListener("click", function () {
       var on = BZG.sounds.toggleSfx();
