@@ -55,7 +55,7 @@ Os símbolos do Bazinguinha passam a ser **os itens da Equipe BZG**, em versão 
 | `assets/bazinguinha/sym-pilha.webp` | 512 × 512 | **Pilha**: pilha laranja e preta com detalhes dourados e um raio gravado, soltando faíscas douradas. | baixo |
 | `assets/bazinguinha/sym-abobora.webp` | 512 × 512 | **Abóbora**: abóbora laranja sorridente com folhinha, com um nó chinês vermelho pendurado. | o mais baixo |
 
-(As imagens antigas `sym-lingote`, `sym-saco`, `sym-envelope`, `sym-fogos` e `sym-laranja` já foram apagadas. Não recrie.)
+(As imagens antigas `sym-lingote`, `sym-saco`, `sym-envelope`, `sym-fogos` e `sym-laranja` deixam de ser usadas — não mexa nelas, eu apago depois.)
 
 ---
 
