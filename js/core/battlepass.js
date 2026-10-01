@@ -5,15 +5,14 @@
 window.BZG = window.BZG || {};
 
 BZG.battlepass = (function () {
-  // Completar o Passe agora e MUITO mais dificil: cada nivel custa 2500 XP (era 600).
-  // 100 niveis x 2500 = 250.000 XP = BZ$ 2.500.000 apostados pra zerar o passe
-  // (antes eram BZ$ 600.000). So chega ao fim quem joga MUITO.
-  var XP_PER_TIER = 2500;
+  // Completar o Passe e MUITO dificil: cada nivel custa 7500 XP (v1.33, era 2500).
+  // 100 niveis x 7500 = 750.000 XP = BZ$ 7.500.000 apostados pra zerar o passe.
+  var XP_PER_TIER = 7500;
   var TIER_PER_CHAPTER = 10; // precisa bater com js/pages/passe.js
 
-  // bonus extra de recarga ao completar (resgatar) o ultimo nivel de um capitulo,
-  // por cima de qualquer outra recompensa que esse nivel ja de
-  var CHAPTER_BONUS = 5000;
+  // bonus ao resgatar o ultimo nivel de um capitulo: 1 figurinha NOVA garantida
+  // (v1.33 - antes aumentava a recarga, que agora e fixa em BZ$ 10.000)
+  var CHAPTER_BONUS = 1;
 
   var TITLES = {
     novato: "Novato",
@@ -46,8 +45,8 @@ BZG.battlepass = (function () {
   /* Recompensas especiais (SO cosmeticos: avatares, cores de nome, temas, titulos
      e o Modo Turbo) fixadas em cada nivel (chave = nivel 1-based). Nao ha mais
      figurinhas aqui - a Colecao virou uma coleta lenta, so pelo drop aleatorio nas
-     apostas (ver rollOnBet em collectibles.js). A UNICA recarga do passe vem do
-     bonus de capitulo (CHAPTER_BONUS). Todo nivel 1-100 tem uma entrada explicita.
+     apostas (ver rollOnBet em collectibles.js). O bonus de capitulo da 1 figurinha nova
+     (CHAPTER_BONUS). Todo nivel 1-100 tem uma entrada explicita.
      Os avatares NUNCA repetem um valor que ja e gratis por padrao (AVATARS em
      profile.js) nem entre si - senao o "desbloqueio" nao desbloquearia nada. */
   var SPECIALS = {
@@ -173,8 +172,8 @@ BZG.battlepass = (function () {
   };
 
   // fallback de seguranca (nunca deveria ser usado - todo nivel 1-100 tem uma
-  // entrada explicita em SPECIALS agora que a recarga so vem do bonus de capitulo)
-  var FALLBACK_REWARD = { r: "reloadBoost", v: 5000, icon: "💳", label: "Recarga +BZ$ 5.000" };
+  // entrada explicita em SPECIALS )
+  var FALLBACK_REWARD = { r: "title", v: "novato", icon: "🎖️", label: "Título: Novato" };
 
   /* 100 niveis: uma recompensa especifica cada, ver SPECIALS acima */
   var TIERS = (function () {
@@ -216,9 +215,13 @@ BZG.battlepass = (function () {
 
   function isChapterEndTier(index0) { return (index0 + 1) % TIER_PER_CHAPTER === 0; }
 
+  // figurinha nova garantida do bonus de capitulo (false se o album ja esta completo)
+  function chapterSticker() {
+    return !!(BZG.collectibles && BZG.collectibles.grantRandomNew && BZG.collectibles.grantRandomNew());
+  }
+
   function applyReward(t) {
     switch (t.r) {
-      case "reloadBoost": BZG.storage.addReloadBonus(t.v); break;
       case "avatar": BZG.storage.unlockCosmetic("avatars", t.v); break;
       case "color": BZG.storage.unlockCosmetic("nameColors", t.v); break;
       case "theme": BZG.storage.unlockCosmetic("themes", t.v); break;
@@ -237,10 +240,7 @@ BZG.battlepass = (function () {
     var t = TIERS[index0];
     applyReward(t);
     var chapterBonus = 0;
-    if (isChapterEndTier(index0)) {
-      BZG.storage.addReloadBonus(CHAPTER_BONUS);
-      chapterBonus = CHAPTER_BONUS;
-    }
+    if (isChapterEndTier(index0) && chapterSticker()) chapterBonus = CHAPTER_BONUS;
     BZG.storage.markTierClaimed(index0);
     return Object.assign({}, t, { chapterBonus: chapterBonus });
   }
@@ -253,10 +253,7 @@ BZG.battlepass = (function () {
       if (!BZG.storage.isTierClaimed(i)) {
         var t = TIERS[i];
         applyReward(t);
-        if (isChapterEndTier(i)) {
-          BZG.storage.addReloadBonus(CHAPTER_BONUS);
-          totalChapterBonus += CHAPTER_BONUS;
-        }
+        if (isChapterEndTier(i) && chapterSticker()) totalChapterBonus += CHAPTER_BONUS;
         BZG.storage.markTierClaimed(i);
         claimed.push(t);
       }

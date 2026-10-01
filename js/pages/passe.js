@@ -16,7 +16,7 @@
 
   /* icone do premio: avatar de personagem -> imagem do personagem; outros
      tipos -> assets/passe/premio-<tipo>.webp; sem imagem -> o emoji de sempre */
-  var REWARD_TYPES = ["avatar", "color", "theme", "title", "turbo", "collectible", "reloadBoost"];
+  var REWARD_TYPES = ["avatar", "color", "theme", "title", "turbo", "collectible"];
   function rewardIconHTML(t) {
     if (t.r === "avatar" && BZG.ui.avatarInfo(t.v)) {
       return '<span class="bp-icon-avatar">' + BZG.ui.avatarHTML(t.v) + '</span>';
@@ -95,7 +95,7 @@
           '</div>' +
           '<div class="bp-chapter-progress">' +
             claimedInChapter + ' / ' + TIERS_PER_CHAPTER + ' resgatados' +
-            '<span class="bp-chapter-bonus">🎉 +' + BZG.ui.formatMoney(BZG.battlepass.CHAPTER_BONUS) + ' na recarga ao completar</span>' +
+            '<span class="bp-chapter-bonus">🎴 Figurinha nova ao completar</span>' +
           '</div>' +
         '</div>' +
         '<div class="bp-track">' + cards + '</div>' +
@@ -113,11 +113,10 @@
           BZG.effects.confetti(r.left + r.width / 2, r.top, 40);
           if (reward.r === "theme") BZG.ui.toast("Novo tema disponível nas Configurações! 🎨", "success");
           if (reward.r === "turbo") BZG.ui.toast("⚡ Modo Turbo liberado nas Configurações!", "success");
-          if (reward.r === "reloadBoost") BZG.ui.toast("💳 Recarregue mais: " + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + " agora!", "success");
           if (reward.r === "collectible") BZG.ui.toast("🎴 Nova figurinha guardada na sua Coleção!", "success");
           if (reward.chapterBonus) {
             setTimeout(function () {
-              BZG.ui.toast("🎉 Capítulo completo! +" + BZG.ui.formatMoney(reward.chapterBonus) + " na recarga!", "success");
+              BZG.ui.toast("🎉 Capítulo completo! Figurinha nova na sua Coleção!", "success");
             }, 500);
           }
           render();
@@ -144,7 +143,7 @@
         BZG.effects.confetti(window.innerWidth / 2, window.innerHeight / 3, 80);
         if (result.chapterBonus) {
           setTimeout(function () {
-            BZG.ui.toast("🎉 Capítulo(s) completo(s)! +" + BZG.ui.formatMoney(result.chapterBonus) + " na recarga!", "success");
+            BZG.ui.toast("🎉 Capítulo(s) completo(s)! +" + result.chapterBonus + " figurinha(s) nova(s)!", "success");
           }, 600);
         }
         render();

@@ -198,6 +198,21 @@ BZG.collectibles = (function () {
     reveal(item, character, justCompleted);
   }
 
+  // da 1 figurinha que o jogador ainda NAO tem (bonus de capitulo do Passe) e mostra
+  // o popup. Retorna o item, ou null se ja tem todas.
+  function grantRandomNew() {
+    var missing = ALL_ITEMS.filter(function (it) { return !BZG.storage.ownsCollectible(it.id); });
+    if (!missing.length) return null;
+    var item = missing[Math.floor(Math.random() * missing.length)];
+    var wasComplete = isSetComplete(item.char);
+    BZG.storage.grantCollectible(item.id);
+    var character = characterByKey(item.char);
+    var justCompleted = !wasComplete && isSetComplete(item.char);
+    if (justCompleted) BZG.storage.unlockCosmetic("avatars", character.avatar);
+    reveal(item, character, justCompleted);
+    return item;
+  }
+
   // popup animado de "novo colecionavel" - bem mais chamativo que um toast.
   // Nao bloqueia o jogo (overlay com pointer-events:none; so o card fecha ao clicar).
   function reveal(item, character, justCompleted) {
@@ -249,6 +264,7 @@ BZG.collectibles = (function () {
     DROP_CHANCE: DROP_CHANCE,
     RARITY: RARITY,
     rarityFor: rarityFor,
+    grantRandomNew: grantRandomNew,
     rarityMeta: rarityMeta,
     iconHTML: iconHTML,
     characters: characters,

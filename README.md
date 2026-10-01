@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.32
+# 🎰 Bazinga BET — v1.33
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.33 (2026-10-01) — 📈 Progresso mais difícil, recarga fixa
+- Subir de nível ficou **3x mais difícil** (perfil e Passe de Batalha: 7.500 XP por nível do Passe).
+- A recarga é **sempre BZ$ 10.000** — nada aumenta mais esse valor (bônus antigos foram zerados).
+- Completar um capítulo do Passe agora dá **1 figurinha nova garantida** (antes aumentava a recarga).
 
 ### v1.32 (2026-10-01) — 🤖 Modo Auto no Bazinguinha
 - Botão **AUTO** na máquina: escolha 10, 25, 50, 100 ou ∞ giros.
