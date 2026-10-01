@@ -181,7 +181,11 @@ BZG.layout = (function () {
     if (maxwinEl) maxwinEl.textContent = BZG.ui.formatMoney(stats.maxWin || 0);
     if (avatarEl || nameEl || chipLvlEl) {
       var profile = BZG.storage.getProfile();
-      if (avatarEl) avatarEl.textContent = profile.avatar;
+      // so redesenha quando o avatar muda (evita recarregar a imagem a cada aposta)
+      if (avatarEl && avatarEl.getAttribute("data-avatar") !== profile.avatar) {
+        avatarEl.setAttribute("data-avatar", profile.avatar);
+        avatarEl.innerHTML = BZG.ui.avatarHTML ? BZG.ui.avatarHTML(profile.avatar, 0, { lazy: false }) : BZG.ui.escapeHtml(profile.avatar);
+      }
       if (nameEl) nameEl.innerHTML = BZG.ui.nameHTML(profile.nickname);
       if (chipLvlEl) chipLvlEl.textContent = "Lv " + lvl.level;
     }
@@ -194,7 +198,7 @@ BZG.layout = (function () {
     el.innerHTML = '' +
       '<button class="icon-btn topbar-menu" id="menu-btn" title="Menu" aria-label="Abrir menu">' + navIcon("menu", "☰") + '</button>' +
       '<a class="topbar-profile" id="topbar-profile-link" href="' + ROOT_PREFIX + 'profile.html" title="Ver perfil">' +
-        '<span class="topbar-profile-avatar" id="topbar-profile-avatar">😎</span>' +
+        '<span class="topbar-profile-avatar" id="topbar-profile-avatar" aria-hidden="true">😎</span>' +
         '<span class="topbar-profile-name" id="topbar-profile-name"></span>' +
         '<span class="topbar-profile-lvl" id="topbar-profile-lvl">Lv 1</span>' +
       '</a>' +

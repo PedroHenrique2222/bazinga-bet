@@ -241,7 +241,11 @@ BZG.achievements = (function () {
     });
     novos.forEach(function (a, i) {
       setTimeout(function () {
-        if (BZG.ui) BZG.ui.toast("🏆 Conquista: " + a.icon + " " + a.name, "success");
+        if (BZG.ui) {
+          // com a medalha em imagem (se existir); sem ela, o emoji de sempre
+          if (BZG.ui.achievementIconHTML) BZG.ui.toast("Conquista: " + a.name, "success", { iconHTML: BZG.ui.achievementIconHTML(a) });
+          else BZG.ui.toast("🏆 Conquista: " + a.icon + " " + a.name, "success");
+        }
         if (BZG.sounds && BZG.sounds.achievement) BZG.sounds.achievement();
       }, 400 + i * 900);
     });

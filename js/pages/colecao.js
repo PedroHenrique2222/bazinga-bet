@@ -29,7 +29,7 @@
 
     return '<section class="panel col-char' + (complete ? " col-char--complete" : "") + '">' +
       '<div class="col-char-head">' +
-        '<div class="col-char-avatar">' + c.avatar + '</div>' +
+        '<div class="col-char-avatar" aria-hidden="true">' + BZG.ui.avatarHTML(c.avatar) + '</div>' +
         '<div class="col-char-info">' +
           '<h2>' + BZG.ui.escapeHtml(c.name) + '</h2>' +
           '<p>' + BZG.ui.escapeHtml(c.game) + '</p>' +

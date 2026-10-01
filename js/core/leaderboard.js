@@ -77,7 +77,8 @@ BZG.leaderboard = (function () {
   // HTML do jogador a partir de uma linha do ranking: avatar + nome colorido + titulo
   function rowNameHTML(row) {
     var colorCls = row.name_color && row.name_color !== "default" ? " color-" + row.name_color : "";
-    var html = '<span class="lb-avatar">' + esc(row.avatar || "😎") + '</span>' +
+    var av = row.avatar || "😎";
+    var html = '<span class="lb-avatar" aria-hidden="true">' + (BZG.ui && BZG.ui.avatarHTML ? BZG.ui.avatarHTML(av) : esc(av)) + '</span>' +
       '<span class="bzg-name' + colorCls + '">' + esc(row.nickname || "Anônimo") + '</span>';
     if (row.title) html += '<span class="bzg-title">' + esc(row.title) + '</span>';
     return html;

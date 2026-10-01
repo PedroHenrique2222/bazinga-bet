@@ -14,6 +14,24 @@
   ];
   var TIERS_PER_CHAPTER = 10;
 
+  /* icone do premio: avatar de personagem -> imagem do personagem; outros
+     tipos -> assets/passe/premio-<tipo>.webp; sem imagem -> o emoji de sempre */
+  var REWARD_TYPES = ["avatar", "color", "theme", "title", "turbo", "collectible", "reloadBoost"];
+  function rewardIconHTML(t) {
+    if (t.r === "avatar" && BZG.ui.avatarInfo(t.v)) {
+      return '<span class="bp-icon-avatar">' + BZG.ui.avatarHTML(t.v) + '</span>';
+    }
+    if (REWARD_TYPES.indexOf(t.r) === -1) return t.icon;
+    var img = BZG.ui.imgHTML(BZG.ui.assetPath("assets/passe/premio-" + t.r + ".webp"), {
+      cls: "bp-icon-img", emoji: t.icon, fallbackCls: "bp-icon-emoji"
+    });
+    // avatar comum (emoji): moldura do premio + o emoji no cantinho, pra saber qual e
+    if (t.r === "avatar" && img.indexOf("<img") === 0) {
+      return '<span class="bp-icon-wrap">' + img + '<span class="bp-icon-badge">' + t.icon + '</span></span>';
+    }
+    return img;
+  }
+
   function tierCardHTML(t, i, prog) {
     var reached = i < prog.reached;
     var claimed = BZG.storage.isTierClaimed(i);
@@ -28,7 +46,7 @@
     }
     return '<div class="' + cls + '">' +
       '<span class="bp-lvl">Lv ' + (i + 1) + '</span>' +
-      '<div class="bp-icon">' + t.icon + '</div>' +
+      '<div class="bp-icon" aria-hidden="true">' + rewardIconHTML(t) + '</div>' +
       '<div class="bp-reward">' + t.label + '</div>' +
       action +
       '</div>';
@@ -61,12 +79,16 @@
       var claimedInChapter = 0;
       for (var i = from; i < to; i++) if (BZG.storage.isTierClaimed(i)) claimedInChapter++;
 
+      var banner = BZG.ui.assetPath("assets/passe/capitulo-" + (ci + 1) + ".webp");
       var cards = "";
       for (var t = from; t < to; t++) cards += tierCardHTML(tiers[t], t, prog);
 
       return '<section class="panel bp-chapter" id="chapter-' + ci + '">' +
-        '<div class="bp-chapter-head">' +
-          '<div class="bp-chapter-icon">' + ch.icon + '</div>' +
+        '<div class="bp-chapter-head' + (BZG.ui.imgLoaded(banner) ? " bp-chapter-head--banner" : "") + '" data-img-host>' +
+          BZG.ui.imgHTML(banner, {
+            cls: "bp-chapter-banner", onloadCls: "bp-chapter-head--banner"
+          }) +
+          '<div class="bp-chapter-icon" aria-hidden="true">' + ch.icon + '</div>' +
           '<div class="bp-chapter-info">' +
             '<h2>Capítulo ' + (ci + 1) + ': ' + ch.name + '</h2>' +
             '<p>Níveis ' + (from + 1) + '–' + to + '</p>' +

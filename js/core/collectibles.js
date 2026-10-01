@@ -138,6 +138,11 @@ BZG.collectibles = (function () {
       'onerror="var s=document.createElement(\'span\');s.textContent=this.dataset.emoji;this.replaceWith(s);" data-emoji="' + item.icon + '">';
   }
 
+  // avatar do personagem (imagem redonda ou emoji, ver BZG.ui.avatarHTML)
+  function avatarHTML(emoji) {
+    return BZG.ui && BZG.ui.avatarHTML ? BZG.ui.avatarHTML(emoji, 0, { lazy: false }) : emoji;
+  }
+
   // pool ponderada por raridade pro sorteio do drop (lendarios repetem menos)
   var WEIGHTED_POOL = [];
   ALL_ITEMS.forEach(function (it) {
@@ -210,8 +215,8 @@ BZG.collectibles = (function () {
         '<div class="cr-sticker"><span class="cr-icon">' + iconHTML(item) + '</span><span class="cr-shine"></span></div>' +
         '<div class="cr-rarity">' + meta.label + '</div>' +
         '<div class="cr-name">' + BZG.ui.escapeHtml(item.name) + '</div>' +
-        '<div class="cr-album">' + character.avatar + ' ' + BZG.ui.escapeHtml(character.name) + ' · <strong>' + got + '/' + total + '</strong></div>' +
-        (justCompleted ? '<div class="cr-unlock">Avatar ' + character.avatar + ' desbloqueado!</div>' : '') +
+        '<div class="cr-album"><span class="cr-album-avatar" aria-hidden="true">' + avatarHTML(character.avatar) + '</span> ' + BZG.ui.escapeHtml(character.name) + ' · <strong>' + got + '/' + total + '</strong></div>' +
+        (justCompleted ? '<div class="cr-unlock">Avatar <span class="cr-album-avatar" aria-hidden="true">' + avatarHTML(character.avatar) + '</span> desbloqueado!</div>' : '') +
         '<div class="cr-hint">toque para fechar</div>' +
       '</div>';
     document.body.appendChild(overlay);
