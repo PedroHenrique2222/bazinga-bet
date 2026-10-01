@@ -227,7 +227,12 @@
 
     var basePull = TARGET_PULL[rows] || 2.0;
     var playHeight = L.slotY - L.marginTop - 14;
-    var homeStartY = L.marginTop + playHeight * 0.72; // ultimos ~28%: "assenta" na casa certa
+    var rowHeight = playHeight / rows;
+    // os pinos da penultima fileira ficam bem em cima do centro das casas: se puxar a
+    // bolinha para o centro antes de passar por eles, ela fica equilibrada em cima do pino.
+    // Por isso o "assentar" so comeca depois dessa fileira.
+    var penultY = L.marginTop + (rows - 1) * rowHeight;
+    var homeStartY = Math.max(L.marginTop + playHeight * 0.72, penultY + L.pegR + L.ballR);
 
     for (var i = 0; i < balls.length; i++) {
       var ball = balls[i];
@@ -271,6 +276,13 @@
 
             // amortecimento + empurraozinho aleatorio para espalhar naturalmente
             ball.vx = ball.vx * VX_DAMPING + (Math.random() - 0.5) * KICK;
+
+            // bateu bem no topo do pino (quase reto)? escorrega para o lado
+            // em direcao a casa sorteada, em vez de ficar parada em cima dele
+            if (Math.abs(nx) < 0.35 && ny < 0) {
+              var side = targetX !== peg.x ? (targetX > peg.x ? 1 : -1) : (Math.random() < 0.5 ? -1 : 1);
+              ball.vx += side * (70 + Math.random() * 50);
+            }
 
             if (now - lastPegSound > 70) {
               BZG.sounds.pegHit();

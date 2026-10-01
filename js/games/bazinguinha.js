@@ -49,6 +49,7 @@
   }
 
   var spinning = false;
+  var auto = null; // giro automatico (autospin.js)
   var BET_STEPS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
 
   function setStatus(t) { statusEl.textContent = t; }
@@ -97,14 +98,74 @@
     }
   }
 
+  /* simbolo desenhado (icons.js) de cada emoji; sem icons.js, mostra o emoji */
+  var SYM_ART = { "🎃": "s-abobora", "🔋": "s-pilha", "🥒": "s-picles", "🍰": "s-bolo", "🍑": "s-pessego", "⚡": "s-raio" };
+  function symArt(icon, size) {
+    return BZG.icons && SYM_ART[icon] ? BZG.icons.art(SYM_ART[icon], size || 64) : icon;
+  }
+
+  /* troca so as celulas indicadas, sem recriar a grade inteira */
+  function updateCells(grid, idxs) {
+    idxs.forEach(function (idx) {
+      var col = gridEl.children[idx % 3];
+      var strip = col && col.firstChild;
+      var old = strip && strip.children[Math.floor(idx / 3)];
+      if (!old) return;
+      var tmp = document.createElement("div");
+      tmp.innerHTML = cellHTML(grid[idx]);
+      var cell = tmp.firstChild;
+      cell.classList.add("reroll");
+      if (grid[idx] === "⚡") cell.classList.add("locked");
+      strip.replaceChild(cell, old);
+    });
+  }
+
   function cellHTML(icon) {
     if (icon === "⚡") {
-      return '<div class="ft-cell ft-cell-wild"><i>⚡</i><em>WILD</em></div>';
+      return '<div class="ft-cell ft-cell-wild"><i>' + symArt("⚡") + '</i><em>WILD</em></div>';
     }
-    return '<div class="ft-cell">' + icon + '</div>';
+    return '<div class="ft-cell">' + symArt(icon) + '</div>';
+  }
+
+  /* troca os emojis de um texto pelos simbolos desenhados (tabela de premios) */
+  function symbolizeText(el) {
+    if (!BZG.icons) return;
+    Object.keys(SYM_ART).forEach(function (emo) {
+      el.innerHTML = el.innerHTML.split(emo).join('<span class="sym-inline">' + symArt(emo, 22) + '</span>');
+    });
+  }
+
+  /* suspense: as duas primeiras colunas ja formam meia linha (iguais ou com wild)?
+     entao a 3a coluna gira mais devagar, brilhando */
+  function teaseLine(grid) {
+    return LINES.some(function (ln) {
+      var byCol = ln.slice().sort(function (a, b) { return (a % 3) - (b % 3); });
+      var a = grid[byCol[0]], b = grid[byCol[1]];
+      return a === b || a === "⚡" || b === "⚡";
+    });
+  }
+
+  /* o ganho sobe contando na barra */
+  function countUp(el, to) {
+    var start = performance.now(), dur = Math.min(1600, 500 + to / 40) * BZG.modes.speed();
+    (function step(now) {
+      var p = Math.min(1, (now - start) / dur);
+      el.textContent = BZG.ui.formatMoney(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
   }
 
   function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+
+  /* posicao do rolo no tempo t (0..1): desacelera, passa um pouquinho do ponto
+     (overshoot de ~18% de uma celula) e volta macio - parece um rolo de verdade */
+  var STOP_AT = 0.86;
+  function reelPos(t, dist, cellH) {
+    var over = cellH * 0.18;
+    if (t < STOP_AT) return (dist + over) * easeOutQuart(t / STOP_AT);
+    var k = (t - STOP_AT) / (1 - STOP_AT);
+    return dist + over * (1 - (1 - Math.pow(1 - k, 2)));
+  }
 
   function buildStrip(stripEl, colSymbols) {
     var cells = [];
@@ -157,11 +218,11 @@
   }
 
   function spin() {
-    if (spinning) return;
+    if (spinning) return false;
     var bet = Math.round(Number(betInput.value));
     var balance = BZG.storage.getBalance();
-    if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return; }
-    if (bet > balance) { BZG.ui.toast("Você não tem saldo suficiente.", "error"); return; }
+    if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return false; }
+    if (bet > balance) { BZG.ui.toast("Você não tem saldo suficiente.", "error"); return false; }
 
     spinning = true;
     betInput.disabled = true;
@@ -197,6 +258,10 @@
     }
     reactMascot(null); // volta o mascote ao repouso ao começar
 
+    var tease = teaseLine(grid);
+    var durs = COL_DURATIONS.slice();
+    if (tease) durs[2] += 1500; // a 3a coluna demora mais quando pode fechar linha
+
     var start = performance.now();
     var lastTicks = [0, 0, 0];
     var done = [false, false, false];
@@ -204,18 +269,28 @@
     function frame(now) {
       var allDone = true;
       for (var c2 = 0; c2 < 3; c2++) {
-        var t = Math.min(1, (now - start) / (COL_DURATIONS[c2] * BZG.modes.speed()));
-        var eased = easeOutQuart(t);
-        stripEls[c2].style.transform = "translateY(-" + (distances[c2] * eased).toFixed(1) + "px)";
+        var t = Math.min(1, (now - start) / (durs[c2] * BZG.modes.speed()));
         var cellH = distances[c2] / (STRIP_LEN - 3);
-        var crossed = Math.floor((distances[c2] * eased) / cellH);
-        if (crossed > lastTicks[c2] && t < 1) { if (c2 === 0) BZG.sounds.tick(); lastTicks[c2] = crossed; }
-        if (t >= 1 && !done[c2]) {
+        var pos = reelPos(t, distances[c2], cellH);
+        stripEls[c2].style.transform = "translate3d(0,-" + pos.toFixed(1) + "px,0)";
+        var crossed = Math.floor(pos / cellH);
+        if (crossed > lastTicks[c2] && t < 1) {
+          if (c2 === 0 || (tease && c2 === 2 && done[1])) BZG.sounds.tick();
+          lastTicks[c2] = crossed;
+        }
+        if (t >= STOP_AT && !done[c2]) {
           done[c2] = true;
           BZG.sounds.click();
           stripEls[c2].classList.remove("blur");       // tira o blur ao parar
           var col = stripEls[c2].parentElement;         // flash de "quique" na coluna
-          if (col) { col.classList.remove("bump"); void col.offsetWidth; col.classList.add("bump"); }
+          if (col) { col.classList.remove("bump", "tease"); void col.offsetWidth; col.classList.add("bump"); }
+          // 2a coluna parou e pode sair linha: a 3a brilha e o banner faz suspense
+          if (c2 === 1 && tease && stripEls[2]) {
+            stripEls[2].parentElement.classList.add("tease");
+            bannerEl.className = "ft-banner tease";
+            bannerEl.textContent = "Será?! 👀";
+            BZG.sounds.countdownBeep();
+          }
         }
         if (t < 1) allDone = false;
       }
@@ -252,7 +327,7 @@
       }
     }
     var wc = countWild(grid);
-    renderStaticGrid(grid, { locked: true, reroll: changed });
+    updateCells(grid, changed);
     BZG.sounds.click();
 
     var sp = BZG.modes.speed();
@@ -301,7 +376,7 @@
     // desenha as linhas vencedoras e acende os indicadores
     winlinesEl.innerHTML = winLines.map(function (l) {
       var co = LINE_COORDS[l];
-      return '<line x1="' + co[0][0] + '" y1="' + co[0][1] + '" x2="' + co[1][0] + '" y2="' + co[1][1] + '"/>';
+      return '<line pathLength="100" x1="' + co[0][0] + '" y1="' + co[0][1] + '" x2="' + co[1][0] + '" y2="' + co[1][1] + '"/>';
     }).join("");
     lineDots.forEach(function (d) {
       if (winLines.indexOf(Number(d.dataset.line)) !== -1) d.classList.add("hit");
@@ -316,7 +391,8 @@
     renderHistory();
 
     if (won) {
-      barWinEl.textContent = BZG.ui.formatMoney(payout);
+      countUp(barWinEl, payout);
+      if (totalPay >= 5) BZG.effects.shake(stageEl);
       var bigWin = fullScreen || totalPay >= 15 || payout >= 25000;
       if (fullScreen) {
         bannerEl.className = "ft-banner fullscreen";
@@ -352,6 +428,7 @@
     minusBtn.disabled = false;
     plusBtn.disabled = false;
     spinBtn.classList.remove("spinning");
+    if (auto) auto.done(true);
   }
 
   function quickBet(fn) {
@@ -388,7 +465,10 @@
     renderHistory();
     updateBar();
 
-    spinBtn.addEventListener("click", spin);
+    spinBtn.addEventListener("click", function () { if (auto) auto.stop(); spin(); });
+    var autoEl = document.getElementById("autospin");
+    if (autoEl && BZG.autospin) auto = BZG.autospin.create(autoEl, spin);
+    Array.prototype.forEach.call(document.querySelectorAll(".paytable-row span, #round-status"), symbolizeText);
     minusBtn.addEventListener("click", function () { stepBet(-1); });
     plusBtn.addEventListener("click", function () { stepBet(1); });
     betInput.addEventListener("input", updateBar);

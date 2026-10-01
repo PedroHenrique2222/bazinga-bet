@@ -34,6 +34,7 @@
 
   var grid = [];  // grid[c][r], r=0 no topo; cada celula: {k:'p',i} | {k:'s'} | {k:'b',v}
   var spinning = false;
+  var auto = null; // giro automatico (autospin.js)
 
   var betInput, spinBtn, buyBtn, statusEl, historyListEl, gridEl, bannerEl, winEl, stageEl, freeEl;
 
@@ -91,36 +92,77 @@
   // cascata: por coluna, mantem as celulas NAO removidas (scatter/bomba grudam e caem),
   // preenche o topo com celulas novas
   function tumble(remove, pBomb, st) {
+    var falls = []; // falls[c][r] = quantas linhas a celula desceu (0 = ficou parada)
     for (var c = 0; c < COLS; c++) {
-      var kept = [];
-      for (var r = 0; r < ROWS; r++) if (!remove[c][r]) kept.push(grid[c][r]);
+      var kept = [], keptFrom = [];
+      for (var r = 0; r < ROWS; r++) if (!remove[c][r]) { kept.push(grid[c][r]); keptFrom.push(r); }
       var need = ROWS - kept.length;
       var col = [];
-      for (var t = 0; t < need; t++) col.push(newCell(pBomb, st));
+      falls[c] = [];
+      for (var t = 0; t < need; t++) { col.push(newCell(pBomb, st)); falls[c].push(need); } // novos vem de cima
+      keptFrom.forEach(function (from, k) { falls[c].push(need + k - from); });
       grid[c] = col.concat(kept); // novos no topo
     }
+    return falls;
   }
 
   function scatterPay(sc) { var key = sc >= 6 ? 6 : sc; return SCAT_PAY[key] || SCAT_PAY[6]; }
 
-  function cellHTML(cell, win, drop) {
-    var cls = "gem" + (drop ? " drop" : "") + (win ? " win" : "");
-    var content;
-    if (cell.k === "p") content = SYMBOLS[cell.i].icon;
-    else if (cell.k === "s") { cls += " scatter"; content = SCATTER; }
-    else { cls += " bomb"; content = '💣<b>' + cell.v + 'x</b>'; }
-    return '<div class="' + cls + '">' + content + '</div>';
+  /* simbolo desenhado (icons.js) de cada emoji; sem icons.js, mostra o emoji */
+  var SYM_ART = { "💎": "s-diamante", "🍰": "s-bolo", "🍑": "s-pessego", "🃏": "s-carta", "🎲": "s-dado",
+    "🥒": "s-picles", "🔋": "s-pilha", "🎃": "s-abobora", "🎇": "s-bonus", "💣": "bomba" };
+  function symArt(icon, size) {
+    return BZG.icons && SYM_ART[icon] ? BZG.icons.art(SYM_ART[icon], size || 64) : icon;
+  }
+  function symbolizeText(el) {
+    if (!BZG.icons) return;
+    Object.keys(SYM_ART).forEach(function (emo) {
+      el.innerHTML = el.innerHTML.split(emo).join('<span class="sym-inline">' + symArt(emo, 22) + '</span>');
+    });
   }
 
+  function cellHTML(cell, win, fall, delay) {
+    var cls = "gem" + (fall ? " fall" : "") + (win ? " win" : "");
+    var style = fall ? ' style="--n:' + fall + ';animation-delay:' + (delay || 0) + 'ms"' : "";
+    var content;
+    if (cell.k === "p") content = symArt(SYMBOLS[cell.i].icon);
+    else if (cell.k === "s") { cls += " scatter"; content = symArt(SCATTER); }
+    else { cls += " bomb"; content = symArt("💣") + '<b>' + cell.v + 'x</b>'; }
+    return '<div class="' + cls + '"' + style + '>' + content + '</div>';
+  }
+
+  /* "+BZ$ X" que sobe de dentro da grade a cada cascata */
+  function floatWin(amount) {
+    if (!(amount > 0)) return;
+    var el = document.createElement("div");
+    el.className = "bonanza-float";
+    el.textContent = "+" + BZG.ui.formatMoney(amount);
+    gridEl.parentElement.appendChild(el);
+    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1300);
+  }
+
+  /* opts.drop: giro novo, tudo cai de cima (coluna por coluna, de baixo pra cima).
+     opts.falls: cascata, so cai quem desceu, cada um a sua distancia. */
   function renderGrid(opts) {
     opts = opts || {};
     var html = "";
+    var sp = BZG.modes.speed();
     for (var r = 0; r < ROWS; r++) {
       for (var c = 0; c < COLS; c++) {
-        html += cellHTML(grid[c][r], opts.remove && opts.remove[c][r], opts.drop);
+        var fall = 0, delay = 0;
+        if (opts.drop) { fall = ROWS; delay = (c * 45 + (ROWS - 1 - r) * 22) * sp; }
+        else if (opts.falls) { fall = opts.falls[c][r]; delay = c * 25 * sp; }
+        html += cellHTML(grid[c][r], false, fall, delay);
       }
     }
     gridEl.innerHTML = html;
+  }
+
+  /* marca os vencedores nas celulas que ja estao na tela (sem redesenhar a grade) */
+  function markWinners(remove) {
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) {
+      if (remove[c][r]) { var el = gridEl.children[r * COLS + c]; if (el) el.classList.add("win"); }
+    }
   }
 
   function showBanner(text, cls) {
@@ -134,7 +176,9 @@
     if (freeLeft > 0) {
       stageEl.classList.add("free-mode");
       freeEl.style.display = "";
-      freeEl.textContent = "🎇 Rodadas grátis: " + freeLeft;
+      var soFar = Math.round(curBet * totalWin * SCALE);
+      freeEl.innerHTML = '<span class="sym-inline">' + symArt("🎇", 22) + '</span> Rodadas grátis: <b>' + freeLeft + '</b>' +
+        (soFar > 0 ? ' · Ganho: <b>' + BZG.ui.formatMoney(soFar) + '</b>' : "");
     } else {
       stageEl.classList.remove("free-mode");
       freeEl.style.display = "none";
@@ -167,29 +211,63 @@
   function runSpin(pBomb, onDone) {
     var st = { sc: 0, bomb: 0 };
     var accWin = 0;
+    var teased = false;
+    // fora das gratis faltam 4 bonus para disparar; nas gratis, 3 re-disparam
+    var need = stageEl.classList.contains("free-mode") ? RETRIGGER_MIN : TRIGGER_MIN;
     fillGrid(pBomb, st);
     renderGrid({ drop: true });
     BZG.sounds.tick();
 
+    function teaseScatter() {
+      if (!teased && st.sc === need - 1) {
+        teased = true;
+        stageEl.classList.add("scatter-tease");
+        showBanner("FALTA 1!", "tease");
+        BZG.sounds.countdownBeep();
+      }
+    }
+
     setTimeout(function step() {
+      teaseScatter();
       var ev = evaluate();
       if (!ev.any) {
+        stageEl.classList.remove("scatter-tease");
         var w = accWin;
         if (st.sc >= TRIGGER_MIN) w += scatterPay(st.sc);
-        if (w > 0 && st.bomb > 0) { w *= st.bomb; showBanner("×" + st.bomb, "mult"); BZG.sounds.bombExplode(); }
+        if (w > 0 && st.bomb > 0) {
+          // as bombas acendem, explodem e o ganho multiplica com tremor
+          Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.bomb"), function (b) { b.classList.add("boom"); });
+          BZG.sounds.bombExplode();
+          setTimeout(function () {
+            w *= st.bomb;
+            showBanner("×" + st.bomb, "mult");
+            BZG.effects.shake(stageEl);
+            BZG.effects.flash(stageEl, "gold");
+            floatWin(Math.round(curBet * (w - accWin) * SCALE));
+            onDone(w, st.sc);
+          }, spd(650));
+          return;
+        }
         onDone(w, st.sc);
         return;
       }
       accWin += ev.pay;
-      renderGrid({ remove: ev.remove });
+      markWinners(ev.remove);
       BZG.sounds.pegHit();
+      floatWin(Math.round(curBet * ev.pay * SCALE));
+      winEl.className = "bonanza-win counting";
+      winEl.textContent = "Ganho: " + BZG.ui.formatMoney(Math.round(curBet * (totalWin + accWin) * SCALE));
       setTimeout(function () {
-        tumble(ev.remove, pBomb, st);
-        renderGrid({ drop: true });
+        // vencedores explodem antes de sumir
+        Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.win"), function (g) { g.classList.add("pop"); });
+      }, spd(360));
+      setTimeout(function () {
+        var falls = tumble(ev.remove, pBomb, st);
+        renderGrid({ falls: falls });
         BZG.sounds.tick();
-        setTimeout(step, spd(260));
-      }, spd(540));
-    }, spd(360));
+        setTimeout(step, spd(470));
+      }, spd(620));
+    }, spd(720));
   }
 
   function lockUI(lock) {
@@ -202,14 +280,14 @@
   }
 
   function doRound(isBuy) {
-    if (spinning) return;
+    if (spinning) return false;
     var bet = Math.round(Number(betInput.value));
     var balance = BZG.storage.getBalance();
-    if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return; }
+    if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return false; }
     var cost = isBuy ? bet * BUY_MULT : bet;
     if (cost > balance) {
       BZG.ui.toast(isBuy ? "A compra custa " + BZG.ui.formatMoney(cost) + " (20x). Saldo insuficiente." : "Você não tem saldo suficiente.", "error");
-      return;
+      return false;
     }
 
     spinning = true;
@@ -306,6 +384,7 @@
     spinning = false;
     isBuyRound = false;
     lockUI(false);
+    if (auto) auto.done(true);
   }
 
   function quickBet(fn) {
@@ -317,7 +396,7 @@
   function updateBuyLabel() {
     if (!buyBtn) return;
     var bet = Math.round(Number(betInput.value)) || 0;
-    buyBtn.innerHTML = "Comprar Grátis 🎇<small>" + BZG.ui.formatMoney(bet * BUY_MULT) + " (20x)</small>";
+    buyBtn.innerHTML = '<span class="buy-title">Comprar Grátis <span class="sym-inline">' + symArt("🎇", 22) + '</span></span><small>' + BZG.ui.formatMoney(bet * BUY_MULT) + " (20x)</small>";
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -341,8 +420,12 @@
     renderHistory();
     updateBuyLabel();
 
-    spinBtn.addEventListener("click", function () { doRound(false); });
-    if (buyBtn) buyBtn.addEventListener("click", function () { doRound(true); });
+    spinBtn.addEventListener("click", function () { if (auto) auto.stop(); doRound(false); });
+    if (buyBtn) buyBtn.addEventListener("click", function () { if (auto) auto.stop(); doRound(true); });
+    var autoEl = document.getElementById("autospin");
+    if (autoEl && BZG.autospin) auto = BZG.autospin.create(autoEl, function () { return doRound(false); });
+    Array.prototype.forEach.call(document.querySelectorAll(".paytable-row span, .paytable .section-title, .paytable p"), symbolizeText);
+    spinBtn.textContent = "Girar";
     betInput.addEventListener("input", updateBuyLabel);
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });

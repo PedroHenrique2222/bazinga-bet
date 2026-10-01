@@ -81,11 +81,6 @@ BZG.achievements = (function () {
       check: function (s) { return s.balance >= 100000; }
     },
     {
-      id: "loyal", icon: "📅", name: "Fiel à casa",
-      desc: "Colete o bônus diário 3 dias seguidos",
-      check: function (s) { return s.bonus.streak >= 3; }
-    },
-    {
       id: "whale", icon: "🐋", name: "Baleia",
       desc: "Aposte BZ$ 50.000 no total",
       check: function (s) { return s.stats.totalWagered >= 50000; }
@@ -144,10 +139,6 @@ BZG.achievements = (function () {
     { id: "mult-250", icon: "🌟", name: "Fora da curva", desc: "Ganhe com um multiplicador de 250x ou mais", check: function (s) { return s.stats.bestMultiplier >= 250; } },
     { id: "mult-500", icon: "🌟", name: "Sortudo demais", desc: "Ganhe com um multiplicador de 500x ou mais", check: function (s) { return s.stats.bestMultiplier >= 500; } },
 
-    /* ---------- Bonus diario ---------- */
-    { id: "bonus-7", icon: "📅", name: "Uma semana de panetone", desc: "Colete o bônus diário 7 dias seguidos", check: function (s) { return s.bonus.streak >= 7; } },
-    { id: "bonus-14", icon: "📅", name: "Duas semanas fiel", desc: "Colete o bônus diário 14 dias seguidos", check: function (s) { return s.bonus.streak >= 14; } },
-    { id: "bonus-30", icon: "📅", name: "Um mês inteiro", desc: "Colete o bônus diário 30 dias seguidos", check: function (s) { return s.bonus.streak >= 30; } },
 
     /* ---------- Exploracao e personalizacao ---------- */
     { id: "all-games", icon: "🗺️", name: "Cassino completo", desc: "Jogue todos os jogos disponíveis pelo menos uma vez",

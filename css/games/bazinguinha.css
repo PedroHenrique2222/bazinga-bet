@@ -505,3 +505,92 @@
   .ft-spin-btn { width: 64px; height: 64px; font-size: 30px; }
   .ft-controls { gap: 12px; }
 }
+
+/* ---------- v1.23: simbolos desenhados, suspense na 3a coluna, vitoria mais viva ---------- */
+.ft-cell .bzg-icon {
+  width: 74%;
+  height: 74%;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+}
+.ft-cell-wild > i .bzg-icon { width: calc(var(--ftcell) * 0.5); height: calc(var(--ftcell) * 0.5); }
+.ft-cell.hit .bzg-icon { animation: ft-sym-bounce 0.55s ease-in-out infinite alternate; }
+@keyframes ft-sym-bounce {
+  from { transform: scale(1) rotate(-4deg); }
+  to { transform: scale(1.14) rotate(4deg); }
+}
+
+/* suspense: a ultima coluna brilha enquanto ainda gira */
+.ft-col.tease {
+  box-shadow: 0 0 0 3px #ffd400, 0 0 26px rgba(255, 190, 0, 0.9);
+  animation: ft-tease 0.35s ease-in-out infinite alternate;
+}
+@keyframes ft-tease {
+  from { box-shadow: 0 0 0 3px #ffd400, 0 0 14px rgba(255, 190, 0, 0.6); }
+  to { box-shadow: 0 0 0 4px #ff8a00, 0 0 34px rgba(255, 150, 0, 1); }
+}
+.ft-banner.tease {
+  background: linear-gradient(120deg, #ff8a00, #ffd400);
+  color: #241a00;
+  animation: ft-banner-pop 0.3s cubic-bezier(0.2, 1.6, 0.4, 1), live-pulse 0.5s ease-in-out infinite;
+}
+.sym-inline { display: inline-flex; vertical-align: middle; }
+.sym-inline .bzg-icon { width: 22px; height: 22px; }
+.paytable-row span { display: inline-flex; align-items: center; gap: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-col.tease, .ft-cell.hit .bzg-icon { animation: none; }
+}
+
+/* ---------- v1.24: animacoes mais fluidas ----------
+   so transform/opacity animam (a placa de video cuida); brilhos viram uma camada
+   fixa (::before) que so muda de opacidade, em vez de redesenhar sombras a cada quadro */
+.ft-strip { transform: translate3d(0, 0, 0); backface-visibility: hidden; }
+/* giro: em vez do blur (pesado), o simbolo "estica" na direcao do movimento */
+.ft-strip.blur { filter: none; }
+.ft-strip.blur .ft-cell .bzg-icon { transform: scaleY(1.22); opacity: 0.88; }
+.ft-strip .ft-cell .bzg-icon { transition: transform 0.18s ease-out, opacity 0.18s ease-out; }
+
+.ft-cell.hit, .ft-cell.locked { animation: none; box-shadow: none; }
+.ft-cell.hit::before, .ft-cell.locked::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 8px;
+  pointer-events: none;
+  will-change: opacity;
+  animation: ft-glow 0.6s ease-in-out infinite alternate;
+}
+.ft-cell.hit::before { box-shadow: inset 0 0 0 3px #ff8a00, 0 0 18px rgba(255, 170, 0, 0.8); }
+.ft-cell.locked::before { box-shadow: inset 0 0 0 3px #ffb300, 0 0 20px rgba(255, 190, 0, 0.85); animation-duration: 0.9s; }
+@keyframes ft-glow { from { opacity: 0.35; } to { opacity: 1; } }
+
+.ft-cell.reroll { animation: ft-cell-reroll 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+@keyframes ft-cell-reroll {
+  0% { transform: translate3d(0, -40%, 0) scale(0.75); opacity: 0.2; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+}
+
+/* suspense: brilho fixo que pulsa por opacidade */
+.ft-col.tease { animation: none; box-shadow: none; }
+.ft-col.tease::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 4px #ffd400, inset 0 0 26px rgba(255, 170, 0, 0.9);
+  animation: ft-glow 0.3s ease-in-out infinite alternate;
+}
+
+/* linhas vencedoras se desenham de ponta a ponta */
+.ft-winlines line {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: ft-line-draw 0.45s ease-out forwards;
+}
+@keyframes ft-line-draw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-cell.hit::before, .ft-cell.locked::before, .ft-col.tease::after { animation: none; opacity: 1; }
+  .ft-winlines line { animation: none; stroke-dashoffset: 0; }
+}

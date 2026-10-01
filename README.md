@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.21
+# 🎰 Bazinga BET — v1.24
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -172,7 +172,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 ## 🏆 Conquistas
 
-**80 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, bônus diário, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis (Equipe, Amigos e tudo junto) e recordes nos 4 minigames sem aposta. São verificadas automaticamente a cada aposta.
+**76 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis (Equipe, Amigos e tudo junto) e recordes nos 4 minigames sem aposta. São verificadas automaticamente a cada aposta.
 
 ---
 
@@ -200,6 +200,24 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.24 (2026-10-01) — 🧈 Animações fluidas nos caça-níqueis + Plinko consertado
+- **Plinko consertado**: as abóboras ficavam paradas em cima dos pinos da penúltima fileira e só caíam pelo limite de 10s. Causa: o "assentar na casa sorteada" puxava a bolinha para o centro da casa antes de ela passar pela penúltima fileira, cujos pinos ficam exatamente em cima desse centro. Agora o assentar só começa depois dessa fileira, e uma bolinha que bate reto no topo de um pino escorrega para o lado. Queda volta a levar ~2,5–4,5s (antes: 10s cravados).
+- **Bazinguinha mais fluido**: os rolos param com um quique suave (passam um pouco do ponto e voltam), o desfoque pesado do giro virou um "esticar" do símbolo (bem mais leve), a re-rolagem do WILD troca só as casas que giraram (os wilds travados não piscam mais) e as linhas vencedoras se desenham de ponta a ponta.
+- **Bonanza mais fluido**: na cascata, só caem os símbolos que desceram, cada um da sua distância e com quique — antes a grade inteira era redesenhada e caía de novo a cada cascata. No giro novo os símbolos caem coluna por coluna.
+- **Brilhos sem engasgo** (os dois jogos): os brilhos pulsantes (vencedores, WILD travado, bônus, bombas, moldura) deixaram de redesenhar sombras a cada quadro e viraram uma camada que só muda de transparência. Medido: 60 quadros por segundo durante o giro e as cascatas.
+
+### v1.23 (2026-10-01) — 🎰 Bazinguinha e Bonanza turbinados, reset geral, sem bônus diário
+- **Reset geral**: `RESET_TOKEN` em `theme.js` trocado para `v1.23-reset` — na próxima visita, todo jogador recomeça do zero (saldo, nível, passe, coleção e cadastro). O ranking online (Supabase) é zerado junto, quando esta versão entra no ar.
+- **Bônus diário (Panetone diário) removido**: sai o modal de coleta (`showDailyBonus` em `layout.js`) e as 4 conquistas que dependiam dele (Fiel à casa, 7/14/30 dias). O limite de recarga continua subindo pelo Passe.
+- **Símbolos desenhados nos caça-níqueis**: abóbora, pilha, picles, bolo, pêssego, diamante, carta, dado, raio (WILD), bônus e bomba agora são SVG (`s-*` em `icons.js`), na grade e nas tabelas de prêmios.
+- **Bazinguinha**: **suspense na 3ª coluna** (quando as duas primeiras já formam meia linha, ela gira mais devagar, brilhando, com o banner "Será?!"), símbolos vencedores pulam, o ganho **sobe contando** na barra e prêmios de 5x+ tremem a máquina.
+- **Bazinga Bonanza**: vencedores **explodem** antes da cascata, "+BZ$" sobe a cada cascata e o ganho do giro aparece ao vivo; **"FALTA 1!"** quando falta 1 bônus para as rodadas grátis (a grade pulsa); as **bombas acendem e explodem** antes de multiplicar, com tremor; a barra das rodadas grátis mostra o ganho acumulado.
+- **Giro automático** nos dois jogos (novo `js/core/autospin.js`): 10, 25, 50 ou 100 giros, botão Parar, espera a animação de vitória grande fechar e para sozinho sem saldo.
+- **Tabela de prêmios** com nome à esquerda e prêmio à direita (vale também para a Raspadinha).
+
+### v1.22 (2026-10-01) — 🎃 Ícone novo da Abóbora
+- **Plinko da Abóbora**: ícone redesenhado — abóbora redonda e brilhante, com folha e carinha sorrindo (bochechas rosadas), no lugar da abóbora de Halloween.
 
 ### v1.21 (2026-10-01) — 🎨 Ícones desenhados + telas de jogo novas
 - **Ícones desenhados (SVG) no lugar dos emojis**: novo `js/core/icons.js` (`BZG.icons.tile/art/nav`) com um ícone para cada um dos 15 jogos e 4 minigames, mais os ícones de linha do menu e do topo (Lobby, Ranking, Coleção, Passe, Perfil, Configurações, música, efeitos, tema, menu, nível, saldo). Aparecem iguais em qualquer aparelho. Usados no menu lateral, no título da topbar, nos cartões do lobby e na tabela de últimas apostas. Se o arquivo faltar, tudo volta para os emojis antigos.
