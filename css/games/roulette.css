@@ -225,3 +225,23 @@
     var(--jogo-fundo, none) center / cover no-repeat,
     #0b0912;
 }
+
+/* ---------- v1.34: roleta ao vivo (contador da rodada) ---------- */
+.rl-cd {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+  margin: 0 auto 10px; padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff; font-size: 13px; font-weight: 800;
+}
+.rl-cd[hidden] { display: none; }
+.rl-cd-label { color: rgba(255, 255, 255, 0.75); text-transform: uppercase; letter-spacing: 0.08em; font-size: 11.5px; }
+.rl-cd-time { color: var(--yellow); font-size: 18px; font-variant-numeric: tabular-nums; min-width: 2ch; }
+.rl-cd-bar { width: 90px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+.rl-cd-fill { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--yellow), var(--red)); transition: width 0.2s linear; }
+.rl-cd:not(.is-open) .rl-cd-bar { display: none; }
+.rl-live-bets[hidden] { display: none; }
+.rl-live-list .bet-row .result { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+.rl-live-list .bet-row.cashed .result { color: var(--green); }

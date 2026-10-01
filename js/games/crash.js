@@ -1,9 +1,16 @@
-/* Bazinga BET - Crash com rodadas continuas (estilo Blaze): todo mundo joga a mesma rodada */
+/* Bazinga BET - Crash com rodadas continuas (estilo Blaze): todo mundo joga a mesma rodada.
+   v1.34: modo AO VIVO (padrao). As rodadas seguem uma "agenda" montada a partir do relogio
+   do servidor (BZG.live): a cada hora comeca uma corrente de rodadas, e o ponto em que a
+   canoa afunda sai do numero da rodada - todo aparelho calcula a mesma agenda e ve a mesma
+   canoa, com as apostas dos jogadores de verdade. O modo Solo e o de sempre. */
 (function () {
   var HOUSE_EDGE = 0.04;
   var GROWTH_RATE = 0.18;
   var BETTING_MS = 7000;
   var CRASHED_PAUSE_MS = 3200;
+  var MAX_CRASH = 500;
+  var CHAIN_MS = 3600000;     // uma corrente de rodadas por hora
+  var CHAIN_LEAD_MS = 45000;  // folga: cabe uma rodada inteira de 500x (7s + 34,5s + 3,2s)
 
   var betInput, autoCashoutInput, actionBtn, statusEl, multiplierEl, canvas, ctx,
       historyListEl, roundBetsEl, stageEl, countdownEl, countdownTimeEl, countdownFillEl, crashHistoryEl;
@@ -22,6 +29,14 @@
   var queuedBet = null; // aposta feita durante uma rodada, entra na proxima
   var cashMarkers = []; // pontos de retirada exibidos no grafico
   var roundIdEl = null;
+
+  /* modo ao vivo */
+  var live = false;
+  var liveR = null;        // rodada ao vivo atual { id, bet, run, crash, end, cp }
+  var liveTable = null;
+  var liveBar = null;
+  var others = [];         // outros jogadores na mesa
+  var botLimit = 99;
 
   /* imagens opcionais do Codex (plano B: desenho/visual atual) */
   var IMG_DIR = "../assets/jogos/crash/";
@@ -46,13 +61,67 @@
     statusEl.textContent = text;
   }
 
-  function generateCrashPoint() {
-    var r = Math.random();
+  function generateCrashPoint(r) {
+    if (r === undefined) r = Math.random();
     if (r < HOUSE_EDGE) return 1.00;
     var r2 = (r - HOUSE_EDGE) / (1 - HOUSE_EDGE);
     var point = 1 / (1 - r2);
     point = Math.floor(point * 100) / 100;
-    return Math.max(1.00, Math.min(point, 500));
+    return Math.max(1.00, Math.min(point, MAX_CRASH));
+  }
+
+  /* ---------- agenda ao vivo ---------- */
+
+  function runMs(cp) { return Math.log(cp) / GROWTH_RATE * 1000; }
+  var MAX_ROUND_MS = BETTING_MS + runMs(MAX_CRASH) + CRASHED_PAUSE_MS;
+  var chains = {};
+
+  // todas as rodadas da corrente da hora h (mesma conta em todo aparelho)
+  function chain(h) {
+    if (chains[h]) return chains[h];
+    var t = h * CHAIN_MS + CHAIN_LEAD_MS;
+    var limit = (h + 1) * CHAIN_MS + CHAIN_LEAD_MS;
+    var rounds = [];
+    for (var i = 0; t + MAX_ROUND_MS <= limit; i++) {
+      var cp = generateCrashPoint(BZG.live.rng("crash:" + h + ":" + i)());
+      var run = t + BETTING_MS;
+      var crash = run + runMs(cp);
+      rounds.push({ id: h * 1000 + i, bet: t, run: run, crash: crash, end: crash + CRASHED_PAUSE_MS, cp: cp });
+      t = crash + CRASHED_PAUSE_MS;
+    }
+    var keys = Object.keys(chains);
+    if (keys.length > 4) delete chains[keys[0]];
+    return (chains[h] = { rounds: rounds, end: t });
+  }
+
+  // rodada no instante t. Na folga do fim da hora, a 1a rodada da proxima hora
+  // fica com as apostas abertas por mais tempo.
+  function liveRoundAt(t) {
+    var h = Math.floor((t - CHAIN_LEAD_MS) / CHAIN_MS);
+    var c = chain(h);
+    var rs = c.rounds;
+    var lo = 0, hi = rs.length - 1;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (t < rs[mid].bet) hi = mid - 1;
+      else if (t >= rs[mid].end) lo = mid + 1;
+      else return rs[mid];
+    }
+    return chain(h + 1).rounds[0];
+  }
+
+  // ultimos n resultados ao vivo antes da rodada r
+  function liveRecent(r, n) {
+    var out = [];
+    var t = r.bet - 1;
+    while (out.length < n) {
+      var prev = liveRoundAt(t);
+      if (prev.id === r.id) { t = chain(Math.floor((t - CHAIN_LEAD_MS) / CHAIN_MS)).end - 1; prev = liveRoundAt(t); } // folga do fim da hora
+      out.push(prev.cp);
+      t = prev.bet - 1;
+      r = prev;
+    }
+    return out;
   }
 
   /* ---------- Historico de rodadas (bolinhas) ---------- */
@@ -65,6 +134,7 @@
 
   function renderCrashHistory() {
     var recent = BZG.storage.getRecent("crash");
+    if (live && liveR) recent = (phase === "crashed" ? [liveR.cp] : []).concat(liveRecent(liveR, phase === "crashed" ? 11 : 12));
     crashHistoryEl.innerHTML = recent.map(function (m) {
       return '<span class="crash-chip ' + chipClass(m) + '">' + Number(m).toFixed(2) + 'x</span>';
     }).join("");
@@ -79,8 +149,14 @@
       var profile = BZG.storage.getProfile();
       rows.push(betRowHTML(profile.avatar, profile.nickname + " (você)", userBet.amount, userBet, true));
     }
+    if (live) others.forEach(function (o) {
+      if (!liveR || o.r !== liveR.id || !o.bet) return;
+      var colorCls = o.color && o.color !== "default" ? " bzg-name color-" + esc(o.color) : "";
+      rows.push(betRowHTML(esc(o.avatar), '<span class="' + colorCls + '">' + esc(o.nick) + '</span><span class="real-tag" title="Jogador ao vivo"></span>',
+        Number(o.bet) || 0, { status: o.st || "in", cashMult: Number(o.m) || 1 }, false));
+    });
     bots.forEach(function (b) {
-      rows.push(betRowHTML(b.avatar, b.name, b.bet, b, false));
+      rows.push(betRowHTML(b.avatar, b.name + (live ? '<span class="bot-tag">BOT</span>' : ''), b.bet, b, false));
     });
 
     roundBetsEl.innerHTML = rows.join("") ||
@@ -215,9 +291,13 @@
       ctx.fillText(ts + "s", tx, h - 10);
     }
 
-    // marcadores de quem ja retirou nesta subida
-    for (var mk = 0; mk < cashMarkers.length; mk++) {
-      var marker = cashMarkers[mk];
+    // marcadores de quem ja retirou nesta subida (+ jogadores ao vivo)
+    var allMarkers = cashMarkers;
+    if (live && liveR) others.forEach(function (o) {
+      if (o.r === liveR.id && o.st === "cashed" && o.m) allMarkers = allMarkers.concat([{ mult: Number(o.m) }]);
+    });
+    for (var mk = 0; mk < allMarkers.length; mk++) {
+      var marker = allMarkers[mk];
       if (marker.mult > mult) continue;
       var mxy = toXY(Math.log(marker.mult) / GROWTH_RATE, marker.mult);
       ctx.beginPath();
@@ -258,14 +338,15 @@
 
   /* ---------- Maquina de estados da rodada ---------- */
 
-  function startBettingPhase() {
+  function startBettingPhase(r) {
     phase = "betting";
     phaseStart = performance.now();
     lastBeepSecond = -1;
-    bots = BZG.bots.crashRoundBots();
+    bots = live ? BZG.live.withSeed("crash-bots:" + r.id, BZG.bots.crashRoundBots).slice(0, botLimit) : BZG.bots.crashRoundBots();
     userBet = null;
     cashMarkers = [];
-    if (roundIdEl) roundIdEl.textContent = "Rodada #" + nextRoundId();
+    if (roundIdEl) roundIdEl.textContent = "Rodada #" + (live ? r.id % 1000000 : nextRoundId());
+    if (live) renderCrashHistory();
 
     multiplierEl.textContent = "1.00x";
     multiplierEl.classList.remove("crashed", "cashed", "tier-low", "tier-mid", "tier-high");
@@ -289,6 +370,7 @@
       autoCashoutInput.disabled = true;
       setStatus("Aposta de " + BZG.ui.formatMoney(userBet.amount) + " entrou nesta rodada!");
       BZG.sounds.bet();
+      sendLiveBet();
     }
 
     renderRoundBets();
@@ -297,7 +379,7 @@
   function startRunningPhase() {
     phase = "running";
     phaseStart = performance.now();
-    crashPoint = generateCrashPoint();
+    crashPoint = live && liveR ? liveR.cp : generateCrashPoint();
     lastMultiplier = 1;
     lastTickTime = phaseStart;
     lastWholeMult = 1;
@@ -338,6 +420,7 @@
     // resolve o usuario se ainda estava em jogo
     if (userBet && userBet.status === "in") {
       userBet.status = "lost";
+      sendLiveBet();
       BZG.storage.recordBet("crash", {
         bet: userBet.amount,
         multiplier: finalMult,
@@ -356,7 +439,7 @@
       BZG.effects.flash(stageEl, "red");
     }
 
-    BZG.storage.pushRecent("crash", finalMult);
+    if (!live) BZG.storage.pushRecent("crash", finalMult);
     renderCrashHistory();
 
     multiplierEl.textContent = formatMult(finalMult);
@@ -386,11 +469,12 @@
   }
 
   function loop(now) {
+    if (live) liveSync(now);
     if (phase === "betting") {
       var remaining = Math.max(0, BETTING_MS - (now - phaseStart));
       var secs = remaining / 1000;
       countdownTimeEl.textContent = secs.toFixed(1) + "s";
-      countdownFillEl.style.width = ((remaining / BETTING_MS) * 100) + "%";
+      countdownFillEl.style.width = Math.min(100, (remaining / BETTING_MS) * 100) + "%";
 
       var whole = Math.ceil(secs);
       if (whole <= 3 && whole !== lastBeepSecond && whole > 0) {
@@ -398,7 +482,7 @@
         lastBeepSecond = whole;
       }
 
-      if (remaining <= 0) startRunningPhase();
+      if (remaining <= 0 && !live) startRunningPhase();
     } else if (phase === "running") {
       var elapsedSec = (now - phaseStart) / 1000;
       var mult = Math.exp(GROWTH_RATE * elapsedSec);
@@ -446,10 +530,66 @@
         }
       }
     } else if (phase === "crashed") {
-      if (now - phaseStart >= CRASHED_PAUSE_MS) startBettingPhase();
+      if (now - phaseStart >= CRASHED_PAUSE_MS && !live) startBettingPhase();
     }
 
     requestAnimationFrame(loop);
+  }
+
+  /* ao vivo: segue a agenda do relogio do servidor */
+  function liveSync(now) {
+    var t = BZG.live.now();
+    var r = liveRoundAt(t);
+    if (!liveR || r.id !== liveR.id) {
+      // rodada anterior ainda em andamento (aba em segundo plano): a canoa ja afundou
+      if (liveR && phase === "running") startCrashedPhase(crashPoint);
+      if (liveR && phase === "betting" && userBet) { startRunningPhase(); startCrashedPhase(crashPoint); }
+      botLimit = Math.max(0, 10 - 2 * others.length);
+      liveR = r;
+      startBettingPhase(r);
+    }
+    if (phase === "betting") {
+      if (t >= r.run) { startRunningPhase(); phaseStart = now - (t - r.run); }
+      else phaseStart = now - (BETTING_MS - (r.run - t));
+    } else if (phase === "running") {
+      phaseStart = now - (t - r.run);
+    }
+  }
+
+  function esc(s) { return BZG.ui.escapeHtml ? BZG.ui.escapeHtml(String(s == null ? "" : s)) : String(s); }
+
+  function sendLiveBet() {
+    if (!live || !liveTable || !liveR || !userBet) return;
+    liveTable.update({ r: liveR.id, bet: userBet.amount, st: userBet.status, m: userBet.cashMult || 0 });
+  }
+
+  /* ---------- Ao Vivo / Solo ---------- */
+
+  function setLive(on) {
+    if ((userBet && userBet.status === "in") || queuedBet) {
+      BZG.ui.toast("Espere sua aposta desta rodada terminar para trocar de modo.", "info");
+      return false;
+    }
+    live = on;
+    BZG.live.setLiveMode("crash", on);
+    if (engine) { engine.stop(0.05); engine = null; }
+    if (on) {
+      liveR = null;
+      others = [];
+      liveTable = BZG.live.table("crash", function (list, count) {
+        others = list;
+        if (liveBar) liveBar.setCount(count);
+        renderRoundBets();
+      });
+      BZG.live.setChatTable("crash");
+    } else {
+      if (liveTable) liveTable.leave();
+      liveTable = null;
+      others = [];
+      BZG.live.setChatTable(null);
+      startBettingPhase();
+      renderCrashHistory();
+    }
   }
 
   /* ---------- Acoes do usuario ---------- */
@@ -480,6 +620,7 @@
     autoCashoutInput.disabled = true;
     setStatus("Aposta de " + BZG.ui.formatMoney(amount) + " confirmada. Aguarde a rodada começar.");
     BZG.sounds.bet();
+    sendLiveBet();
     renderRoundBets();
   }
 
@@ -491,6 +632,7 @@
     userBet.cashMult = mult;
     userBet.payout = payout;
     cashMarkers.push({ mult: mult, user: true });
+    sendLiveBet();
 
     BZG.storage.recordBet("crash", {
       bet: userBet.amount,
@@ -610,7 +752,12 @@
       quickBet(function (v, balance) { return balance; });
     });
 
-    startBettingPhase();
+    live = BZG.live ? BZG.live.isLiveMode("crash") : false;
+    if (BZG.live) {
+      liveBar = BZG.live.bar(stageEl.parentNode, live, setLive);
+      if (live) setLive(true);
+    }
+    if (!live) startBettingPhase();
     requestAnimationFrame(loop);
     loadImages();
   });

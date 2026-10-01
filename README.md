@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.33
+# 🎰 Bazinga BET — v1.34
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,15 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.34 (2026-10-01) — 🔴 Ao Vivo de verdade: Canoa, Double e Roleta + chat
+- **Canoa, Double e Roleta ao vivo:** todo mundo joga a mesma rodada, na mesma hora. As rodadas seguem o relógio do servidor (`server_now()` no Supabase) e o resultado sai do número da rodada — todo aparelho calcula igual, sem servidor pago.
+- **Apostas de jogadores reais** aparecem na mesa (bolinha verde). Bots continuam aparecendo quando tem pouca gente, marcados com **BOT**.
+- Chave **Ao Vivo / Solo** em cada um dos 3 jogos (Solo = como era antes). A Roleta ao vivo gira sozinha a cada 25s.
+- **Chat:** botão flutuante em todas as páginas, com abas **Global** e **Mesa** (nos jogos ao vivo). Guarda as últimas 100 mensagens por sala, 1 mensagem a cada 2s, palavrões viram *** e links viram [link].
+- **Contador real** de jogadores online (menu lateral e chat) e "👥 X na mesa" nos jogos; o lobby mostra quantos estão jogando cada mesa.
+- Arquivos novos: `js/core/live.js` (relógio, presença, mesa, chat) e `js/core/chat.js` (janela do chat). Tabela nova no Supabase: `chat_messages`.
+- Política de Privacidade atualizada (ranking, chat e ao vivo).
 
 ### v1.33 (2026-10-01) — 📈 Progresso mais difícil, recarga fixa
 - Subir de nível ficou **3x mais difícil** (perfil e Passe de Batalha: 7.500 XP por nível do Passe).
