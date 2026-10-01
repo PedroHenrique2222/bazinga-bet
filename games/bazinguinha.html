@@ -20,99 +20,286 @@
       <header class="topbar" id="topbar"></header>
       <main class="container">
 
-        <div class="game-layout">
-          <section class="panel controls">
+        <div class="game-layout bz-layout">
+          <section class="panel controls bz-panel">
+            <!-- logo do jogo: texto em CSS, troca sozinho por assets/bazinguinha/logo.webp -->
+            <div class="bz-brand">
+              <div class="bz-logo" data-bz-logo>
+                <span class="bz-logo-txt">BAZINGUINHA</span>
+                <span class="bz-logo-sub">com O Menor Quentão 🔥</span>
+              </div>
+            </div>
+
             <label for="bet-amount">Valor da aposta (BZ$)</label>
             <input type="number" id="bet-amount" min="1" step="1" value="100" />
             <div class="input-row" style="margin-top:8px;">
-              <button class="btn btn--ghost" id="bet-half">½</button>
-              <button class="btn btn--ghost" id="bet-double">2x</button>
-              <button class="btn btn--ghost" id="bet-max">Máx</button>
+              <button type="button" class="btn btn--ghost" id="bet-half" aria-label="Metade da aposta">½</button>
+              <button type="button" class="btn btn--ghost" id="bet-double" aria-label="Dobrar a aposta">2x</button>
+              <button type="button" class="btn btn--ghost" id="bet-max" aria-label="Aposta máxima (todo o saldo)">Máx</button>
             </div>
 
             <div class="autospin" id="autospin"></div>
 
-            <p id="round-status" style="color:var(--text-muted); font-size:13px; margin-top:14px;">
+            <p id="round-status" class="bz-status" aria-live="polite">
               5 linhas: 3 horizontais + 2 diagonais. O ⚡ é curinga e substitui qualquer símbolo.
             </p>
 
-            <div class="paytable">
-              <h2 class="section-title" style="margin-top:20px;">Prêmios por linha</h2>
-              <div class="paytable-row"><span>⚡⚡⚡ WILD</span><strong>50x</strong></div>
-              <div class="paytable-row"><span>🍑🍑🍑</span><strong>12.5x</strong></div>
-              <div class="paytable-row"><span>🍰🍰🍰</span><strong>5x</strong></div>
-              <div class="paytable-row"><span>🥒🥒🥒</span><strong>2.5x</strong></div>
-              <div class="paytable-row"><span>🔋🔋🔋</span><strong>1.5x</strong></div>
-              <div class="paytable-row"><span>🎃🎃🎃</span><strong>1x</strong></div>
-              <div class="paytable-row"><span>💥 Tela cheia</span><strong>ganho ×10</strong></div>
-            </div>
+            <details class="bz-details paytable">
+              <summary><span>Prêmios por linha</span></summary>
+              <div class="bz-details-body">
+                <div class="paytable-row"><span>⚡⚡⚡ WILD</span><strong>50x</strong></div>
+                <div class="paytable-row"><span>🍑🍑🍑</span><strong>12.5x</strong></div>
+                <div class="paytable-row"><span>🍰🍰🍰</span><strong>5x</strong></div>
+                <div class="paytable-row"><span>🥒🥒🥒</span><strong>2.5x</strong></div>
+                <div class="paytable-row"><span>🔋🔋🔋</span><strong>1.5x</strong></div>
+                <div class="paytable-row"><span>🎃🎃🎃</span><strong>1x</strong></div>
+                <div class="paytable-row"><span>💥 Tela cheia</span><strong>ganho ×10</strong></div>
+              </div>
+            </details>
 
-            <div class="paytable" style="margin-top:14px;">
-              <h2 class="section-title">⚡ Respin do WILD</h2>
-              <p style="color:var(--text-muted); font-size:13px; line-height:1.5; margin:2px 0 0;">
-                Caiu um ⚡ WILD? Ele <strong style="color:var(--accent);">trava</strong> e os outros
-                símbolos re-giram de graça. Se a re-rolagem trouxer um novo ⚡, gira mais uma vez —
-                e assim por diante, até a tela encher e valer o <strong>×10</strong>.
-              </p>
-            </div>
+            <details class="bz-details">
+              <summary><span>⚡ Respin do WILD</span></summary>
+              <div class="bz-details-body">
+                <p class="bz-rule">
+                  Caiu um ⚡ WILD? Ele <strong>trava</strong> e os outros
+                  símbolos re-giram de graça. Se a re-rolagem trouxer um novo ⚡, gira mais uma vez —
+                  e assim por diante, até a tela encher e valer o <strong>×10</strong>.
+                </p>
+              </div>
+            </details>
 
             <div class="history-list">
-              <h2 class="section-title" style="margin-top:20px;">Últimos giros</h2>
+              <h2 class="section-title">Últimos giros</h2>
               <div id="history-list"></div>
             </div>
           </section>
 
-          <section class="panel stage" id="tiger-stage">
-            <div class="ft-machine">
-              <div class="ft-top">
-                <!-- Mascote: O Menor Quentão (personagem desenhado em CSS) -->
-                <div class="mq-mascot" id="mq-mascot" role="img" aria-label="O Menor Quentão">
-                  <span class="mq-arm mq-arm--l"></span>
-                  <span class="mq-arm mq-arm--r"></span>
-                  <span class="mq-head">
-                    <span class="mq-shades"><b></b><b></b></span>
-                    <span class="mq-mouth"></span>
-                  </span>
-                </div>
-                <div class="ft-title">BAZINGUINHA</div>
-                <div class="mq-name">O Menor Quentão 🔥</div>
+          <section class="panel stage bz-stage" id="tiger-stage">
+            <!-- cenario: patio de festa a noite (CSS) ou assets/bazinguinha/fundo.webp -->
+            <div class="bz-scene" id="bz-scene" aria-hidden="true">
+              <div class="bz-scene-img"></div>
+              <div class="bz-scene-img bz-scene-img--sharp"></div>
+              <div class="bz-scene-art">
+                <!-- pagode desenhado uma vez e usado dos dois lados -->
+                <svg width="0" height="0" class="bz-defs" focusable="false">
+                  <symbol id="bzPagoda" viewBox="0 0 300 400">
+                    <rect x="20" y="368" width="260" height="32" fill="#1e050a" />
+                    <rect x="34" y="358" width="232" height="14" fill="#2c0710" />
+                    <rect x="48" y="262" width="204" height="100" fill="#3f0a13" />
+                    <rect x="56" y="262" width="9" height="100" fill="#6b0d18" />
+                    <rect x="235" y="262" width="9" height="100" fill="#6b0d18" />
+                    <rect x="72" y="290" width="34" height="52" rx="14" fill="#e8904a" opacity="0.5" />
+                    <rect x="133" y="290" width="34" height="52" rx="14" fill="#f0a858" opacity="0.55" />
+                    <rect x="194" y="290" width="34" height="52" rx="14" fill="#e8904a" opacity="0.5" />
+                    <path d="M88 228 L212 228 C256 252 276 264 290 248 L284 268 L16 268 L10 248 C24 264 44 252 88 228 Z" fill="#0b4a3a" stroke="#c99a3a" stroke-width="3" stroke-linejoin="round" />
+                    <rect x="78" y="172" width="144" height="58" fill="#3f0a13" />
+                    <rect x="98" y="186" width="26" height="32" rx="9" fill="#e8904a" opacity="0.45" />
+                    <rect x="137" y="186" width="26" height="32" rx="9" fill="#f0a858" opacity="0.5" />
+                    <rect x="176" y="186" width="26" height="32" rx="9" fill="#e8904a" opacity="0.45" />
+                    <path d="M102 140 L198 140 C232 160 248 172 260 158 L255 176 L45 176 L40 158 C52 172 68 160 102 140 Z" fill="#0b4a3a" stroke="#c99a3a" stroke-width="3" stroke-linejoin="round" />
+                    <rect x="104" y="92" width="92" height="50" fill="#3f0a13" />
+                    <rect x="128" y="102" width="44" height="30" rx="9" fill="#f0a858" opacity="0.5" />
+                    <path d="M116 62 L184 62 C206 80 218 90 230 78 L226 96 L74 96 L70 78 C82 90 94 80 116 62 Z" fill="#0b4a3a" stroke="#c99a3a" stroke-width="3" stroke-linejoin="round" />
+                    <rect x="147" y="20" width="6" height="44" fill="#c99a3a" />
+                    <circle cx="150" cy="30" r="7" fill="#e8b53a" />
+                    <circle cx="150" cy="48" r="5" fill="#e8b53a" />
+                    <circle cx="12" cy="256" r="6" fill="#ff5a3c" />
+                    <circle cx="288" cy="256" r="6" fill="#ff5a3c" />
+                    <circle cx="42" cy="166" r="5" fill="#ff5a3c" />
+                    <circle cx="258" cy="166" r="5" fill="#ff5a3c" />
+                  </symbol>
+                </svg>
+                <svg class="bz-pav bz-pav--l" viewBox="0 0 300 400" preserveAspectRatio="xMidYMax meet" focusable="false"><use href="#bzPagoda" /></svg>
+                <svg class="bz-pav bz-pav--r" viewBox="0 0 300 400" preserveAspectRatio="xMidYMax meet" focusable="false"><use href="#bzPagoda" /></svg>
+                <span class="bz-string bz-string--l"></span>
+                <span class="bz-string bz-string--r"></span>
+                <span class="bz-lantern bz-lantern--s1"></span>
+                <span class="bz-lantern bz-lantern--s2"></span>
+                <span class="bz-lantern bz-lantern--s3"></span>
+                <span class="bz-lantern bz-lantern--s4"></span>
+                <span class="bz-lantern bz-lantern--s5"></span>
+                <span class="bz-lantern bz-lantern--s6"></span>
+              </div>
+              <div class="bz-glow"></div>
+              <div class="bz-particles" id="bz-particles"></div>
+              <div class="bz-vignette"></div>
+            </div>
+
+            <div class="bz-world">
+              <!-- no celular o logo aparece aqui, em cima da maquina -->
+              <div class="bz-logo bz-logo--stage" data-bz-logo aria-hidden="true">
+                <span class="bz-logo-txt">BAZINGUINHA</span>
               </div>
 
-              <div class="ft-body">
-                <div class="ft-side" id="ft-side-left">
-                  <span class="ft-line-dot" data-line="1">2</span>
-                  <span class="ft-line-dot" data-line="0">1</span>
-                  <span class="ft-line-dot" data-line="2">3</span>
-                </div>
+              <!-- telas largas: pergaminhos com regras e premios dos lados da maquina -->
+              <div class="bz-board bz-board--left" id="bz-board-left" aria-hidden="true"></div>
+              <div class="bz-board bz-board--right" id="bz-board-right" aria-hidden="true"></div>
 
-                <div class="ft-window">
-                  <div class="ft-grid" id="ft-grid">
-                    <div class="ft-col"><div class="ft-strip" id="fstrip-0"></div></div>
-                    <div class="ft-col"><div class="ft-strip" id="fstrip-1"></div></div>
-                    <div class="ft-col"><div class="ft-strip" id="fstrip-2"></div></div>
+              <div class="ft-machine" id="ft-machine">
+                <div class="ft-top">
+                  <!-- telhado: desenho SVG proprio ou assets/bazinguinha/topo.webp -->
+                  <div class="bz-roof" id="bz-roof" aria-hidden="true">
+                    <svg class="bz-roof-svg" viewBox="0 0 500 150" preserveAspectRatio="xMidYMid meet" focusable="false">
+                      <defs>
+                        <linearGradient id="bzJade" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stop-color="#6ff2c6" />
+                          <stop offset="0.35" stop-color="#22b386" />
+                          <stop offset="1" stop-color="#0a5a43" />
+                        </linearGradient>
+                        <linearGradient id="bzGold" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stop-color="#fff4b8" />
+                          <stop offset="0.45" stop-color="#f5bf3c" />
+                          <stop offset="1" stop-color="#a8640b" />
+                        </linearGradient>
+                        <linearGradient id="bzRed" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stop-color="#ec3443" />
+                          <stop offset="1" stop-color="#8a0915" />
+                        </linearGradient>
+                        <radialGradient id="bzPearl" cx="0.38" cy="0.32" r="0.7">
+                          <stop offset="0" stop-color="#fffbe0" />
+                          <stop offset="0.45" stop-color="#ffd24a" />
+                          <stop offset="1" stop-color="#c47a0c" />
+                        </radialGradient>
+                        <pattern id="bzTiles" width="13" height="150" patternUnits="userSpaceOnUse">
+                          <rect x="0" y="0" width="3" height="150" fill="#063d2e" opacity="0.55" />
+                          <rect x="4" y="0" width="2" height="150" fill="#b5ffe6" opacity="0.28" />
+                        </pattern>
+                        <clipPath id="bzRoofClip">
+                          <path d="M150 34 L350 34 C372 66 420 84 496 66 C488 78 478 88 462 94 C420 104 380 106 340 106 L160 106 C120 106 80 104 38 94 C22 88 12 78 4 66 C80 84 128 66 150 34 Z" />
+                        </clipPath>
+                      </defs>
+                      <!-- vigas/colunas de apoio (encaixam nas colunas vermelhas da maquina) -->
+                      <rect x="30" y="122" width="42" height="30" rx="3" fill="url(#bzRed)" stroke="#5c1a00" stroke-width="2" />
+                      <rect x="428" y="122" width="42" height="30" rx="3" fill="url(#bzRed)" stroke="#5c1a00" stroke-width="2" />
+                      <rect x="30" y="122" width="42" height="6" fill="url(#bzGold)" />
+                      <rect x="428" y="122" width="42" height="6" fill="url(#bzGold)" />
+                      <!-- viga vermelha com frisos dourados -->
+                      <rect x="36" y="104" width="428" height="24" rx="4" fill="url(#bzRed)" stroke="#5c1a00" stroke-width="2" />
+                      <rect x="36" y="105" width="428" height="3" fill="#ffd45a" />
+                      <rect x="36" y="124" width="428" height="3" fill="#ffd45a" />
+                      <path d="M64 116 H436" stroke="#ffd45a" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 31" fill="none" />
+                      <path d="M64 116 H436" stroke="#8a0915" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0 31" fill="none" />
+                      <!-- telhado de telhas verde-jade com pontas curvas -->
+                      <path d="M150 34 L350 34 C372 66 420 84 496 66 C488 78 478 88 462 94 C420 104 380 106 340 106 L160 106 C120 106 80 104 38 94 C22 88 12 78 4 66 C80 84 128 66 150 34 Z" fill="url(#bzJade)" stroke="#03281e" stroke-width="3" stroke-linejoin="round" />
+                      <rect x="0" y="0" width="500" height="150" fill="url(#bzTiles)" clip-path="url(#bzRoofClip)" />
+                      <path d="M160 46 C200 42 300 42 340 46" stroke="#c9ffee" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55" />
+                      <!-- beiral dourado com pontas das telhas -->
+                      <path d="M4 66 C12 78 22 88 38 94 C80 104 120 106 160 106 L340 106 C380 106 420 104 462 94 C478 88 488 78 496 66" stroke="#5c1a00" stroke-width="9" stroke-linecap="round" fill="none" />
+                      <path d="M4 66 C12 78 22 88 38 94 C80 104 120 106 160 106 L340 106 C380 106 420 104 462 94 C478 88 488 78 496 66" stroke="url(#bzGold)" stroke-width="5" stroke-linecap="round" fill="none" />
+                      <path d="M30 90 C80 100 120 101 160 101 L340 101 C380 101 420 100 470 90" stroke="#ffe27a" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 17" fill="none" />
+                      <!-- cumeeira com pontas enroladas e a perola da sorte -->
+                      <path d="M150 30 C130 30 120 17 127 6 C131 0 141 2 140 10" stroke="#5c1a00" stroke-width="10" stroke-linecap="round" fill="none" />
+                      <path d="M350 30 C370 30 380 17 373 6 C369 0 359 2 360 10" stroke="#5c1a00" stroke-width="10" stroke-linecap="round" fill="none" />
+                      <path d="M150 30 C130 30 120 17 127 6 C131 0 141 2 140 10" stroke="url(#bzGold)" stroke-width="5.5" stroke-linecap="round" fill="none" />
+                      <path d="M350 30 C370 30 380 17 373 6 C369 0 359 2 360 10" stroke="url(#bzGold)" stroke-width="5.5" stroke-linecap="round" fill="none" />
+                      <rect x="144" y="24" width="212" height="13" rx="6" fill="url(#bzGold)" stroke="#5c1a00" stroke-width="2.5" />
+                      <circle cx="250" cy="15" r="11" fill="url(#bzPearl)" stroke="#5c1a00" stroke-width="2.5" />
+                      <circle cx="246" cy="11" r="3" fill="#fff" opacity="0.8" />
+                      <!-- ganchos das lanternas -->
+                      <path d="M18 70 V80 M482 70 V80" stroke="#ffd45a" stroke-width="2.5" stroke-linecap="round" />
+                    </svg>
+                    <span class="bz-lantern bz-lantern--roof bz-lantern--l"></span>
+                    <span class="bz-lantern bz-lantern--roof bz-lantern--r"></span>
                   </div>
-                  <svg class="ft-winlines" id="ft-winlines" viewBox="0 0 300 300" preserveAspectRatio="none"></svg>
+
+                  <!-- Mascote: O Menor Quentão (CSS) ou assets/bazinguinha/mascote*.webp -->
+                  <div class="bz-mascot" id="bz-mascot">
+                    <div class="mq-mascot" id="mq-mascot" role="img" aria-label="O Menor Quentão">
+                      <span class="mq-shadow"></span>
+                      <span class="mq-flame"><b></b><b></b><b></b></span>
+                      <span class="mq-arm mq-arm--l"></span>
+                      <span class="mq-arm mq-arm--r"></span>
+                      <span class="mq-head">
+                        <span class="mq-shades"><b></b><b></b></span>
+                        <span class="mq-cheek mq-cheek--l"></span>
+                        <span class="mq-cheek mq-cheek--r"></span>
+                        <span class="mq-mouth"></span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="ft-side" id="ft-side-right">
-                  <span class="ft-line-dot" data-line="3">4</span>
-                  <span class="ft-line-dot" data-line="0">1</span>
-                  <span class="ft-line-dot" data-line="4">5</span>
+                <div class="ft-cabinet">
+                  <div class="ft-body">
+                    <div class="ft-side" id="ft-side-left">
+                      <span class="ft-line-dot" data-line="3" style="--y:22">4</span>
+                      <span class="ft-line-dot" data-line="1" style="--y:68">2</span>
+                      <span class="ft-line-dot" data-line="0" style="--y:168">1</span>
+                      <span class="ft-line-dot" data-line="2" style="--y:268">3</span>
+                      <span class="ft-line-dot" data-line="4" style="--y:314">5</span>
+                    </div>
+
+                    <div class="ft-window">
+                      <div class="ft-grid" id="ft-grid">
+                        <div class="ft-col"><div class="ft-strip" id="fstrip-0"></div></div>
+                        <div class="ft-col"><div class="ft-strip" id="fstrip-1"></div></div>
+                        <div class="ft-col"><div class="ft-strip" id="fstrip-2"></div></div>
+                      </div>
+                      <svg class="ft-winlines" id="ft-winlines" viewBox="0 0 300 300" preserveAspectRatio="none" aria-hidden="true"></svg>
+                    </div>
+
+                    <div class="ft-side" id="ft-side-right">
+                      <span class="ft-line-dot" data-line="4" style="--y:22">5</span>
+                      <span class="ft-line-dot" data-line="1" style="--y:68">2</span>
+                      <span class="ft-line-dot" data-line="0" style="--y:168">1</span>
+                      <span class="ft-line-dot" data-line="2" style="--y:268">3</span>
+                      <span class="ft-line-dot" data-line="3" style="--y:314">4</span>
+                    </div>
+                  </div>
+
+                  <div class="bz-ribbon">
+                    <div class="ft-banner" id="ft-banner">Ganhe até 2500x!</div>
+                  </div>
+
+                  <div class="ft-bar">
+                    <div class="ft-bar-item ft-bar-item--saldo">
+                      <i class="bz-pill-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H17v2.5" /><rect x="3.5" y="7.5" width="17" height="12" rx="2.5" /><path d="M20.5 11.5H16a2 2 0 0 0 0 4h4.5" /></svg></i>
+                      <span>Saldo</span><strong id="ft-balance">—</strong>
+                    </div>
+                    <div class="ft-bar-item ft-bar-item--aposta">
+                      <i class="bz-pill-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="3.8" /><path d="M12 3.5v3M12 17.5v3M3.5 12h3M17.5 12h3" /></svg></i>
+                      <span>Aposta</span><strong id="ft-bet">—</strong>
+                    </div>
+                    <div class="ft-bar-item ft-bar-item--ganho">
+                      <i class="bz-pill-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3" /></svg></i>
+                      <span>Ganho</span><strong id="ft-win">BZ$ 0</strong>
+                    </div>
+                  </div>
+
+                  <div class="ft-controls">
+                    <button type="button" class="ft-round ft-menu" id="bz-menu" aria-label="Prêmios e regras" aria-expanded="false" aria-controls="bz-info" title="Prêmios e regras">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16" /></svg>
+                    </button>
+                    <div class="ft-controls-mid">
+                      <button type="button" class="ft-adj" id="ft-minus" aria-label="Diminuir aposta" title="Diminuir aposta">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 12h13" /></svg>
+                      </button>
+                      <button type="button" class="ft-spin-btn" id="ft-spin" aria-label="Girar" title="Girar">
+                        <span>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 9.6A7.2 7.2 0 0 1 17.6 7" /><path d="M18.6 3.2v4.4h-4.4" /><path d="M18.8 14.4A7.2 7.2 0 0 1 6.4 17" /><path d="M5.4 20.8v-4.4h4.4" /></svg>
+                        </span>
+                      </button>
+                      <button type="button" class="ft-adj" id="ft-plus" aria-label="Aumentar aposta" title="Aumentar aposta">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" /></svg>
+                      </button>
+                    </div>
+                    <button type="button" class="ft-round ft-turbo" id="bz-turbo" aria-label="Modo Turbo" aria-pressed="false" title="Modo Turbo">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2.5L5 13.5h6.2l-1.2 8l8.5-11h-6.3z" /></svg>
+                      <b class="ft-turbo-lock" aria-hidden="true">🔒</b>
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div class="ft-banner" id="ft-banner">⚡ Ganhe até 2500x! ⚡</div>
-
-              <div class="ft-bar">
-                <div class="ft-bar-item"><span>Saldo</span><strong id="ft-balance">—</strong></div>
-                <div class="ft-bar-item"><span>Aposta</span><strong id="ft-bet">—</strong></div>
-                <div class="ft-bar-item"><span>Ganho</span><strong id="ft-win">BZ$ 0</strong></div>
-              </div>
-
-              <div class="ft-controls">
-                <button class="ft-adj" id="ft-minus" title="Diminuir aposta">−</button>
-                <button class="ft-spin-btn" id="ft-spin" title="Girar"><span>⟳</span></button>
-                <button class="ft-adj" id="ft-plus" title="Aumentar aposta">+</button>
+                <!-- folha de premios e regras (botao de menu) -->
+                <div class="bz-info" id="bz-info" role="dialog" aria-labelledby="bz-info-title" hidden>
+                  <div class="bz-info-head">
+                    <h2 id="bz-info-title">Prêmios e regras</h2>
+                    <button type="button" class="bz-info-close" id="bz-info-close" aria-label="Fechar prêmios e regras">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                    </button>
+                  </div>
+                  <div class="bz-info-body" id="bz-info-body"></div>
+                </div>
               </div>
             </div>
           </section>

@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.27
+# 🎰 Bazinga BET — v1.28
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,13 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.28 (2026-10-01) — 🏮 Bazinguinha e 🍭 Bonanza com tela imersiva
+- **Bazinguinha no estilo "tigrinho"** (arte própria): máquina em retrato com telhado de telhas verde-jade, lanternas balançando e o mascote O Menor Quentão sentado em cima dos rolos; rolos creme com moldura dourada e moedinhas com os números das 5 linhas; faixa vermelha e dourada com o ganho grande; pílulas de Saldo/Aposta/Ganho; botão de girar redondo verde-jade, −/+, menu "Prêmios e regras" e turbo ⚡. A área do jogo ocupa a altura da tela e a máquina cresce junto; em telas largas aparecem pergaminhos com as regras dos lados. Cenário de pátio de festa à noite, linhas vencedoras douradas se desenhando, símbolos vencedores pulsando, mascote reagindo.
+- **Bazinga Bonanza no estilo Pragmatic** (Sweet/Gems Bonanza): palco imersivo em terra dos doces (nuvens, morros de bala, pirulito), logo no canto, grade grande num tabuleiro de vidro com borda dourada, cards "Comprar bônus" e "Aposta" à esquerda, Estrela-Bônus flutuando e botão de girar redondo à direita, barra de saldo e ganho embaixo. Rodadas grátis mudam o clima (noite magenta, raios, contador grande de rodadas e ganho total). Tabela de pagamentos montada direto dos dados do jogo.
+- **Imagens do Codex com plano B**: novo `js/core/assets.js` (`BZG.assets.preload`) — os dois jogos usam cenário, logo, topo, mascotes e símbolos de `assets/bazinguinha/` e `assets/bonanza/` assim que existirem (prompt em `docs/codex-slots-logo.md`) e, enquanto não existem, ficam com os desenhos SVG/CSS.
+- **Matemática intacta**: pesos, pagamentos, chances e SCALE conferidos linha a linha contra a versão anterior.
+- **Correções gerais**: painel de aposta não estoura mais a largura no celular (bug da v1.27), a topbar cabe em tablets e notebooks (esconde os mini-stats extras abaixo de 1600px, saldo nunca quebra linha) e saíram do repositório capturas de tela de teste que tinham entrado por engano.
 
 ### v1.27 (2026-10-01) — 🖥️ Site usa a tela toda + banner com todos os jogos
 - **Mais espaço na tela**: a área central deixou de ter 1160px de largura máxima e passou a ocupar quase a tela toda (até 2200px, com margem de 16–40px). O lobby mostra mais cartões por linha e a área dos jogos fica maior.
