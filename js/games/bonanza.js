@@ -9,7 +9,10 @@
    Pagamentos calibrados por Monte Carlo (5M giros): RTP ~95%, disparo de gratis ~1 em 210.
    v3 (visual): palco imersivo estilo Pragmatic - cenario, logo, mascote (Estrela-Bonus),
    botao de girar redondo, barra de saldo/ganho e imagens opcionais do Codex
-   (assets/bonanza/) que entram sozinhas quando existirem. A matematica nao mudou. */
+   (assets/bonanza/) que entram sozinhas quando existirem. A matematica nao mudou.
+   v4 (visual): tema caverna/templo antigo (estilo Gems Bonanza) - "Joias dos Bazingas",
+   tabuleiro de pedra com moldura de ouro, Guardiao (idolo de pedra) no lugar da
+   Estrela-Bonus. Sem imagens, o idolo e o orbe sao SVG desenhados aqui. Matematica igual. */
 (function () {
   var COLS = 6, ROWS = 5, N = COLS * ROWS;
   var SCALE = 0.972;   // ajuste fino global do RTP
@@ -124,14 +127,51 @@
     mascote: IMG_DIR + "mascote.webp", vitoria: IMG_DIR + "mascote-vitoria.webp" };
   var imgSym = {};      // emoji -> caminho da imagem que carregou
   var imgScene = {};    // fundo/logo/mascote/vitoria -> true se carregou
+  // nomes exibidos (tabela de pagamentos / legendas); nao mexem na matematica
+  var SYM_NAME = { "💎": "Diamante BZG", "🍰": "Rubi do Panetone", "🍑": "Quartzo do Bogão", "🃏": "Ametista do Pitoco",
+    "🎲": "Jade do 616", "🥒": "Esmeralda do Pikles", "🔋": "Topázio da Pilha", "🎃": "Âmbar da Abóbora",
+    "🎇": "Ídolo BZG", "💣": "Orbe multiplicador" };
+
+  /* fallbacks desenhados (sem imagem): idolo de pedra com olhos de joia e orbe de cristal.
+     So cores chapadas (sem gradiente com id) para poder repetir o SVG varias vezes na pagina. */
+  var IDOL_SVG =
+    '<path d="M13 55h38l3 7H10z" fill="#2c3238" stroke="#0b1418" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M17 22h30v30a4 4 0 0 1-4 4H21a4 4 0 0 1-4-4z" fill="#68717a" stroke="#0b1418" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<path d="M38 24h8v28a3 3 0 0 1-3 3h-5z" fill="#4a535b"/>' +
+    '<path d="M19 24h4v30h-1a3 3 0 0 1-3-3z" fill="#7d868f"/>' +
+    '<path d="M44 29l-3 5 2 3-2 5" fill="none" stroke="#353c43" stroke-width="1.3" stroke-linecap="round"/>' +
+    '<path d="M13 23l6-12 6 6 7-13 7 13 6-6 6 12z" fill="#c9a24a" stroke="#0b1418" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<path d="M14 21h36v6H14z" fill="#f2d27a" stroke="#0b1418" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M32 8l3.5 4.5L32 17l-3.5-4.5z" fill="#2ee59d" stroke="#0b1418" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M21 31.5h8.5M34.5 31.5H43" stroke="#0b1418" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<circle class="bz-idol-glow" cx="25.5" cy="37.5" r="6.5" fill="#4fe3d0" opacity="0.35"/>' +
+    '<circle class="bz-idol-glow" cx="38.5" cy="37.5" r="6.5" fill="#4fe3d0" opacity="0.35"/>' +
+    '<path d="M25.5 33.5l4 4-4 4-4-4z" fill="#4fe3d0" stroke="#0b1418" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<path d="M38.5 33.5l4 4-4 4-4-4z" fill="#4fe3d0" stroke="#0b1418" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<circle cx="24.4" cy="36.4" r="1.1" fill="#ffffff"/><circle cx="37.4" cy="36.4" r="1.1" fill="#ffffff"/>' +
+    '<path d="M32 41v4.5" stroke="#353c43" stroke-width="2" stroke-linecap="round"/>' +
+    '<path d="M25 49.5h14" stroke="#0b1418" stroke-width="3" stroke-linecap="round"/>';
+  var ORB_SVG =
+    '<circle cx="32" cy="32" r="26" fill="#c9a24a" stroke="#0b1418" stroke-width="2.5"/>' +
+    '<circle cx="32" cy="32" r="21" fill="#0d3b40" stroke="#0b1418" stroke-width="2"/>' +
+    '<circle cx="32" cy="34" r="15" fill="#13646a"/>' +
+    '<circle class="bz-orb-core" cx="32" cy="35" r="9" fill="#4fe3d0" opacity="0.75"/>' +
+    '<ellipse cx="24.5" cy="23.5" rx="6.5" ry="4" fill="#ffffff" opacity="0.55" transform="rotate(-30 24.5 23.5)"/>' +
+    '<path d="M32 6v5M32 53v5M6 32h5M53 32h5" stroke="#f2d27a" stroke-width="2.2" stroke-linecap="round"/>';
+  function drawn(svg, size, cls) {
+    return '<svg class="bzg-icon ' + cls + '" width="' + size + '" height="' + size + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false">' + svg + '</svg>';
+  }
+
   var reduceMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   function symArt(icon, size) {
     if (imgSym[icon]) return '<img class="sym-img" src="' + imgSym[icon] + '" alt="" draggable="false">';
+    if (icon === SCATTER) return drawn(IDOL_SVG, size || 64, "bz-idol");
+    if (icon === "💣") return drawn(ORB_SVG, size || 64, "bz-orb");
     return BZG.icons && SYM_ART[icon] ? BZG.icons.art(SYM_ART[icon], size || 64) : icon;
   }
   function symInline(icon) {
-    return '<span class="sym-inline" data-sym="' + icon + '">' + symArt(icon, 22) + '</span>';
+    return '<span class="sym-inline" data-sym="' + icon + '" title="' + (SYM_NAME[icon] || "") + '">' + symArt(icon, 22) + '</span>';
   }
   function symbolizeText(el) {
     var html = el.innerHTML;
@@ -220,7 +260,7 @@
     bannerEl.innerHTML = '<span class="bz-banner-sym">' + symArt(icon, 64) + '</span>' + text;
   }
 
-  /* ---------- mascote (Estrela-Bonus) ---------- */
+  /* ---------- mascote (Guardiao: idolo de pedra com olhos de joia) ---------- */
   var cheerTimer = null, bubbleTimer = null;
   function renderMascot() {
     if (!mascotBody) return;
@@ -230,7 +270,7 @@
       mascotEl.classList.add("has-img");
       mascotEl.classList.toggle("has-win", !!imgScene.vitoria);
     } else {
-      mascotBody.innerHTML = BZG.icons ? BZG.icons.art("s-bonus", 240) : "🎇";
+      mascotBody.innerHTML = drawn(IDOL_SVG, 240, "bz-idol bz-idol--guard");
     }
   }
   function showBubble(text) {
@@ -530,7 +570,7 @@
     } else {
       winEl.className = "bonanza-win";
       setWinText(0);
-      setStatus(isBuyRound ? "As rodadas grátis não pagaram desta vez." : "Nenhum símbolo com 8+. Tente outra vez!");
+      setStatus(isBuyRound ? "As rodadas grátis não pagaram desta vez." : "Nenhuma joia com 8+. Tente outra vez!");
       BZG.sounds.lose();
     }
 
@@ -562,22 +602,23 @@
     if (!box) return;
     box.innerHTML = SYMBOLS.map(function (s) {
       return '<div class="bz-pay-card">' + symInline(s.icon) +
+        '<div class="bz-pay-body"><span class="bz-pay-name">' + SYM_NAME[s.icon] + '</span>' +
         '<dl>' +
         '<div><dt>12+</dt><dd>' + s.pay[2] + 'x</dd></div>' +
         '<div><dt>10-11</dt><dd>' + s.pay[1] + 'x</dd></div>' +
         '<div><dt>8-9</dt><dd>' + s.pay[0] + 'x</dd></div>' +
-        '</dl></div>';
+        '</dl></div></div>';
     }).join("");
   }
 
-  /* brilhinhos subindo no cenario (so transform/opacity) */
+  /* poeira dourada e faiscas de joia subindo no cenario (so transform/opacity) */
   function makeSparkles() {
     var box = document.getElementById("bonanza-sparkles");
     if (!box) return;
     var html = "";
     for (var i = 0; i < 18; i++) {
       var s = (3 + Math.random() * 6).toFixed(1);
-      html += '<i style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (12 + Math.random() * 84).toFixed(1) +
+      html += '<i' + (i % 3 === 0 ? ' class="c"' : '') + ' style="left:' + (Math.random() * 100).toFixed(1) + '%;top:' + (12 + Math.random() * 84).toFixed(1) +
         '%;width:' + s + 'px;height:' + s + 'px;animation-delay:-' + (Math.random() * 9).toFixed(2) +
         's;animation-duration:' + (6 + Math.random() * 6).toFixed(2) + 's"></i>';
     }

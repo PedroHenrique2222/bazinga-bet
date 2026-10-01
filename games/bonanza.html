@@ -8,7 +8,7 @@
   <script src="../js/core/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
   <link rel="stylesheet" href="../css/games/bonanza.css" />
 </head>
@@ -22,16 +22,20 @@
 
         <div class="game-layout bonanza-layout">
 
-          <!-- palco imersivo: cenario, logo, tabuleiro, mascote e todos os comandos do giro -->
+          <!-- palco imersivo (caverna/templo): cenario, logo, tabuleiro de pedra, guardiao e todos os comandos do giro -->
           <section class="panel stage bz-stage" id="bonanza-stage" aria-label="Mesa do Bazinga Bonanza">
             <div class="bz-scene" aria-hidden="true">
               <div class="bz-scene-img"></div>
-              <div class="bz-cloud bz-cloud--1"></div>
-              <div class="bz-cloud bz-cloud--2"></div>
-              <div class="bz-cloud bz-cloud--3"></div>
-              <div class="bz-cloud bz-cloud--4"></div>
-              <div class="bz-hills"></div>
-              <div class="bz-lolly"></div>
+              <!-- caverna/templo em CSS (some quando o fundo.webp existe) -->
+              <div class="bz-cave"></div>
+              <div class="bz-arch"></div>
+              <div class="bz-pillar bz-pillar--l"></div>
+              <div class="bz-pillar bz-pillar--r"></div>
+              <div class="bz-floor"></div>
+              <div class="bz-crystals bz-crystals--l"><i></i><i></i><i></i></div>
+              <div class="bz-crystals bz-crystals--r"><i></i><i></i><i></i></div>
+              <div class="bz-torch bz-torch--l"><span class="bz-torch-glow"></span><span class="bz-torch-flame"></span></div>
+              <div class="bz-torch bz-torch--r"><span class="bz-torch-glow"></span><span class="bz-torch-flame"></span></div>
               <div class="bz-scene-free"></div>
               <div class="bz-free-rays"></div>
               <div class="bz-sparkles" id="bonanza-sparkles"></div>
@@ -66,7 +70,11 @@
 
               <div class="bz-center">
                 <div class="bonanza-frame">
-                  <div class="bonanza-grid" id="bonanza-grid" role="img" aria-label="Grade de símbolos 6 por 5"></div>
+                  <span class="bz-corner bz-corner--tl" aria-hidden="true"></span>
+                  <span class="bz-corner bz-corner--tr" aria-hidden="true"></span>
+                  <span class="bz-corner bz-corner--bl" aria-hidden="true"></span>
+                  <span class="bz-corner bz-corner--br" aria-hidden="true"></span>
+                  <div class="bonanza-grid" id="bonanza-grid" role="img" aria-label="Grade de joias 6 por 5"></div>
                   <div class="bonanza-banner" id="bonanza-banner" aria-hidden="true"></div>
                 </div>
               </div>
@@ -74,6 +82,7 @@
               <div class="bz-right">
                 <div class="bz-mascot" id="bonanza-mascot" aria-hidden="true">
                   <div class="bz-rays"></div>
+                  <div class="bz-niche"></div>
                   <div class="bz-mascot-float">
                     <div class="bz-mascot-body" id="bonanza-mascot-body"></div>
                   </div>
@@ -84,10 +93,10 @@
                   <button type="button" id="spin-btn" class="bz-spin" aria-label="Girar" title="Girar">
                     <svg class="bz-spin-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
                       <g fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15.09 25.84A18 18 0 0 1 48.91 25.84M48.91 38.16A18 18 0 0 1 15.09 38.16" stroke="#4a0f6b" stroke-width="11" />
-                        <path d="M51.3 32.4L43.27 27.89L54.55 23.79ZM12.7 31.58L20.73 36.11L9.45 40.21Z" fill="#4a0f6b" stroke="#4a0f6b" stroke-width="5" />
-                        <path d="M15.09 25.84A18 18 0 0 1 48.91 25.84M48.91 38.16A18 18 0 0 1 15.09 38.16" stroke="#ffffff" stroke-width="6" />
-                        <path d="M51.3 32.4L43.27 27.89L54.55 23.79ZM12.7 31.58L20.73 36.11L9.45 40.21Z" fill="#ffffff" stroke="#ffffff" stroke-width="1.5" />
+                        <path d="M15.09 25.84A18 18 0 0 1 48.91 25.84M48.91 38.16A18 18 0 0 1 15.09 38.16" stroke="#120d05" stroke-width="11" />
+                        <path d="M51.3 32.4L43.27 27.89L54.55 23.79ZM12.7 31.58L20.73 36.11L9.45 40.21Z" fill="#120d05" stroke="#120d05" stroke-width="5" />
+                        <path d="M15.09 25.84A18 18 0 0 1 48.91 25.84M48.91 38.16A18 18 0 0 1 15.09 38.16" stroke="#f2d27a" stroke-width="6" />
+                        <path d="M51.3 32.4L43.27 27.89L54.55 23.79ZM12.7 31.58L20.73 36.11L9.45 40.21Z" fill="#f2d27a" stroke="#f2d27a" stroke-width="1.5" />
                       </g>
                     </svg>
                   </button>
@@ -117,7 +126,7 @@
           <section class="panel bz-info" id="bonanza-info">
             <div class="bz-info-col">
               <h2 class="section-title">Como funciona</h2>
-              <p class="bz-howto">Sem linhas! <strong>8 ou mais</strong> símbolos iguais em <strong>qualquer lugar</strong> da grade pagam. Os vencedores explodem, novos caem (cascata) e você pode ganhar de novo no mesmo giro.</p>
+              <p class="bz-howto">Sem linhas! <strong>8 ou mais</strong> joias iguais em <strong>qualquer lugar</strong> da grade pagam. Os vencedores explodem, novos caem (cascata) e você pode ganhar de novo no mesmo giro.</p>
               <details class="paytable bz-paytable" id="bonanza-paytable-box" open>
                 <summary>Pagamentos (8-9 · 10-11 · 12+ iguais)</summary>
                 <div class="bz-pay-grid" id="bonanza-paytable"></div>
@@ -127,12 +136,12 @@
 
             <div class="bz-info-col">
               <div class="paytable">
-                <h2 class="section-title">🎇 Bônus &amp; 💣 Multiplicadores</h2>
-                <div class="paytable-row"><span>🎇 4+ Bônus</span><strong>10 grátis</strong></div>
-                <div class="paytable-row"><span>🎇 4 / 5 / 6+ Bônus</span><strong>1x / 2x / 20x</strong></div>
-                <div class="paytable-row"><span>💣 Bombas</span><strong>×2 até ×100</strong></div>
+                <h2 class="section-title">🎇 Ídolo BZG &amp; 💣 Orbes</h2>
+                <div class="paytable-row"><span>🎇 4+ Ídolo BZG</span><strong>10 grátis</strong></div>
+                <div class="paytable-row"><span>🎇 4 / 5 / 6+ Ídolo BZG</span><strong>1x / 2x / 20x</strong></div>
+                <div class="paytable-row"><span>💣 Orbe multiplicador</span><strong>×2 até ×100</strong></div>
                 <div class="paytable-row"><span>Comprar Grátis (10 rodadas)</span><strong>20x a aposta</strong></div>
-                <p class="bz-note">Nas rodadas grátis chovem bombas 💣 — todas somam e multiplicam o ganho do giro. Pegar 3+ 🎇 numa grátis dá +5 rodadas.</p>
+                <p class="bz-note">Nas rodadas grátis aparecem muito mais orbes 💣 — todos somam e multiplicam o ganho do giro. Pegar 3+ 🎇 numa grátis dá +5 rodadas.</p>
               </div>
             </div>
 
