@@ -52,15 +52,15 @@
   };
   var SYM_IMG = {
     "⚡": IMG_DIR + "sym-wild.webp",
-    "🍑": IMG_DIR + "sym-lingote.webp",
-    "🍰": IMG_DIR + "sym-saco.webp",
-    "🥒": IMG_DIR + "sym-envelope.webp",
-    "🔋": IMG_DIR + "sym-fogos.webp",
-    "🎃": IMG_DIR + "sym-laranja.webp"
+    "🍑": IMG_DIR + "sym-pessego.webp",   // Bogao (premio mais alto)
+    "🍰": IMG_DIR + "sym-panetone.webp",
+    "🥒": IMG_DIR + "sym-picles.webp",
+    "🔋": IMG_DIR + "sym-pilha.webp",
+    "🎃": IMG_DIR + "sym-abobora.webp"
   };
   var symImgOk = {}; // emoji -> true quando a imagem do simbolo carregou
   var SYM_NAME = { "⚡": "WILD", "🍑": "Pêssego", "🍰": "Bolo", "🥒": "Picles", "🔋": "Pilha", "🎃": "Abóbora" };
-  var SYM_NAME_IMG = { "⚡": "WILD", "🍑": "Lingote", "🍰": "Saco da sorte", "🥒": "Envelope", "🔋": "Bombinhas", "🎃": "Laranja" };
+  var SYM_NAME_IMG = { "⚡": "WILD", "🍑": "Pêssego do Bogão", "🍰": "Panetone", "🥒": "Picles", "🔋": "Pilha", "🎃": "Abóbora" };
 
   var betInput, statusEl, historyListEl, gridEl, stageEl, stripEls, machineEl, windowEl,
       bannerEl, barBalanceEl, barBetEl, barWinEl, spinBtn, minusBtn, plusBtn, winlinesEl, lineDots, mascotEl,
