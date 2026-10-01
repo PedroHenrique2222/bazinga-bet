@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.24
+# 🎰 Bazinga BET — v1.25
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.25 (2026-10-01) — 🎡 Roleta com giro de verdade
+- **Roda redesenhada** (`drawWheel` em `roulette.js`): aro de madeira, pista com losangos defletores, casas com separadores dourados, prato central com torre e cruz que giram junto, e desenho nítido em telas retina (canvas 400px lógico × densidade da tela).
+- **Bolinha de verdade**: a roda gira num sentido e desacelera; a bolinha corre na pista no sentido contrário, perde velocidade, **desce quicando** pelas casas (com "tec-tec" a cada separador) e **assenta** no número — daí gira junto com a roda. O número continua sorteado antes (RNG justo); a animação só leva a bolinha até ele. A casa onde caiu brilha e o número aparece no centro.
+- **Câmera aproxima** a roda quando a bolinha começa a cair (respeita `prefers-reduced-motion`). Giro de 6s (metade no Turbo).
 
 ### v1.24 (2026-10-01) — 🧈 Animações fluidas nos caça-níqueis + Plinko consertado
 - **Plinko consertado**: as abóboras ficavam paradas em cima dos pinos da penúltima fileira e só caíam pelo limite de 10s. Causa: o "assentar na casa sorteada" puxava a bolinha para o centro da casa antes de ela passar pela penúltima fileira, cujos pinos ficam exatamente em cima desse centro. Agora o assentar só começa depois dessa fileira, e uma bolinha que bate reto no topo de um pino escorrega para o lado. Queda volta a levar ~2,5–4,5s (antes: 10s cravados).
