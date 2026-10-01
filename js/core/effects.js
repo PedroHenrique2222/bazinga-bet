@@ -122,6 +122,7 @@ BZG.effects = (function () {
      ao passar de cada faixa, o nivel "sobe ao vivo" com flash, anel e aviso.
      Confete, moedas e fogos aumentam a cada nivel; no BAZINGA a tela treme. */
 
+  var BW_ROOT = /\/(games|minigames)\//.test(location.pathname) ? "../" : "";
   var BW_TIERS = [
     { key: "grande", label: "GRANDE<br>VITÓRIA", coins: 12, confetti: 24, bursts: 0 },
     { key: "mega", label: "MEGA<br>VITÓRIA", coins: 24, confetti: 48, bursts: 3, badge: "SUBIU DE NÍVEL!" },
@@ -209,6 +210,8 @@ BZG.effects = (function () {
       particles.innerHTML = particlesHTML(t);
       tierLayer.innerHTML =
         '<div class="bw-flash"></div><div class="bw-ring"></div>' +
+        // arte da comemoracao do nivel (assets/bigwin/<nivel>.webp, Codex); some se nao existir
+        '<img class="bw-art" src="' + BW_ROOT + 'assets/bigwin/' + t.key + '.webp" alt="" onerror="this.remove()">' +
         (i > 0 ? '<div class="bw-badge">' + t.badge + '</div>' : '') +
         '<div class="bw-title"><span>' + t.label + '</span></div>';
       stage.classList.remove("bw-shake", "bw-shake-hard");

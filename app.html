@@ -5,54 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bazinga BET</title>
   <link rel="icon" type="image/webp" href="assets/logo/icone.webp" />
-  <style>
-    html, body { margin: 0; height: 100%; background: #0f1923; overflow: hidden; }
-    #bzg-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-  </style>
-</head>
-<body>
-  <!-- Moldura do site: guarda o player da musica e mostra as paginas num iframe.
-       Trocar de pagina so troca o iframe, entao a musica nunca para. -->
-  <iframe id="bzg-frame" title="Bazinga BET"></iframe>
-
-  <script src="js/core/sounds.js"></script>
+  <!-- A moldura da musica de fundo foi removida (v1.31). Links antigos no formato
+       app.html#games/crash.html continuam funcionando: vao direto para a pagina. -->
   <script>
     (function () {
-      // as paginas dentro do iframe pedem a musica para esta moldura (ver sounds.js)
-      BZG.musicHost = BZG.sounds;
-
-      var frame = document.getElementById("bzg-frame");
-      var base = location.pathname.replace(/[^\/]*$/, "");
-
-      // so caminhos internos do site (evita abrir qualquer coisa vinda do link)
-      function safePath(raw) {
-        var p = decodeURIComponent(raw || "").replace(/^\//, "");
-        if (/^[a-z0-9_\-\/]+\.html(\?[a-z0-9_=&%\-.]*)?$/i.test(p) && p.indexOf("..") === -1 && !/^app\.html/.test(p)) return p;
-        return "index.html";
-      }
-
-      frame.src = safePath(location.hash.slice(1));
-
-      // a cada pagina aberta no iframe: atualiza o endereco e o titulo da aba
-      frame.addEventListener("load", function () {
-        try {
-          var loc = frame.contentWindow.location;
-          var rel = loc.pathname.indexOf(base) === 0 ? loc.pathname.slice(base.length) : loc.pathname;
-          history.replaceState(null, "", "#" + rel + loc.search);
-          document.title = frame.contentDocument.title || "Bazinga BET";
-        } catch (e) {}
-      });
-
-      // colar um link com outro # na mesma aba abre aquela pagina
-      window.addEventListener("hashchange", function () {
-        var want = safePath(location.hash.slice(1));
-        try {
-          var loc = frame.contentWindow.location;
-          if (loc.pathname.slice(base.length) + loc.search === want) return;
-        } catch (e) {}
-        frame.src = want;
-      });
+      var p = decodeURIComponent(location.hash.slice(1) || "").replace(/^\//, "");
+      var ok = /^[a-z0-9_\-\/]+\.html(\?[a-z0-9_=&%\-.]*)?$/i.test(p) && p.indexOf("..") === -1 && !/^app\.html/.test(p);
+      location.replace(ok ? p : "index.html");
     })();
   </script>
-</body>
+</head>
+<body style="background:#0f1923"></body>
 </html>

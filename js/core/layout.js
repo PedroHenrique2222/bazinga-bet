@@ -219,7 +219,6 @@ BZG.layout = (function () {
         '<span id="balance-value">BZ$ 0</span>' +
       '</div>' +
       '<button id="reset-balance-btn" class="btn btn--gold btn--sm" title="Recarrega o saldo para ' + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + '">Recarregar</button>' +
-      '<button class="icon-btn" id="music-btn" title="Música ligada/desligada" aria-label="Música">' + navIcon("musica", "🎵") + '</button>' +
       '<button class="icon-btn" id="sfx-btn" title="Efeitos sonoros ligados/desligados" aria-label="Efeitos sonoros">' + navIcon("som", "🔊") + '</button>' +
       '<button class="icon-btn" id="theme-btn" title="Tema claro/escuro"></button>';
 
@@ -252,19 +251,12 @@ BZG.layout = (function () {
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     });
 
-    var musicBtn = document.getElementById("music-btn");
     var sfxBtn = document.getElementById("sfx-btn");
     function syncSoundIcons() {
-      musicBtn.classList.toggle("off", !BZG.sounds.isMusicEnabled());
       if (!BZG.icons) sfxBtn.textContent = BZG.sounds.isSfxEnabled() ? "🔊" : "🔇";
       sfxBtn.classList.toggle("off", !BZG.sounds.isSfxEnabled());
     }
     syncSoundIcons();
-    musicBtn.addEventListener("click", function () {
-      BZG.sounds.toggleMusic();
-      syncSoundIcons();
-      BZG.sounds.click();
-    });
     sfxBtn.addEventListener("click", function () {
       BZG.sounds.toggleSfx();
       syncSoundIcons();
@@ -511,7 +503,6 @@ BZG.layout = (function () {
 
     renderSidebar(page);
     renderTopbar(title, icon);
-    BZG.sounds.armMusicAutostart();
     wireUiSounds();
 
     updateOnlineCount();

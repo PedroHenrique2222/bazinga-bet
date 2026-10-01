@@ -1333,119 +1333,12 @@ BZG.sounds = (function () {
     });
   }
 
-  /* ---------- Musica ambiente: video do YouTube em loop, escondido ----------
-     So o audio importa - o player fica num divzinho de 1x1px, sem controles,
-     sem aparecer na tela. Precisa de internet; sem ela, so a musica de fundo
-     nao toca (o resto do site, incluindo os efeitos sonoros acima, e local). */
-
-  var YT_VIDEO_ID = "PaFHwTjy1yE";
-
-  var ytPlayer = null;
-  var ytReady = false;
-  var ytApiLoading = false;
-  var wantPlaying = false; // true = deveria estar tocando assim que o player ficar pronto
-
-  function ytVolume() {
-    // le de novo do armazenamento: a pagina dentro da moldura pode ter mudado
-    try {
-      var s = localStorage.getItem("bzgMusicVol");
-      if (s !== null) musicVolPct = clampPct(s, musicVolPct);
-    } catch (e) {}
-    return musicVolPct; // 0-100 (mesma escala do YouTube)
-  }
-
-  function ensureYtApiLoaded(onReady) {
-    if (window.YT && window.YT.Player) { onReady(); return; }
-    var prevCallback = window.onYouTubeIframeAPIReady;
-    window.onYouTubeIframeAPIReady = function () {
-      if (typeof prevCallback === "function") prevCallback();
-      onReady();
-    };
-    if (ytApiLoading) return;
-    ytApiLoading = true;
-    try {
-      var tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-    } catch (e) { /* sem internet ou bloqueado - musica de fundo so nao toca */ }
-  }
-
-  function createYtPlayer() {
-    if (ytPlayer) return;
-    var holder = document.createElement("div");
-    holder.id = "bzg-yt-music";
-    holder.style.cssText = "position:fixed; left:0; bottom:0; width:1px; height:1px; overflow:hidden; opacity:0; pointer-events:none;";
-    document.body.appendChild(holder);
-
-    try {
-      ytPlayer = new window.YT.Player("bzg-yt-music", {
-        videoId: YT_VIDEO_ID,
-        playerVars: {
-          autoplay: 0, controls: 0, disablekb: 1, fs: 0,
-          modestbranding: 1, rel: 0, iv_load_policy: 3,
-          loop: 1, playlist: YT_VIDEO_ID // "loop" sozinho nao repete video unico, precisa do playlist
-        },
-        events: {
-          onReady: function () {
-            ytReady = true;
-            ytPlayer.setVolume(ytVolume());
-            if (wantPlaying) ytPlayer.playVideo();
-          },
-          onStateChange: function (e) {
-            // reforco do loop, caso o truque do playlist falhe
-            if (e.data === window.YT.PlayerState.ENDED) {
-              ytPlayer.seekTo(0);
-              ytPlayer.playVideo();
-            }
-          }
-        }
-      });
-    } catch (e) { /* falha silenciosa */ }
-  }
-
-  /* dentro da moldura (app.html) quem toca a musica e a moldura: o player dela
-     nao e recriado a cada pagina, entao a musica continua sem parar */
-  function musicHost() {
-    try {
-      if (window.parent !== window && window.parent.BZG && window.parent.BZG.musicHost) return window.parent.BZG.musicHost;
-    } catch (e) {}
-    return null;
-  }
-
-  function startMusic() {
-    if (!musicOn) return;
-    var host = musicHost();
-    if (host) { host.startMusic(); return; }
-    wantPlaying = true;
-    if (ytReady && ytPlayer) {
-      try { ytPlayer.setVolume(ytVolume()); ytPlayer.playVideo(); } catch (e) {}
-    } else {
-      ensureYtApiLoaded(createYtPlayer);
-    }
-  }
-
-  function stopMusic() {
-    var host = musicHost();
-    if (host) { host.stopMusic(); return; }
-    wantPlaying = false;
-    if (ytReady && ytPlayer) {
-      try { ytPlayer.pauseVideo(); } catch (e) {}
-    }
-  }
-
-  /* comeca a musica na primeira interacao do usuario (politica de autoplay) */
-  function armMusicAutostart() {
-    var started = false;
-    function onFirstInteract() {
-      if (started) return;
-      started = true;
-      startMusic();
-      document.removeEventListener("pointerdown", onFirstInteract);
-      document.removeEventListener("keydown", onFirstInteract);
-    }
-    document.addEventListener("pointerdown", onFirstInteract);
-    document.addEventListener("keydown", onFirstInteract);
-  }
+  /* ---------- Musica de fundo: removida (v1.31) ----------
+     O site nao tem mais trilha de fundo. As funcoes ficam como "nao faz nada"
+     para nenhuma pagina antiga quebrar se ainda chamar alguma delas. */
+  function startMusic() {}
+  function stopMusic() {}
+  function armMusicAutostart() {}
 
   /* ---------- Controles separados: efeitos e musica ---------- */
 
@@ -1464,23 +1357,9 @@ BZG.sounds = (function () {
     return setSfxEnabled(!sfxOn);
   }
 
-  function isMusicEnabled() {
-    return musicOn;
-  }
-
-  function setMusicEnabled(value) {
-    musicOn = !!value;
-    try { localStorage.setItem("bzgMusic", musicOn ? "on" : "off"); } catch (e) {}
-    var host = musicHost();
-    if (host) host.setMusicEnabled(musicOn);
-    else if (musicOn) startMusic();
-    else stopMusic();
-    return musicOn;
-  }
-
-  function toggleMusic() {
-    return setMusicEnabled(!musicOn);
-  }
+  function isMusicEnabled() { return false; }
+  function setMusicEnabled() { return false; }
+  function toggleMusic() { return false; }
 
   /* volumes (0-100). O dos efeitos vale para esta pagina (cada pagina tem o seu
      AudioContext); o da musica vai para quem toca a musica (a moldura, se houver). */
@@ -1495,18 +1374,8 @@ BZG.sounds = (function () {
     return sfxVolPct;
   }
 
-  function getMusicVolume() { return musicVolPct; }
-
-  function setMusicVolume(pct) {
-    musicVolPct = clampPct(pct, musicVolPct);
-    try { localStorage.setItem("bzgMusicVol", String(musicVolPct)); } catch (e) {}
-    var host = musicHost();
-    if (host && host.setMusicVolume) { host.setMusicVolume(musicVolPct); return musicVolPct; }
-    if (ytReady && ytPlayer) {
-      try { ytPlayer.setVolume(musicVolPct); } catch (e) {}
-    }
-    return musicVolPct;
-  }
+  function getMusicVolume() { return 0; }
+  function setMusicVolume() { return 0; }
 
   // so para testes/diagnostico: contagem de vozes e fontes (detecta vazamento de nos)
   function debugStats() {
