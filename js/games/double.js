@@ -189,6 +189,7 @@
     betInput.disabled = true;
     colorButtons.forEach(function (b) { b.disabled = true; });
     setStatus("A roleta está girando...");
+    if (BZG.sounds.reelStart) BZG.sounds.reelStart();
   }
 
   function startResultPhase() {
@@ -222,7 +223,7 @@
       if (won) {
         setStatus("Caiu " + number + " (" + colorLabel(color) + ")! Você ganhou " + BZG.ui.formatMoney(payout) + ".");
         BZG.ui.toast("Caiu " + colorLabel(color) + "! +" + BZG.ui.formatMoney(payout), "success");
-        BZG.sounds.win();
+        BZG.sounds.winFor(mult);
         BZG.effects.flash(stageEl, "gold");
         var rect = stageEl.getBoundingClientRect();
         BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, mult >= 14 ? 100 : 60);
@@ -234,7 +235,7 @@
       }
     } else {
       setStatus("Caiu " + number + " (" + colorLabel(color) + "). Aposte na próxima rodada!");
-      BZG.sounds.click();
+      BZG.sounds.landChime();
     }
   }
 
@@ -260,7 +261,7 @@
 
       var crossed = Math.floor(current / TILE_STEP);
       if (crossed > lastCrossed) {
-        BZG.sounds.tick();
+        BZG.sounds.spinTick(1 - t); // mais grave conforme a faixa desacelera
         lastCrossed = crossed;
       }
 

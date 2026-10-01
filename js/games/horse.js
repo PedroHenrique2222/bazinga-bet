@@ -105,6 +105,7 @@
     picksEl.style.pointerEvents = "none";
     setStatus("E lá vão eles!");
     BZG.sounds.bet();
+    BZG.sounds.raceStart();
 
     // o seu corredor vence com P_WIN; senao vence um outro qualquer
     var won = Math.random() < P_WIN;
@@ -129,7 +130,8 @@
       });
       setPositions(progs);
 
-      if (now - lastTick > 130) { BZG.sounds.tick(); lastTick = now; }
+      // galope: batidas de casco em ritmo, mais intensas perto da chegada
+      if (now - lastTick > 95) { BZG.sounds.hoof(0.5 + 0.5 * Math.min(1, elapsed / winDur)); lastTick = now; }
 
       if (elapsed >= winDur) {
         setPositions(HORSES.map(function (_, i) { return i === winner ? 1 : Math.min(0.97, easeOut(elapsed / durs[i])); }));
@@ -143,6 +145,7 @@
 
   function finish(winner, bet) {
     laneEls[winner].classList.add("winner");
+    BZG.sounds.crowdCheer();
     var won = winner === selected;
     var payout = won ? bet * PAYOUT : 0;
 
@@ -157,7 +160,7 @@
     if (won) {
       setStatus("🏆 " + HORSES[winner].name + " venceu! +" + BZG.ui.formatMoney(payout));
       BZG.ui.toast("Seu corredor venceu! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(PAYOUT);
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, 60);

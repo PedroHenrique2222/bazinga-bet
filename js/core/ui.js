@@ -19,6 +19,10 @@ BZG.ui = (function () {
   function toast(message, type) {
     var container = document.getElementById("toast-container");
     if (!container) return;
+    // som da notificacao, so se o jogo nao tiver tocado nada junto (sem empilhar sons)
+    if (BZG.sounds && BZG.sounds.ifQuiet && BZG.sounds.toast) {
+      BZG.sounds.ifQuiet(function () { BZG.sounds.toast(type || "info"); }, 40, 200);
+    }
     var el = document.createElement("div");
     el.className = "toast toast--" + (type || "info");
     el.textContent = message;

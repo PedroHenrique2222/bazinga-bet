@@ -25,11 +25,25 @@
             <h2 class="section-title">🔊 Som</h2>
             <div class="setting-row">
               <div class="setting-label"><strong>Música de fundo</strong><span>Trilha ambiente do cassino</span></div>
-              <button class="toggle" id="toggle-music" role="switch"><span class="toggle-knob"></span></button>
+              <button class="toggle" id="toggle-music" role="switch" aria-label="Música de fundo"><span class="toggle-knob"></span></button>
+            </div>
+            <div class="setting-row setting-row--slider">
+              <label class="setting-label" for="vol-music"><strong>Volume da música</strong><span>Altura da trilha de fundo</span></label>
+              <div class="vol-control">
+                <input type="range" class="vol-slider" id="vol-music" min="0" max="100" step="1" value="25" aria-describedby="vol-music-val" />
+                <output class="vol-value" id="vol-music-val" for="vol-music">25%</output>
+              </div>
             </div>
             <div class="setting-row">
               <div class="setting-label"><strong>Efeitos sonoros</strong><span>Sons de aposta, vitória e cliques</span></div>
-              <button class="toggle" id="toggle-sfx" role="switch"><span class="toggle-knob"></span></button>
+              <button class="toggle" id="toggle-sfx" role="switch" aria-label="Efeitos sonoros"><span class="toggle-knob"></span></button>
+            </div>
+            <div class="setting-row setting-row--slider">
+              <label class="setting-label" for="vol-sfx"><strong>Volume dos efeitos</strong><span>Toca uma prévia ao ajustar</span></label>
+              <div class="vol-control">
+                <input type="range" class="vol-slider" id="vol-sfx" min="0" max="100" step="1" value="70" aria-describedby="vol-sfx-val" />
+                <output class="vol-value" id="vol-sfx-val" for="vol-sfx">70%</output>
+              </div>
             </div>
           </section>
 

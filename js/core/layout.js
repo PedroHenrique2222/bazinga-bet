@@ -160,6 +160,7 @@ BZG.layout = (function () {
   }
 
   // atualiza os campos dinamicos da topbar: card de perfil + os 3 mini-stats
+  var lastLevelSeen = 0; // para tocar o som de "subiu de nivel"
   function refreshTopbarStats() {
     var lvlEl = document.getElementById("topbar-level");
     var peakEl = document.getElementById("topbar-peak");
@@ -171,6 +172,11 @@ BZG.layout = (function () {
     var lvl = BZG.storage.getLevel();
     var stats = BZG.storage.getStats();
     if (lvlEl) lvlEl.textContent = "Lv " + lvl.level;
+    if (lastLevelSeen && lvl.level > lastLevelSeen && BZG.sounds.levelUp) {
+      // depois do som da aposta/vitoria, para nao embolar
+      setTimeout(function () { BZG.sounds.levelUp(); }, 450);
+    }
+    lastLevelSeen = lvl.level;
     if (peakEl) peakEl.textContent = BZG.ui.formatMoney(stats.peakBalance || 0);
     if (maxwinEl) maxwinEl.textContent = BZG.ui.formatMoney(stats.maxWin || 0);
     if (avatarEl || nameEl || chipLvlEl) {
@@ -241,7 +247,7 @@ BZG.layout = (function () {
 
       BZG.storage.resetBalance();
       BZG.ui.refreshBalance();
-      BZG.sounds.click();
+      if (BZG.sounds.reload) BZG.sounds.reload(); else BZG.sounds.click();
       BZG.ui.toast("Saldo recarregado para " + BZG.ui.formatMoney(reloadAmount) + "!", "success");
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     });
@@ -291,12 +297,14 @@ BZG.layout = (function () {
       menuBtn.addEventListener("click", function () {
         sidebar.classList.toggle("open");
         if (backdrop) backdrop.classList.toggle("visible", sidebar.classList.contains("open"));
+        if (BZG.sounds.menuOpen) BZG.sounds[sidebar.classList.contains("open") ? "menuOpen" : "menuClose"]();
       });
     }
     if (backdrop && sidebar) {
       backdrop.addEventListener("click", function () {
         sidebar.classList.remove("open");
         backdrop.classList.remove("visible");
+        if (BZG.sounds.menuClose) BZG.sounds.menuClose();
       });
     }
   }
@@ -453,6 +461,32 @@ BZG.layout = (function () {
     LB.myId().then(function (id) { myUuid = id; load(); });
   }
 
+  /* Sons globais de interface (delegacao de eventos, vale para todas as paginas):
+     - clique em botao/link: so toca se o proprio jogo/pagina nao tocou nada no
+       mesmo clique (ifQuiet), entao nao duplica os sons dos jogos;
+     - hover sutil em cartoes/botoes: so com mouse, baixinho e com limite de frequencia.
+     Nada toca antes da primeira interacao (o motor de som respeita o autoplay). */
+  function wireUiSounds() {
+    var S = BZG.sounds;
+    if (!S || !S.ifQuiet || !S.hover) return;
+    var CLICK_SEL = 'button, a[href], [role="button"], [role="switch"], [role="tab"], summary, .theme-card';
+    var HOVER_SEL = '.btn, .icon-btn, .game-card, .nav-item, .theme-card, .toggle';
+    document.addEventListener("click", function (e) {
+      var el = e.target && e.target.closest ? e.target.closest(CLICK_SEL) : null;
+      if (!el || el.disabled || el.closest(".bigwin-overlay, .cr-overlay")) return;
+      S.ifQuiet(S.uiClick);
+    });
+    var lastHover = null;
+    document.addEventListener("pointerover", function (e) {
+      if (e.pointerType && e.pointerType !== "mouse") return;
+      var el = e.target && e.target.closest ? e.target.closest(HOVER_SEL) : null;
+      if (el === lastHover) return;
+      lastHover = el;
+      if (!el || el.disabled || el.classList.contains("disabled") || el.classList.contains("game-card--dev")) return;
+      S.hover();
+    });
+  }
+
   function init() {
     var body = document.body;
     var page = body.dataset.page || "";
@@ -478,6 +512,7 @@ BZG.layout = (function () {
     renderSidebar(page);
     renderTopbar(title, icon);
     BZG.sounds.armMusicAutostart();
+    wireUiSounds();
 
     updateOnlineCount();
     setInterval(updateOnlineCount, 5000);
@@ -487,6 +522,7 @@ BZG.layout = (function () {
     function doAutoReload() {
       var amount = BZG.storage.autoReload();
       BZG.ui.refreshBalance();
+      if (BZG.sounds.reload) BZG.sounds.reload();
       refreshTopbarStats();
       BZG.ui.toast("💳 Saldo recarregado automaticamente: " + BZG.ui.formatMoney(amount), "info");
     }

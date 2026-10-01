@@ -148,7 +148,7 @@
     } else {
       tileEl.classList.add("revealed", "safe");
       tileEl.textContent = "♻️";
-      BZG.sounds.click();
+      BZG.sounds.stepUp(currentLevel); // cada andar soa mais agudo
       currentLevel++;
 
       var mult = multiplierAt(currentLevel);
@@ -214,7 +214,8 @@
     if (won) {
       setStatus("Você chegou ao nível " + currentLevel + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Colheu em " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.collect();
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var rect = multiplierEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);

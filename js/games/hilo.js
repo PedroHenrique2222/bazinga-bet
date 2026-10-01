@@ -128,6 +128,7 @@
     multiplierEl.textContent = "1.00x";
     updateGuessButtons();
     BZG.sounds.bet();
+    BZG.sounds.cardDeal();
     setStatus("Carta atual: " + rankLabel(currentValue) + ". A próxima vem maior ou menor?");
   }
 
@@ -147,6 +148,7 @@
     var suit = randomSuit();
     renderCard(nextCardEl, nextValue, suit, true);
     nextCardEl.classList.add("revealed", "flip");
+    BZG.sounds.cardFlip();
     setTimeout(function () { nextCardEl.classList.remove("flip"); }, 400);
 
     var correct = direction === "higher" ? nextValue > currentValue : nextValue < currentValue;
@@ -154,7 +156,7 @@
     if (correct) {
       fairProduct *= (1 / chance);
       streak++;
-      BZG.sounds.click();
+      BZG.sounds.gemReveal(streak); // acerto: sobe o tom a cada carta certa
 
       var mult = currentMultiplier();
       multiplierEl.textContent = formatMult(mult);
@@ -205,7 +207,8 @@
     if (won) {
       setStatus("Você colheu em " + formatMult(mult) + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Colheu em " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.collect();
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var rect = multiplierEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);

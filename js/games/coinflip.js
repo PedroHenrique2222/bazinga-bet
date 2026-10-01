@@ -53,7 +53,7 @@
     var start = performance.now();
     var lastTick = 0;
     function frame(now) {
-      if (now - lastTick > 90) { BZG.sounds.tick(); lastTick = now; }
+      if (now - lastTick > 90) { BZG.sounds.coinFlipTick(); lastTick = now; }
       if (now - start < FLIP_MS) {
         requestAnimationFrame(frame);
       } else {
@@ -68,6 +68,7 @@
 
   function finish(result, bet) {
     var won = result === selectedSide;
+    BZG.sounds.coinLand();
     var payout = won ? Math.round(bet * PAYOUT) : 0;
     var label = result === "cara" ? "Cara ⚡" : "Coroa 🔋";
 
@@ -83,8 +84,7 @@
       resultEl.textContent = "Deu " + label + "! +" + BZG.ui.formatMoney(payout);
       setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Deu " + label + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
-      BZG.sounds.coin();
+      BZG.sounds.winFor(PAYOUT);
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, 50);

@@ -13,6 +13,8 @@
   var crashPoint = 1;
   var lastMultiplier = 1;
   var lastTickTime = 0;
+  var lastWholeMult = 1;  // ultimo multiplicador inteiro que tocou o "ding"
+  var engine = null;      // som continuo do motor durante a rodada
   var lastBeepSecond = -1;
 
   var bots = [];
@@ -285,8 +287,12 @@
     crashPoint = generateCrashPoint();
     lastMultiplier = 1;
     lastTickTime = phaseStart;
+    lastWholeMult = 1;
 
     countdownEl.classList.remove("visible");
+    // motor/remada: som continuo que sobe com o multiplicador (mais alto com aposta)
+    if (engine) engine.stop(0.05);
+    engine = BZG.sounds.engineStart ? BZG.sounds.engineStart(userBet ? 1 : 0.6) : null;
 
     if (userBet) {
       betInput.disabled = true;
@@ -309,6 +315,7 @@
   function startCrashedPhase(finalMult) {
     phase = "crashed";
     phaseStart = performance.now();
+    if (engine) { engine.stop(0.06); engine = null; }
 
     // resolve bots que nao retiraram
     bots.forEach(function (b) {
@@ -416,8 +423,12 @@
 
         if (changed) renderRoundBets();
 
-        if (now - lastTickTime > 180) {
-          BZG.sounds.tick();
+        if (engine) engine.set(mult);
+        // passou de um inteiro (2x, 3x...): "ding" subindo
+        var whole = Math.floor(mult);
+        if (whole > lastWholeMult) {
+          lastWholeMult = whole;
+          if (BZG.sounds.milestone) BZG.sounds.milestone(whole);
           lastTickTime = now;
         }
       }
@@ -484,7 +495,7 @@
     actionBtn.textContent = "Retirou em " + formatMult(mult);
     setStatus("Você retirou em " + formatMult(mult) + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
     BZG.ui.toast("Retirou em " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-    BZG.sounds.win();
+    BZG.sounds.cashout(mult);
     BZG.effects.flash(stageEl, "gold");
     var rect = multiplierEl.getBoundingClientRect();
     BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);

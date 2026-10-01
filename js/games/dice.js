@@ -105,7 +105,7 @@
         var fake = Math.round(Math.random() * 10000) / 100;
         resultEl.textContent = fake.toFixed(2);
         if (now - lastTick > 60) {
-          BZG.sounds.tick();
+          BZG.sounds.diceShake();
           lastTick = now;
         }
         requestAnimationFrame(spinFrame);
@@ -118,6 +118,7 @@
 
   function finishRoll(result, threshold, chance, mult, bet) {
     var won = mode === "under" ? result < threshold : result > threshold;
+    BZG.sounds.diceLand();
     var payout = won ? Math.round(bet * mult) : 0;
 
     resultEl.textContent = result.toFixed(2);
@@ -139,7 +140,7 @@
     if (won) {
       setStatus("Rolou " + result.toFixed(2) + "! Você ganhou " + BZG.ui.formatMoney(payout) + ".");
       BZG.ui.toast("Rolou " + result.toFixed(2) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var rect = resultEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, mult >= 10 ? 90 : 55);

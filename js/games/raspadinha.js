@@ -153,6 +153,8 @@
     revealed[i] = true;
     var cellEl = cardEl.querySelector('.rasp-cell[data-i="' + i + '"]');
     if (cellEl) cellEl.classList.add("revealed");
+    // simbolo revelado: "plin" que sobe a cada casa aberta
+    if (BZG.sounds.gemReveal) BZG.sounds.gemReveal(revealed.filter(Boolean).length);
     if (revealed.every(Boolean)) resolve();
   }
 
@@ -238,7 +240,7 @@
       resultEl.textContent = "🎉 " + mult + "x! +" + BZG.ui.formatMoney(payout);
       setStatus("Você achou 3 " + prize.sym + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Raspadinha premiada! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, mult >= 20 ? 100 : 55);

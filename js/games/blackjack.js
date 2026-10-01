@@ -133,6 +133,8 @@
     actionsEl.style.display = "flex";
     setMessage("");
     BZG.sounds.bet();
+    // 4 cartas distribuidas
+    [0, 1, 2, 3].forEach(function (i) { setTimeout(function () { BZG.sounds.cardDeal(); }, 120 + i * 110); });
 
     renderHands(true);
     updateDoubleAvailability();
@@ -164,7 +166,7 @@
     playerHand.push(draw());
     renderHands(true);
     updateDoubleAvailability();
-    BZG.sounds.click();
+    BZG.sounds.cardDeal();
 
     var total = handTotal(playerHand);
     if (total > 21) {
@@ -185,7 +187,8 @@
     currentBet *= 2;
     playerHand.push(draw());
     renderHands(true);
-    BZG.sounds.bet();
+    BZG.sounds.chip();
+    BZG.sounds.cardDeal();
     setStatus("Dobrou para " + BZG.ui.formatMoney(currentBet) + "! Uma carta e fica.");
 
     if (handTotal(playerHand) > 21) {
@@ -203,6 +206,7 @@
     doubleBtn.disabled = true;
     setStatus("Bogão revelando...");
     renderHands(false);
+    BZG.sounds.cardFlip(); // carta escondida do Bogao vira
 
     // dealer compra ate 17 (para em todos os 17), com pausa entre cartas
     function dealerStep() {
@@ -210,7 +214,7 @@
         setTimeout(function () {
           dealerHand.push(draw());
           renderHands(false);
-          BZG.sounds.click();
+          BZG.sounds.cardDeal();
           dealerStep();
         }, 650);
       } else {
@@ -266,14 +270,14 @@
     if (outcome === "blackjack") {
       setStatus("BLACKJACK! Você ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("🃏 Blackjack! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.winBig();
       BZG.effects.flash(stageEl, "gold");
       var rect = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 100);
     } else if (outcome === "win") {
       setStatus("Você venceu com " + detail + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Venceu! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var rect2 = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect2.left + rect2.width / 2, rect2.top + rect2.height / 2, 55);

@@ -215,7 +215,17 @@ BZG.effects = (function () {
       void stage.offsetWidth;
       if (i === 1) stage.classList.add("bw-shake");
       if (i === 2) stage.classList.add("bw-shake-hard");
-      if (BZG.sounds && BZG.sounds.bigWin) BZG.sounds.bigWin();
+      // som: fanfarra do nivel; ao SUBIR de nivel, whoosh + impacto antes
+      var S = BZG.sounds;
+      if (S && S.bigWinTier) {
+        if (i > 0) {
+          if (S.whoosh) S.whoosh(0.35, true);
+          if (S.impact) S.impact(i === 2 ? 1 : 0.75);
+        }
+        S.bigWinTier(i);
+      } else if (S && S.bigWin) {
+        S.bigWin();
+      }
     }
 
     function finish() {
@@ -223,6 +233,7 @@ BZG.effects = (function () {
       done = true;
       if (raf) cancelAnimationFrame(raf);
       setTier(target);
+      if (BZG.sounds && BZG.sounds.countEnd) BZG.sounds.countEnd();
       amountEl.textContent = fmt(amount);
       amountEl.classList.remove("counting");
       amountEl.classList.add("pop");
@@ -235,6 +246,7 @@ BZG.effects = (function () {
     function close() {
       if (closed) return;
       closed = true;
+      if (BZG.sounds && BZG.sounds.collect) BZG.sounds.collect();
       if (raf) cancelAnimationFrame(raf);
       clearTimeout(closeTimer);
       overlay.classList.remove("show");
@@ -255,11 +267,17 @@ BZG.effects = (function () {
     requestAnimationFrame(function () { overlay.classList.add("show"); });
 
     var start = performance.now();
+    var lastTick = 0;
     function step(now) {
       if (done) return;
       var p = Math.min(1, (now - start) / duration);
       var e = 1 - Math.pow(1 - p, 2.2);
       amountEl.textContent = fmt(Math.round(amount * e));
+      // "tic-tic" da contagem: cada vez mais rapido (130ms -> 40ms) e mais agudo
+      if (BZG.sounds && BZG.sounds.countTick && now - lastTick > 130 - 90 * p) {
+        BZG.sounds.countTick(p);
+        lastTick = now;
+      }
       for (var i = cuts.length - 1; i >= 0; i--) { if (e >= cuts[i]) { setTier(i); break; } }
       if (p < 1) raf = requestAnimationFrame(step); else finish();
     }
@@ -274,10 +292,16 @@ BZG.effects = (function () {
     if ((d.multiplier || 0) >= 10 || d.payout >= 25000) bigWin(d.payout, d.multiplier || 0);
   });
 
+  // o Big Win esta na tela? (os jogos nao tocam o som de vitoria por cima da fanfarra)
+  function isBigWinActive() {
+    return bigWinBusy;
+  }
+
   return {
     confetti: confetti,
     shake: shake,
     flash: flash,
-    bigWin: bigWin
+    bigWin: bigWin,
+    isBigWinActive: isBigWinActive
   };
 })();

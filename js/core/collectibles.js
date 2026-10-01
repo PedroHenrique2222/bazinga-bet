@@ -210,6 +210,7 @@ BZG.collectibles = (function () {
     requestAnimationFrame(function () { overlay.classList.add("show"); });
 
     if (BZG.sounds) {
+      if (BZG.sounds.modalOpen) BZG.sounds.modalOpen();
       if (justCompleted && BZG.sounds.achievement) BZG.sounds.achievement();
       else if (BZG.sounds.coin) BZG.sounds.coin();
     }
@@ -225,7 +226,10 @@ BZG.collectibles = (function () {
       setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 350);
     }
     var card = overlay.querySelector(".cr-card");
-    if (card) card.addEventListener("click", dismiss);
+    if (card) card.addEventListener("click", function () {
+      if (BZG.sounds && BZG.sounds.modalClose) BZG.sounds.modalClose();
+      dismiss();
+    });
   }
 
   return {

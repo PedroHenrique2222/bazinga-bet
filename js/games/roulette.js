@@ -318,6 +318,7 @@
     var start = performance.now();
     var lastRelSeg = null;
     var zoomed = false;
+    var roll = BZG.sounds.ballRoll ? BZG.sounds.ballRoll() : null; // bolinha rolando na pista
 
     function frame(now) {
       var e = Math.min(T, now - start), t = e / T;
@@ -326,6 +327,11 @@
       var u = Math.min(1, e / T_SETTLE);
       var rel = relEnd + relSpan * Math.pow(1 - u, 3);
       var r = g.rTrack;
+      // som da bolinha acompanha a velocidade dela na pista; some quando ela desce
+      if (roll) {
+        if (e <= T_DROP) roll.set(Math.min(1, Math.pow(1 - u, 2) * 1.3));
+        else { roll.stop(0.35); roll = null; }
+      }
       if (e > T_DROP) {
         var v = Math.min(1, (e - T_DROP) / (T_SETTLE - T_DROP));
         var target = (g.rPocketOut + g.rPocketIn) / 2;
@@ -336,14 +342,15 @@
         if (!zoomed) { zoomed = true; canvas.classList.add("zoom"); }
         // "tec-tec" a cada separador que a bolinha cruza enquanto quica
         var relSeg = Math.floor(rel / seg);
-        if (relSeg !== lastRelSeg && v < 0.95) { BZG.sounds.tick(); lastRelSeg = relSeg; }
+        if (relSeg !== lastRelSeg && v < 0.95) { BZG.sounds.pocketTick(1 - v); lastRelSeg = relSeg; }
       }
       if (e >= T_SETTLE) r = (g.rPocketOut + g.rPocketIn) / 2;
 
       ball = { angle: wheelRotation + rel, r: r };
       if (e >= T_SETTLE && landedIdx === -1) {
         landedIdx = idx;
-        BZG.sounds.click();
+        if (roll) { roll.stop(0.1); roll = null; }
+        BZG.sounds.ballSettle();
       }
       drawWheel(wheelRotation);
 
@@ -392,7 +399,7 @@
     if (won && profit >= 0) {
       setStatus("Caiu " + n + " (" + colorLabel + ")! Você recebeu " + BZG.ui.formatMoney(totalReturn) + " (+" + BZG.ui.formatMoney(profit) + ").");
       BZG.ui.toast("Caiu " + n + "! +" + BZG.ui.formatMoney(totalReturn), "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(totalReturn / total);
       BZG.effects.flash(stageEl, "gold");
       var rect = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, totalReturn >= total * 10 ? 110 : 60);
