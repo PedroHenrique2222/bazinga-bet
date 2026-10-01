@@ -108,3 +108,12 @@
   .multiplier-display { font-size: 42px; }
   .crash-chip { font-size: 10.5px; padding: 2px 7px; }
 }
+
+/* cenario opcional (assets/jogos/crash/fundo.webp): o JS liga .has-bg quando a imagem
+   carrega; o degrade na cor do tema por cima mantem o jogo legivel */
+#crash-stage.has-bg {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-alt) 58%, transparent), color-mix(in srgb, var(--bg-alt) 84%, transparent)),
+    var(--stage-fundo) center / cover no-repeat,
+    var(--bg-alt);
+}

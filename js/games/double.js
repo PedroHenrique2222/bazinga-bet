@@ -319,6 +319,20 @@
     betInput.value = Math.max(1, Math.round(next));
   }
 
+  /* ---------- imagens opcionais do Codex (plano B: visual atual) ---------- */
+  var IMG_FUNDO = "../assets/jogos/double/fundo.webp";
+
+  function loadImages() {
+    if (!BZG.assets) return;
+    BZG.assets.preload([IMG_FUNDO], function (ok) {
+      if (!ok[IMG_FUNDO] || !stageEl) return;
+      var url = IMG_FUNDO;
+      try { url = new URL(IMG_FUNDO, document.baseURI).href; } catch (e) {}
+      stageEl.style.setProperty("--stage-fundo", 'url("' + url + '")');
+      stageEl.classList.add("has-bg");
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
     betBtn = document.getElementById("bet-btn");
@@ -353,5 +367,7 @@
 
     startBettingPhase();
     requestAnimationFrame(loop);
+
+    loadImages();
   });
 })();

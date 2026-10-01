@@ -101,3 +101,12 @@
   .mines-grid { gap: 7px; }
   .mine-cell { font-size: 18px; }
 }
+
+/* cenario opcional (assets/jogos/mines/fundo.webp): o JS liga .has-bg quando a imagem
+   carrega; o degrade na cor do tema por cima mantem o jogo legivel */
+#mines-stage.has-bg {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-alt) 58%, transparent), color-mix(in srgb, var(--bg-alt) 84%, transparent)),
+    var(--stage-fundo) center / cover no-repeat,
+    var(--bg-alt);
+}

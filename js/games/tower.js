@@ -17,6 +17,11 @@
   var bombIndexPerLevel = [];
   var rowEls = [];
 
+  /* imagens opcionais do Codex (plano B: visual atual, sem o Linden) */
+  var IMG_DIR = "../assets/jogos/tower/";
+  var IMG = { fundo: IMG_DIR + "fundo.webp", linden: IMG_DIR + "linden.webp" };
+  var lindenEl = null; // Linden subindo a lixeira (so existe se a imagem carregou)
+
   function formatMult(m) {
     return m.toFixed(2) + "x";
   }
@@ -90,6 +95,7 @@
       rowEls.push(row);
     }
 
+    if (lindenEl) levelsEl.appendChild(lindenEl);
     updateActiveRow();
   }
 
@@ -98,6 +104,17 @@
       row.classList.toggle("active", idx === currentLevel && state === "running");
       row.classList.toggle("done", idx < currentLevel);
     });
+    placeLinden();
+  }
+
+  /* posiciona o Linden no andar atual (sobe com transicao de transform) */
+  function placeLinden() {
+    if (!lindenEl || !rowEls.length) return;
+    var idx = Math.min(currentLevel, LEVELS - 1);
+    var row = rowEls[idx];
+    rowEls.forEach(function (r, i) { r.classList.toggle("has-linden", i === idx); });
+    lindenEl.style.height = row.offsetHeight + "px";
+    lindenEl.style.transform = "translateY(" + row.offsetTop + "px)";
   }
 
   function startGame() {
@@ -118,6 +135,7 @@
     currentLevel = 0;
     state = "running";
 
+    if (lindenEl) lindenEl.classList.remove("is-fall", "is-top");
     buildTower();
     betInput.disabled = true;
     riskButtons.forEach(function (b) { b.disabled = true; });
@@ -141,6 +159,7 @@
     if (isBomb) {
       tileEl.classList.add("revealed", "bomb");
       tileEl.textContent = "💣";
+      if (lindenEl) lindenEl.classList.add("is-fall");
       BZG.effects.shake(stageEl);
       BZG.effects.flash(stageEl, "red");
       revealRowTiles(row, level);
@@ -158,6 +177,7 @@
       multiplierEl.classList.add("bump");
 
       if (currentLevel >= LEVELS) {
+        if (lindenEl) lindenEl.classList.add("is-top");
         endRound(true, mult);
       } else {
         updateActiveRow();
@@ -251,6 +271,27 @@
     betInput.value = Math.max(1, Math.round(next));
   }
 
+  function loadImages() {
+    if (!BZG.assets) return;
+    BZG.assets.preload([IMG.fundo, IMG.linden], function (ok) {
+      if (ok[IMG.fundo]) {
+        var url = IMG.fundo;
+        try { url = new URL(IMG.fundo, document.baseURI).href; } catch (e) {}
+        stageEl.style.setProperty("--stage-fundo", 'url("' + url + '")');
+        stageEl.classList.add("has-bg");
+      }
+      if (ok[IMG.linden]) {
+        lindenEl = document.createElement("div");
+        lindenEl.className = "tower-linden";
+        lindenEl.setAttribute("aria-hidden", "true");
+        lindenEl.innerHTML = '<img src="' + IMG.linden + '" alt="" />';
+        levelsEl.appendChild(lindenEl);
+        levelsEl.classList.add("has-linden");
+        placeLinden();
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
     startBtn = document.getElementById("start-btn");
@@ -280,5 +321,7 @@
     document.getElementById("bet-max").addEventListener("click", function () {
       quickBet(function (v, balance) { return balance; });
     });
+    window.addEventListener("resize", placeLinden);
+    loadImages();
   });
 })();

@@ -23,6 +23,11 @@
   var cashMarkers = []; // pontos de retirada exibidos no grafico
   var roundIdEl = null;
 
+  /* imagens opcionais do Codex (plano B: desenho/visual atual) */
+  var IMG_DIR = "../assets/jogos/crash/";
+  var IMG = { fundo: IMG_DIR + "fundo.webp", canoa: IMG_DIR + "canoa.webp" };
+  var canoeImg = null; // Image ja carregado, reaproveitado em todo quadro
+
   /* numero da rodada persistido: da a sensacao de plataforma "vivida" */
   function nextRoundId() {
     var v = 0;
@@ -232,14 +237,22 @@
       }
     }
 
-    // foguete na ponta
-    ctx.font = "30px serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    // canoa na ponta (imagem do Codex se carregou; senao o emoji de sempre)
     ctx.save();
     ctx.translate(tipXY[0], tipXY[1]);
     ctx.rotate(-0.5);
-    ctx.fillText("🛶", 0, 0);
+    if (canoeImg) {
+      // balanco leve de remada, so no desenho (nao mexe na curva)
+      ctx.rotate(Math.sin(performance.now() / 260) * 0.06);
+      var cw = Math.min(84, w * 0.13);
+      var ch = cw * canoeImg.naturalHeight / canoeImg.naturalWidth;
+      ctx.drawImage(canoeImg, -cw / 2, -ch / 2, cw, ch);
+    } else {
+      ctx.font = "30px serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🛶", 0, 0);
+    }
     ctx.restore();
   }
 
@@ -545,6 +558,23 @@
     betInput.value = Math.max(1, Math.round(next));
   }
 
+  function loadImages() {
+    if (!BZG.assets) return;
+    BZG.assets.preload([IMG.fundo, IMG.canoa], function (ok) {
+      if (ok[IMG.fundo]) {
+        var url = IMG.fundo;
+        try { url = new URL(IMG.fundo, document.baseURI).href; } catch (e) {}
+        stageEl.style.setProperty("--stage-fundo", 'url("' + url + '")');
+        stageEl.classList.add("has-bg");
+      }
+      if (ok[IMG.canoa]) {
+        var img = new Image();
+        img.onload = function () { if (img.naturalWidth > 0) canoeImg = img; };
+        img.src = IMG.canoa;
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
     autoCashoutInput = document.getElementById("auto-cashout");
@@ -582,5 +612,6 @@
 
     startBettingPhase();
     requestAnimationFrame(loop);
+    loadImages();
   });
 })();
