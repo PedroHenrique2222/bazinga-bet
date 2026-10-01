@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.21
+# 🎰 Bazinga BET — v1.22
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,9 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.22 (2026-10-01) — 🎃 Ícone novo da Abóbora
+- **Plinko da Abóbora**: ícone redesenhado — abóbora redonda e brilhante, com folha e carinha sorrindo (bochechas rosadas), no lugar da abóbora de Halloween.
 
 ### v1.21 (2026-10-01) — 🎨 Ícones desenhados + telas de jogo novas
 - **Ícones desenhados (SVG) no lugar dos emojis**: novo `js/core/icons.js` (`BZG.icons.tile/art/nav`) com um ícone para cada um dos 15 jogos e 4 minigames, mais os ícones de linha do menu e do topo (Lobby, Ranking, Coleção, Passe, Perfil, Configurações, música, efeitos, tema, menu, nível, saldo). Aparecem iguais em qualquer aparelho. Usados no menu lateral, no título da topbar, nos cartões do lobby e na tabela de últimas apostas. Se o arquivo faltar, tudo volta para os emojis antigos.
