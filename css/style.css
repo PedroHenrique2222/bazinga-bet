@@ -2484,3 +2484,34 @@ body[style*="--game-c"] .game-layout .stage { --game-c: inherit; }
 .paytable-row:nth-child(even) { background: var(--bg); }
 .paytable-row strong { color: var(--yellow); white-space: nowrap; }
 .buy-title { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+
+/* ---------- v1.26: capas ilustradas nos cartoes do lobby ---------- */
+.game-card--cover { padding: 0; justify-content: flex-end; }
+.game-card--cover .card-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  transition: transform 0.35s ease;
+}
+.game-card--cover:hover .card-cover { transform: scale(1.07); }
+.game-card--cover .icon { display: none; }
+.game-card--cover h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 10px 14px;
+  font-size: 15px;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+.game-card--cover .card-live { position: relative; z-index: 1; padding: 0 10px 12px; margin-top: -8px; }
+.game-card--cover .card-badge { z-index: 2; }
+.card-badge--free { background: #2ee88a; color: #062b16; }
+@media (max-width: 640px) {
+  .game-card--cover h2 { font-size: 11px; padding: 0 6px 10px; }
+}
+.game-card--cover .card-live { border-top: 0; background: none; }
+@media (max-width: 640px) { .game-card--cover .card-live { display: none; } }

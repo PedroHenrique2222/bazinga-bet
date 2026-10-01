@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.25
+# 🎰 Bazinga BET — v1.26
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,10 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.26 (2026-10-01) — 🖼️ Capas ilustradas no lobby
+- **Capas dos jogos**: os cartões do lobby agora mostram uma arte ilustrada de cada jogo (`assets/capas/<id>.webp`, 768×1024, geradas pelo Codex a partir de `docs/codex-capas.md`), com o nome por cima da faixa escura de baixo e zoom suave no hover. Se uma capa não carregar, o cartão volta sozinho ao visual com ícone.
+- **Minigames no lobby**: nova seção "Minigames (sem aposta)" com as capas da Torre, Sequência Arco-íris, Sombra Rápida e Fuga Alienígena.
 
 ### v1.25 (2026-10-01) — 🎡 Roleta com giro de verdade
 - **Roda redesenhada** (`drawWheel` em `roulette.js`): aro de madeira, pista com losangos defletores, casas com separadores dourados, prato central com torre e cruz que giram junto, e desenho nítido em telas retina (canvas 400px lógico × densidade da tela).
