@@ -285,7 +285,7 @@
             }
 
             if (now - lastPegSound > 70) {
-              BZG.sounds.pegHit();
+              BZG.sounds.pegHit(ball.y / L.slotY); // mais agudo no alto, mais grave embaixo
               lastPegSound = now;
             }
             pegFlashes.push({ x: peg.x, y: peg.y, start: now });
@@ -350,14 +350,14 @@
 
     if (mult >= 10) {
       BZG.ui.toast("💥 " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.plinkoLand(mult);
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var rect = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height * 0.7, 80);
-    } else if (won) {
-      BZG.sounds.click();
     } else {
-      BZG.sounds.lose();
+      // cada bolinha que cai: som da casa (grave nas baixas, brilhante nas altas)
+      BZG.sounds.plinkoLand(mult);
     }
 
     updateStatus("Última: " + formatMult(mult) + " (" + BZG.ui.formatMoney(payout) + ")");

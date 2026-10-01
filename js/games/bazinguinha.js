@@ -382,6 +382,7 @@
     bannerMsg("", "Boa sorte! 🍀");
     setStatus("Girando...");
     BZG.sounds.bet();
+    if (BZG.sounds.reelStart) BZG.sounds.reelStart();
 
     // sorteia a grade 3x3 (indice = linha*3 + coluna)
     var grid = [];
@@ -412,6 +413,7 @@
     var start = performance.now();
     var lastTicks = [0, 0, 0];
     var done = [false, false, false];
+    var tension = null, tensionAt = 0; // som de suspense da 3a coluna
 
     function frame(now) {
       var allDone = true;
@@ -422,12 +424,13 @@
         stripEls[c2].style.transform = "translate3d(0,-" + pos.toFixed(1) + "px,0)";
         var crossed = Math.floor(pos / cellH);
         if (crossed > lastTicks[c2] && t < 1) {
-          if (c2 === 0 || (tease && c2 === 2 && done[1])) BZG.sounds.tick();
+          if (c2 === 0 || (tease && c2 === 2 && done[1])) BZG.sounds.reelTick();
           lastTicks[c2] = crossed;
         }
         if (t >= STOP_AT && !done[c2]) {
           done[c2] = true;
-          BZG.sounds.click();
+          BZG.sounds.reelStop(c2);
+          if (c2 === 2 && tension) { tension.stop(0.25); tension = null; }
           stripEls[c2].classList.remove("blur");       // simbolo volta ao normal ao parar
           var col = stripEls[c2].parentElement;         // clarao de "quique" na coluna
           if (col) { col.classList.remove("bump", "tease"); void col.offsetWidth; col.classList.add("bump"); }
@@ -435,11 +438,15 @@
           if (c2 === 1 && tease && stripEls[2]) {
             stripEls[2].parentElement.classList.add("tease");
             bannerMsg("tease", "Será?! 👀");
-            BZG.sounds.countdownBeep();
+            // suspense: tom subindo ate a 3a coluna parar
+            tension = BZG.sounds.tensionStart();
+            tensionAt = now;
           }
         }
         if (t < 1) allDone = false;
       }
+      if (tension) tension.set(Math.min(1, (now - tensionAt) / (1500 * BZG.modes.speed())));
+      if (allDone && tension) { tension.stop(0.2); tension = null; }
       if (allDone) maybeRespin(grid, bet);
       else requestAnimationFrame(frame);
     }
@@ -455,6 +462,7 @@
     bannerMsg("respin", "⚡ WILD TRAVADO! Re-girando…");
     setStatus("Wild grudento! Re-girando os outros símbolos…");
     renderStaticGrid(grid, { locked: true });
+    BZG.sounds.wildLock();
     BZG.sounds.roar();
     var sp = BZG.modes.speed();
     setTimeout(function () { respinRound(grid, bet, 1); }, 520 * sp);
@@ -473,14 +481,15 @@
     }
     var wc = countWild(grid);
     updateCells(grid, changed);
-    BZG.sounds.click();
+    BZG.sounds.respin();
+    BZG.sounds.reelStop(1);
 
     var sp = BZG.modes.speed();
     var again = newWild && wc < 9 && round < MAX_RESPINS;
     if (newWild) {
       var gained = wc - before;
       bannerMsg("respin", "⚡ +" + gained + " WILD! Re-girando…");
-      BZG.sounds.coin();
+      BZG.sounds.wildLock();
       BZG.effects.flash(stageEl, "gold");
       reactMascot("happy"); // O Menor Quentão se anima a cada wild novo
     }
@@ -551,7 +560,7 @@
       reactMascot(bigWin ? "hype" : "happy"); // O Menor Quentão comemora
       setStatus("Você ganhou " + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)!");
       BZG.ui.toast("🔥 +" + BZG.ui.formatMoney(payout) + " (" + totalPay.toFixed(2) + "x)", "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(totalPay);
       BZG.effects.flash(stageEl, "gold");
       var rect = windowEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, totalPay >= 10 ? 110 : 55);

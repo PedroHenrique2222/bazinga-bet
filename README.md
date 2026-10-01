@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.29
+# 🎰 Bazinga BET — v1.30
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,15 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.30 (2026-10-01) — 🔊 Áudio novo, Bonanza na caverna, Bazinguinha com os itens dos Bazingas
+- **Áudio refeito (tudo sintetizado, sem arquivos)**: `sounds.js` ganhou um motor novo (compressor + limitador, reverb leve, envelopes, ruído filtrado, variação de tom, limite de vozes e de frequência nos ticks, nada antes da 1ª interação, pausa com a aba escondida). Todas as funções antigas continuam e soam melhor.
+  - **Vitórias**: `winSmall/winMedium/winBig/winFor`, chuva de moedas, contagem com "tic" acelerando, e no Big Win uma fanfarra por nível (Grande/Mega/BAZINGA) com whoosh + impacto ao subir e "coletar" no fim.
+  - **Jogos**: rolos e suspense do Bazinguinha, bolinha da Roleta rolando e assentando, motor do Crash subindo com o multiplicador, tom subindo a cada acerto no Mines/Tower/HiLo, pinos do Plinko, cartas, dados, raspadinha, moeda, galope e torcida na Corrida; no Bonanza cascata, estouro das joias subindo a cada cascata, bônus caindo, orbe carregando e multiplicando, entrada e re-disparo das grátis.
+  - **Interface**: cliques, hover discreto, menus, avisos por tipo, conquista, subir de nível e recarga.
+  - **Volume**: dois controles em Configurações ("Volume dos efeitos" e "Volume da música"), salvos no navegador; o da música vai para a moldura.
+- **Bazinga Bonanza na caverna**: visual sério de templo antigo — tabuleiro de pedra com moldura de ouro envelhecido, painéis de pedra, Guardião de pedra num nicho, tochas e cristais; rodadas grátis acendem a caverna em dourado. Símbolos viram "Joias dos Bazingas" (Diamante BZG, Rubi do Panetone, Quartzo do Bogão, Ametista do Pitoco, Jade do 616, Esmeralda do Pikles, Topázio da Pilha, Âmbar da Abóbora, Ídolo BZG, Orbe multiplicador). Imagens novas a caminho pelo Codex (`docs/codex-quentao-bazinguinha-bonanza.md`).
+- **Bazinguinha com os itens dos Bazingas**: os símbolos passam a ser Pêssego do Bogão, Panetone, Picles, Pilha e Abóbora (imagens no clima oriental a caminho; até lá, os desenhos SVG). O mascote O Menor Quentão será refeito pelo desenho original (`docs/ref/menor-quentao-desenho.png`).
 
 ### v1.29 (2026-10-01) — 🖼️ Logo novo e imagens dos caça-níqueis
 - **Logo em imagem** (`assets/logo/logo.webp`, gerado pelo Codex) no menu lateral, com zoom leve no hover; se não carregar, volta o desenho SVG antigo. Ícone da aba (`app.html`) agora é `assets/logo/icone.webp`.

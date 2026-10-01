@@ -384,18 +384,19 @@
     var st = { sc: 0, bomb: 0 };
     var accWin = 0;
     var teased = false;
+    var chain = 0; // cascatas seguidas neste giro (o som do estouro sobe a cada uma)
     // fora das gratis faltam 4 bonus para disparar; nas gratis, 3 re-disparam
     var need = stageEl.classList.contains("free-mode") ? RETRIGGER_MIN : TRIGGER_MIN;
     fillGrid(pBomb, st);
     renderGrid({ drop: true });
-    BZG.sounds.tick();
+    BZG.sounds.tumble();
 
     function teaseScatter() {
       if (!teased && st.sc === need - 1) {
         teased = true;
         stageEl.classList.add("scatter-tease");
         showBanner("FALTA 1!", "tease");
-        BZG.sounds.countdownBeep();
+        BZG.sounds.scatterLand(need - 1);
       }
     }
 
@@ -409,12 +410,13 @@
         if (w > 0 && st.bomb > 0) {
           // as bombas giram, acendem, explodem e o ganho multiplica com tremor
           Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.bomb"), function (b) { b.classList.add("boom"); });
-          BZG.sounds.bombExplode();
+          BZG.sounds.bombCharge();
           setTimeout(function () {
             w *= st.bomb;
             Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.bomb"), function (b) { b.classList.remove("boom"); b.classList.add("blast"); });
             burst(".gem.bomb", "bz-burst--bomb");
             showBanner("×" + st.bomb, "mult");
+            BZG.sounds.bombHit(st.bomb);
             mascotCheer(1, "×" + st.bomb + "!");
             BZG.effects.shake(stageEl);
             BZG.effects.flash(stageEl, "gold");
@@ -429,7 +431,7 @@
       }
       accWin += ev.pay;
       markWinners(ev.remove);
-      BZG.sounds.pegHit();
+      BZG.sounds.gemPop(chain++);
       floatWin(Math.round(curBet * ev.pay * SCALE));
       mascotCheer(0);
       winEl.className = "bonanza-win counting";
@@ -443,7 +445,7 @@
       setTimeout(function () {
         var falls = tumble(ev.remove, pBomb, st);
         renderGrid({ falls: falls });
-        BZG.sounds.tick();
+        BZG.sounds.tumble();
         setTimeout(step, spd(470));
       }, spd(620));
     }, spd(720));
@@ -484,7 +486,7 @@
 
     if (isBuy) {
       showBannerSym("🎇", "COMPRA!", "free");
-      BZG.sounds.jackpot();
+      BZG.sounds.freeSpinsStart();
       setTimeout(function () { startFreeSpins(FREE_SPINS); }, spd(700));
     } else {
       runSpin(P_BOMB_BASE, function (w, sc) {
@@ -492,7 +494,7 @@
         showRunningWin();
         if (sc >= TRIGGER_MIN) {
           showBanner("RODADAS GRÁTIS!", "free");
-          BZG.sounds.jackpot();
+          BZG.sounds.freeSpinsStart();
           setTimeout(function () { startFreeSpins(FREE_SPINS); }, spd(900));
         } else {
           finishRound();
@@ -528,7 +530,7 @@
         updateFreeUI();
         showBanner("+" + RETRIGGER_ADD + " GRÁTIS!", "free");
         mascotCheer(1, "+" + RETRIGGER_ADD + "!");
-        BZG.sounds.jackpot();
+        BZG.sounds.freeSpinsRetrigger();
         setTimeout(nextFreeSpin, spd(750));
       } else {
         setTimeout(nextFreeSpin, spd(480));
@@ -559,7 +561,7 @@
       countWin(payout, ' <small>' + effMult.toFixed(2) + 'x</small>');
       setStatus("Você ganhou " + fmt(payout) + "!");
       BZG.ui.toast("💎 +" + fmt(payout) + " (" + effMult.toFixed(2) + "x)", "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(effMult);
       BZG.effects.flash(stageEl, "gold");
       // abaixo de 1x o jogador recebeu menos do que apostou: so um pulinho, sem "BOA!"
       if (effMult >= 1) mascotCheer(big ? 2 : 1, effMult >= 50 ? "BAZINGA!" : (effMult >= 5 ? "UAU!" : "BOA!"));

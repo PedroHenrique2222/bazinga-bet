@@ -123,7 +123,7 @@
       revealedCount++;
       cell.classList.add("safe");
       cell.innerHTML = BZG.icons ? BZG.icons.art("mines", 48) : "🥒";
-      BZG.sounds.click();
+      BZG.sounds.gemReveal(revealedCount); // cada acerto soa mais agudo
 
       var mult = currentMultiplier(revealedCount);
       var safeTotal = TOTAL_CELLS - mineCount;
@@ -182,7 +182,8 @@
     if (won) {
       setStatus("Você colheu em " + formatMult(mult) + " e ganhou " + BZG.ui.formatMoney(payout) + "!");
       BZG.ui.toast("Colheu em " + formatMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.collect();
+      BZG.sounds.winFor(mult);
       BZG.effects.flash(stageEl, "gold");
       var rect = multiplierEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, 70);

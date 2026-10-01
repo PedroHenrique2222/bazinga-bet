@@ -62,9 +62,35 @@
     };
   }
 
+  /* controle deslizante de volume (0-100%): mostra o valor, salva e aplica na hora */
+  function setupVolume(inputId, outId, getter, setter, onChange) {
+    var input = document.getElementById(inputId);
+    var out = document.getElementById(outId);
+    if (!input || !getter || !setter) return;
+    function paint(v) {
+      if (out) out.textContent = v + "%";
+      input.setAttribute("aria-valuetext", v + "%");
+      input.style.setProperty("--fill", v + "%");
+    }
+    var initial = getter();
+    input.value = initial;
+    paint(initial);
+    input.addEventListener("input", function () {
+      var v = setter(Number(input.value));
+      paint(v);
+      if (onChange) onChange(v);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     var musicToggle = document.getElementById("toggle-music");
     var sfxToggle = document.getElementById("toggle-sfx");
+
+    setupVolume("vol-music", "vol-music-val", BZG.sounds.getMusicVolume, BZG.sounds.setMusicVolume);
+    // previa sonora ao mexer nos efeitos (o motor limita a frequencia)
+    setupVolume("vol-sfx", "vol-sfx-val", BZG.sounds.getSfxVolume, BZG.sounds.setSfxVolume, function () {
+      if (BZG.sounds.preview) BZG.sounds.preview();
+    });
 
     syncToggle(musicToggle, BZG.sounds.isMusicEnabled());
     syncToggle(sfxToggle, BZG.sounds.isSfxEnabled());
@@ -98,8 +124,8 @@
       BZG.ui.refreshBalance();
       refreshSummaries();
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
+      if (BZG.sounds.reload) BZG.sounds.reload(); else BZG.sounds.click();
       BZG.ui.toast("Saldo recarregado!", "success");
-      BZG.sounds.click();
     });
 
     document.getElementById("logout-btn").addEventListener("click", function () {
@@ -119,6 +145,8 @@
         localStorage.removeItem("bzgTheme");
         localStorage.removeItem("bzgMusic");
         localStorage.removeItem("bzgSfx");
+        localStorage.removeItem("bzgMusicVol");
+        localStorage.removeItem("bzgSfxVol");
         localStorage.removeItem("bzgMuted");
         localStorage.removeItem("bzgRoundCrash");
         localStorage.removeItem("bzgRoundDouble");

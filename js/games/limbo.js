@@ -73,6 +73,7 @@
     resultEl.className = "limbo-result rolling";
     setStatus("Sorteando...");
     BZG.sounds.bet();
+    BZG.sounds.launch();
 
     var finalMult = rollMultiplier();
     var start = performance.now();
@@ -84,7 +85,7 @@
         // numeros subindo rapidamente durante a animacao
         var fake = 1 + Math.pow(now % 1000 / 1000, 2) * 8 * Math.random();
         resultEl.textContent = fmtMult(Math.max(1, fake));
-        if (now - lastTick > 60) { BZG.sounds.tick(); lastTick = now; }
+        if (now - lastTick > 60) { BZG.sounds.riseTick(t); lastTick = now; }
         requestAnimationFrame(frame);
       } else {
         finish(finalMult, target, bet);
@@ -111,7 +112,7 @@
     if (won) {
       setStatus("Saiu " + fmtMult(mult) + " (>= " + fmtMult(target) + ")! +" + BZG.ui.formatMoney(payout));
       BZG.ui.toast("Saiu " + fmtMult(mult) + "! +" + BZG.ui.formatMoney(payout), "success");
-      BZG.sounds.win();
+      BZG.sounds.winFor(target);
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, target >= 10 ? 90 : 50);
