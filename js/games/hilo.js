@@ -236,6 +236,30 @@
     betInput.value = Math.max(1, Math.round(next));
   }
 
+  /* ---------- imagens opcionais do Codex (cenario e verso das cartas) ----------
+     trocam sozinhas quando existirem; sem elas fica o visual de sempre */
+  var IMG_FUNDO = "../assets/jogos/hilo/fundo.webp";
+  var IMG_VERSO = "../assets/jogos/cartas/verso.webp";
+
+  function absUrl(p) {
+    try { return new URL(p, document.baseURI).href; } catch (e) { return p; }
+  }
+
+  function loadImages() {
+    if (!BZG.assets || !stageEl) return;
+    BZG.assets.preload([IMG_FUNDO, IMG_VERSO], function (ok) {
+      if (ok[IMG_FUNDO]) {
+        stageEl.style.setProperty("--jogo-fundo", 'url("' + absUrl(IMG_FUNDO) + '")');
+        stageEl.classList.add("has-fundo");
+      }
+      // verso das cartas viradas: a frente continua desenhada pelo codigo
+      if (ok[IMG_VERSO]) {
+        stageEl.style.setProperty("--carta-verso", 'url("' + absUrl(IMG_VERSO) + '")');
+        stageEl.classList.add("has-verso");
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
     startBtn = document.getElementById("start-btn");
@@ -251,6 +275,7 @@
 
     BZG.ui.initHeader();
     renderHistory();
+    loadImages();
     updateGuessButtons();
 
     startBtn.addEventListener("click", startGame);

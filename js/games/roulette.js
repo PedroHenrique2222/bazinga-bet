@@ -434,6 +434,24 @@
     betInput.value = Math.max(1, Math.round(next));
   }
 
+  /* ---------- imagens opcionais do Codex (cenario) ----------
+     trocam sozinhas quando existirem; sem elas fica o visual de sempre */
+  var IMG_FUNDO = "../assets/jogos/roulette/fundo.webp";
+
+  function absUrl(p) {
+    try { return new URL(p, document.baseURI).href; } catch (e) { return p; }
+  }
+
+  function loadImages() {
+    if (!BZG.assets || !stageEl) return;
+    BZG.assets.preload([IMG_FUNDO], function (ok) {
+      if (ok[IMG_FUNDO]) {
+        stageEl.style.setProperty("--jogo-fundo", 'url("' + absUrl(IMG_FUNDO) + '")');
+        stageEl.classList.add("has-fundo");
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
     spinBtn = document.getElementById("spin-btn");
@@ -453,6 +471,7 @@
     BZG.ui.refreshBalance();
     renderResults();
     renderHistory();
+    loadImages();
 
     spinBtn.addEventListener("click", spin);
     clearBtn.addEventListener("click", clearBets);
