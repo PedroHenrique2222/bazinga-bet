@@ -115,14 +115,14 @@
 
     if (mineIndexes.indexOf(index) !== -1) {
       cell.classList.add("bomb");
-      cell.textContent = "💣";
+      cell.innerHTML = BZG.icons ? BZG.icons.art("bomba", 44) : "💣";
       BZG.effects.shake(stageEl);
       BZG.effects.flash(stageEl, "red");
       endRound(false);
     } else {
       revealedCount++;
       cell.classList.add("safe");
-      cell.textContent = "🥒";
+      cell.innerHTML = BZG.icons ? BZG.icons.art("mines", 48) : "🥒";
       BZG.sounds.click();
 
       var mult = currentMultiplier(revealedCount);
@@ -159,10 +159,10 @@
       setTimeout(function () {
         cell.classList.add("revealed", "disabled", "ghost");
         if (isBomb) {
-          cell.textContent = "💣";
+          cell.innerHTML = BZG.icons ? BZG.icons.art("bomba", 44) : "💣";
           cell.classList.add("bomb");
         } else {
-          cell.textContent = "🥒";
+          cell.innerHTML = BZG.icons ? BZG.icons.art("mines", 48) : "🥒";
           cell.classList.add("safe");
         }
       }, delay);

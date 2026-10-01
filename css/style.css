@@ -2317,3 +2317,141 @@ input[type="number"]:focus, input[type="text"]:focus, select:focus {
   .bw-stage.bw-shake, .bw-stage.bw-shake-hard, .bw-amount.counting, .bw-rays { animation: none; }
   .bw-coin, .bw-confetti, .bw-spark { display: none; }
 }
+
+/* ==========================================================================
+   v1.21 - telas de jogo novas (todas) + icones desenhados
+   ========================================================================== */
+
+.bzg-icon { display: block; flex-shrink: 0; }
+.nav-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; }
+.nav-item .nav-icon .bzg-icon { border-radius: 6px; }
+.nav-item.active .nav-icon .bzg-icon { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.85); }
+.topbar-title { display: flex; align-items: center; gap: 10px; }
+.topbar-title-icon { display: inline-flex; font-size: 20px; }
+.mini-stat-icon { display: inline-flex; color: var(--text-muted); }
+.icon-btn .bzg-icon { width: 20px; height: 20px; }
+.topbar-menu .bzg-icon { width: 22px; height: 22px; }
+.game-card .icon .bzg-icon { width: 84px; height: 84px; }
+.bets-game .bzg-icon { border-radius: 6px; }
+
+/* ---------- Layout de jogo: aposta a esquerda, jogo a direita ---------- */
+.game-layout {
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+}
+.game-layout .panel {
+  border-radius: 12px;
+  box-shadow: none;
+}
+.game-layout > .controls {
+  background: var(--panel-solid);
+  padding: 20px;
+}
+.controls label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+.controls input[type="number"], .controls input[type="text"], .controls select {
+  height: 48px;
+  border-radius: 8px;
+  background: var(--bg);
+  font-weight: 800;
+  font-size: 16px;
+}
+.controls input:focus, .controls select:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px var(--red-glow);
+}
+.controls .input-row { gap: 6px; }
+.controls .input-row .btn {
+  flex: 1;
+  height: 40px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+.controls .btn--primary, .controls .btn--gold {
+  min-height: 54px;
+  border-radius: 8px;
+  font-size: 17px !important;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+.controls .btn--primary:not(:disabled) { animation: bzg-bet-pulse 2s ease-out infinite; }
+.controls .btn--gold {
+  background: var(--green);
+  color: #062b16;
+  box-shadow: 0 4px 16px rgba(46, 204, 113, 0.35);
+}
+.controls .btn--gold:hover:not(:disabled) { filter: brightness(1.08); }
+@keyframes bzg-bet-pulse {
+  0% { box-shadow: 0 0 0 0 var(--red-glow); }
+  70%, 100% { box-shadow: 0 0 0 12px rgba(241, 44, 76, 0); }
+}
+.risk-options .btn.active {
+  background: var(--red);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* area do jogo: fundo escuro com brilho na cor do jogo */
+.game-layout .stage {
+  --game-c: var(--red);
+  min-height: 520px;
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--game-c) 26%, transparent), transparent 62%),
+    var(--bg-alt);
+  border: 1px solid var(--border);
+}
+body[style*="--game-c"] .game-layout .stage { --game-c: inherit; }
+
+/* historico em linhas limpas */
+.history-list .section-title { margin-top: 22px; }
+.history-row {
+  align-items: center;
+  padding: 9px 10px;
+  border-radius: 6px;
+  border-bottom: 0;
+}
+.history-row:nth-child(odd) { background: var(--bg); }
+.history-row .tag { border-radius: 6px; }
+
+/* Mines: casas com cara de botao, picles e bomba desenhados */
+.stage .mines-grid { max-width: 520px; gap: 12px; }
+.mines-grid .mine-cell {
+  background: #2a3a4a;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: inset 0 -6px 0 #1e2b38;
+}
+:root[data-theme="light"] .mines-grid .mine-cell { background: #d9dee4; box-shadow: inset 0 -6px 0 #b9c1ca; }
+.mines-grid .mine-cell::after { content: ""; }
+.mines-grid .mine-cell:hover:not(.revealed) {
+  border-color: transparent;
+  background: #33475a;
+  box-shadow: inset 0 -6px 0 #1e2b38, 0 0 0 2px var(--red);
+}
+.mines-grid .mine-cell.safe {
+  background: #14402b;
+  box-shadow: 0 0 0 2px var(--green), 0 0 18px rgba(46, 204, 113, 0.45);
+}
+.mines-grid .mine-cell.bomb {
+  background: #4a0f1a;
+  box-shadow: 0 0 0 2px var(--red), 0 0 22px var(--red-glow);
+}
+.mines-grid .mine-cell .bzg-icon { width: 70%; height: 70%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35)); }
+.stage .mines-multiplier { color: var(--green); text-shadow: 0 0 20px rgba(46, 204, 113, 0.5); font-size: 34px; }
+
+@media (max-width: 980px) {
+  .game-layout { grid-template-columns: 1fr; }
+  /* no celular: jogo em cima, aposta embaixo */
+  .game-layout > .controls { order: 1; }
+  .game-layout .stage { min-height: 360px; }
+}
+@media (max-width: 640px) {
+  .topbar-title-icon { display: none; }
+  .topbar-title { font-size: 15px; min-width: 0; flex-shrink: 1; overflow: hidden; }
+  .topbar .icon-btn .bzg-icon { width: 18px; height: 18px; }
+}

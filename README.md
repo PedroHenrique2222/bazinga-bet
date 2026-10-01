@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.20
+# 🎰 Bazinga BET — v1.21
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.21 (2026-10-01) — 🎨 Ícones desenhados + telas de jogo novas
+- **Ícones desenhados (SVG) no lugar dos emojis**: novo `js/core/icons.js` (`BZG.icons.tile/art/nav`) com um ícone para cada um dos 15 jogos e 4 minigames, mais os ícones de linha do menu e do topo (Lobby, Ranking, Coleção, Passe, Perfil, Configurações, música, efeitos, tema, menu, nível, saldo). Aparecem iguais em qualquer aparelho. Usados no menu lateral, no título da topbar, nos cartões do lobby e na tabela de últimas apostas. Se o arquivo faltar, tudo volta para os emojis antigos.
+- **Telas de jogo novas (todas)**: aposta à esquerda (340px) e jogo à direita; campos maiores, botão de apostar vermelho pulsando, botão de colher/retirar verde, opções ativas em vermelho, histórico em linhas alternadas e área do jogo com brilho na **cor do jogo** (`--game-c`, definida pelo `layout.js`). No celular o jogo fica em cima e a aposta embaixo.
+- **Mines**: casas com cara de botão, picles e bomba desenhados no lugar dos emojis 🥒/💣.
 
 ### v1.20 (2026-10-01) — 🟥 Visual novo estilo Blaze + vitórias em 3 níveis
 - **Visual cinza-escuro + vermelho** (tema escuro, estilo Blaze): nova paleta em `:root[data-theme="dark"]`, vermelho `#f12c4c`, item ativo do menu lateral em vermelho sólido, saldo grudado no botão vermelho **Recarregar** na topbar. Os outros temas/skins continuam funcionando.

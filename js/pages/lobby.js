@@ -91,7 +91,7 @@
       var badge = card.badge ? '<span class="card-badge">' + card.badge + '</span>' : "";
       return '<a class="game-card" href="' + GAMES_DIR + card.href + '" style="--card-c:' + card.color + '">' +
         badge +
-        '<div class="icon">' + card.icon + '</div>' +
+        '<div class="icon">' + (BZG.icons && BZG.icons.has(card.id) ? BZG.icons.art(card.id, 84) : card.icon) + '</div>' +
         '<h2>' + card.name + '</h2>' +
         '<p>' + card.desc + '</p>' +
         liveInfo +
