@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.26
+# 🎰 Bazinga BET — v1.27
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,10 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.27 (2026-10-01) — 🖥️ Site usa a tela toda + banner com todos os jogos
+- **Mais espaço na tela**: a área central deixou de ter 1160px de largura máxima e passou a ocupar quase a tela toda (até 2200px, com margem de 16–40px). O lobby mostra mais cartões por linha e a área dos jogos fica maior.
+- **Banner do lobby passa por todos os jogos**: um slide por jogo (gerados por `initBanner()` em `lobby.js`), com a capa ilustrada inteira e inclinada à direita, a mesma capa ampliada e desfocada no fundo, ícone, selo (NOVO / AO VIVO), nome, descrição e "Jogar agora". Troca a cada 5s, pausa com o mouse em cima, tem setas e dá pra arrastar no celular.
 
 ### v1.26 (2026-10-01) — 🖼️ Capas ilustradas no lobby
 - **Capas dos jogos**: os cartões do lobby agora mostram uma arte ilustrada de cada jogo (`assets/capas/<id>.webp`, 768×1024, geradas pelo Codex a partir de `docs/codex-capas.md`), com o nome por cima da faixa escura de baixo e zoom suave no hover. Se uma capa não carregar, o cartão volta sozinho ao visual com ícone.
