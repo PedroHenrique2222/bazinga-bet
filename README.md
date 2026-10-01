@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.23
+# 🎰 Bazinga BET — v1.24
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,12 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.24 (2026-10-01) — 🧈 Animações fluidas nos caça-níqueis + Plinko consertado
+- **Plinko consertado**: as abóboras ficavam paradas em cima dos pinos da penúltima fileira e só caíam pelo limite de 10s. Causa: o "assentar na casa sorteada" puxava a bolinha para o centro da casa antes de ela passar pela penúltima fileira, cujos pinos ficam exatamente em cima desse centro. Agora o assentar só começa depois dessa fileira, e uma bolinha que bate reto no topo de um pino escorrega para o lado. Queda volta a levar ~2,5–4,5s (antes: 10s cravados).
+- **Bazinguinha mais fluido**: os rolos param com um quique suave (passam um pouco do ponto e voltam), o desfoque pesado do giro virou um "esticar" do símbolo (bem mais leve), a re-rolagem do WILD troca só as casas que giraram (os wilds travados não piscam mais) e as linhas vencedoras se desenham de ponta a ponta.
+- **Bonanza mais fluido**: na cascata, só caem os símbolos que desceram, cada um da sua distância e com quique — antes a grade inteira era redesenhada e caía de novo a cada cascata. No giro novo os símbolos caem coluna por coluna.
+- **Brilhos sem engasgo** (os dois jogos): os brilhos pulsantes (vencedores, WILD travado, bônus, bombas, moldura) deixaram de redesenhar sombras a cada quadro e viraram uma camada que só muda de transparência. Medido: 60 quadros por segundo durante o giro e as cascatas.
 
 ### v1.23 (2026-10-01) — 🎰 Bazinguinha e Bonanza turbinados, reset geral, sem bônus diário
 - **Reset geral**: `RESET_TOKEN` em `theme.js` trocado para `v1.23-reset` — na próxima visita, todo jogador recomeça do zero (saldo, nível, passe, coleção e cadastro). O ranking online (Supabase) é zerado junto, quando esta versão entra no ar.

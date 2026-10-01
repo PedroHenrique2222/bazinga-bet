@@ -104,6 +104,22 @@
     return BZG.icons && SYM_ART[icon] ? BZG.icons.art(SYM_ART[icon], size || 64) : icon;
   }
 
+  /* troca so as celulas indicadas, sem recriar a grade inteira */
+  function updateCells(grid, idxs) {
+    idxs.forEach(function (idx) {
+      var col = gridEl.children[idx % 3];
+      var strip = col && col.firstChild;
+      var old = strip && strip.children[Math.floor(idx / 3)];
+      if (!old) return;
+      var tmp = document.createElement("div");
+      tmp.innerHTML = cellHTML(grid[idx]);
+      var cell = tmp.firstChild;
+      cell.classList.add("reroll");
+      if (grid[idx] === "⚡") cell.classList.add("locked");
+      strip.replaceChild(cell, old);
+    });
+  }
+
   function cellHTML(icon) {
     if (icon === "⚡") {
       return '<div class="ft-cell ft-cell-wild"><i>' + symArt("⚡") + '</i><em>WILD</em></div>';
@@ -140,6 +156,16 @@
   }
 
   function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+
+  /* posicao do rolo no tempo t (0..1): desacelera, passa um pouquinho do ponto
+     (overshoot de ~18% de uma celula) e volta macio - parece um rolo de verdade */
+  var STOP_AT = 0.86;
+  function reelPos(t, dist, cellH) {
+    var over = cellH * 0.18;
+    if (t < STOP_AT) return (dist + over) * easeOutQuart(t / STOP_AT);
+    var k = (t - STOP_AT) / (1 - STOP_AT);
+    return dist + over * (1 - (1 - Math.pow(1 - k, 2)));
+  }
 
   function buildStrip(stripEl, colSymbols) {
     var cells = [];
@@ -244,15 +270,15 @@
       var allDone = true;
       for (var c2 = 0; c2 < 3; c2++) {
         var t = Math.min(1, (now - start) / (durs[c2] * BZG.modes.speed()));
-        var eased = easeOutQuart(t);
-        stripEls[c2].style.transform = "translateY(-" + (distances[c2] * eased).toFixed(1) + "px)";
         var cellH = distances[c2] / (STRIP_LEN - 3);
-        var crossed = Math.floor((distances[c2] * eased) / cellH);
+        var pos = reelPos(t, distances[c2], cellH);
+        stripEls[c2].style.transform = "translate3d(0,-" + pos.toFixed(1) + "px,0)";
+        var crossed = Math.floor(pos / cellH);
         if (crossed > lastTicks[c2] && t < 1) {
           if (c2 === 0 || (tease && c2 === 2 && done[1])) BZG.sounds.tick();
           lastTicks[c2] = crossed;
         }
-        if (t >= 1 && !done[c2]) {
+        if (t >= STOP_AT && !done[c2]) {
           done[c2] = true;
           BZG.sounds.click();
           stripEls[c2].classList.remove("blur");       // tira o blur ao parar
@@ -301,7 +327,7 @@
       }
     }
     var wc = countWild(grid);
-    renderStaticGrid(grid, { locked: true, reroll: changed });
+    updateCells(grid, changed);
     BZG.sounds.click();
 
     var sp = BZG.modes.speed();
@@ -350,7 +376,7 @@
     // desenha as linhas vencedoras e acende os indicadores
     winlinesEl.innerHTML = winLines.map(function (l) {
       var co = LINE_COORDS[l];
-      return '<line x1="' + co[0][0] + '" y1="' + co[0][1] + '" x2="' + co[1][0] + '" y2="' + co[1][1] + '"/>';
+      return '<line pathLength="100" x1="' + co[0][0] + '" y1="' + co[0][1] + '" x2="' + co[1][0] + '" y2="' + co[1][1] + '"/>';
     }).join("");
     lineDots.forEach(function (d) {
       if (winLines.indexOf(Number(d.dataset.line)) !== -1) d.classList.add("hit");

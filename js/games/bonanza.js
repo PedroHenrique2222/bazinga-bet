@@ -92,14 +92,18 @@
   // cascata: por coluna, mantem as celulas NAO removidas (scatter/bomba grudam e caem),
   // preenche o topo com celulas novas
   function tumble(remove, pBomb, st) {
+    var falls = []; // falls[c][r] = quantas linhas a celula desceu (0 = ficou parada)
     for (var c = 0; c < COLS; c++) {
-      var kept = [];
-      for (var r = 0; r < ROWS; r++) if (!remove[c][r]) kept.push(grid[c][r]);
+      var kept = [], keptFrom = [];
+      for (var r = 0; r < ROWS; r++) if (!remove[c][r]) { kept.push(grid[c][r]); keptFrom.push(r); }
       var need = ROWS - kept.length;
       var col = [];
-      for (var t = 0; t < need; t++) col.push(newCell(pBomb, st));
+      falls[c] = [];
+      for (var t = 0; t < need; t++) { col.push(newCell(pBomb, st)); falls[c].push(need); } // novos vem de cima
+      keptFrom.forEach(function (from, k) { falls[c].push(need + k - from); });
       grid[c] = col.concat(kept); // novos no topo
     }
+    return falls;
   }
 
   function scatterPay(sc) { var key = sc >= 6 ? 6 : sc; return SCAT_PAY[key] || SCAT_PAY[6]; }
@@ -117,13 +121,14 @@
     });
   }
 
-  function cellHTML(cell, win, drop) {
-    var cls = "gem" + (drop ? " drop" : "") + (win ? " win" : "");
+  function cellHTML(cell, win, fall, delay) {
+    var cls = "gem" + (fall ? " fall" : "") + (win ? " win" : "");
+    var style = fall ? ' style="--n:' + fall + ';animation-delay:' + (delay || 0) + 'ms"' : "";
     var content;
     if (cell.k === "p") content = symArt(SYMBOLS[cell.i].icon);
     else if (cell.k === "s") { cls += " scatter"; content = symArt(SCATTER); }
     else { cls += " bomb"; content = symArt("💣") + '<b>' + cell.v + 'x</b>'; }
-    return '<div class="' + cls + '">' + content + '</div>';
+    return '<div class="' + cls + '"' + style + '>' + content + '</div>';
   }
 
   /* "+BZ$ X" que sobe de dentro da grade a cada cascata */
@@ -136,15 +141,28 @@
     setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 1300);
   }
 
+  /* opts.drop: giro novo, tudo cai de cima (coluna por coluna, de baixo pra cima).
+     opts.falls: cascata, so cai quem desceu, cada um a sua distancia. */
   function renderGrid(opts) {
     opts = opts || {};
     var html = "";
+    var sp = BZG.modes.speed();
     for (var r = 0; r < ROWS; r++) {
       for (var c = 0; c < COLS; c++) {
-        html += cellHTML(grid[c][r], opts.remove && opts.remove[c][r], opts.drop);
+        var fall = 0, delay = 0;
+        if (opts.drop) { fall = ROWS; delay = (c * 45 + (ROWS - 1 - r) * 22) * sp; }
+        else if (opts.falls) { fall = opts.falls[c][r]; delay = c * 25 * sp; }
+        html += cellHTML(grid[c][r], false, fall, delay);
       }
     }
     gridEl.innerHTML = html;
+  }
+
+  /* marca os vencedores nas celulas que ja estao na tela (sem redesenhar a grade) */
+  function markWinners(remove) {
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < COLS; c++) {
+      if (remove[c][r]) { var el = gridEl.children[r * COLS + c]; if (el) el.classList.add("win"); }
+    }
   }
 
   function showBanner(text, cls) {
@@ -234,7 +252,7 @@
         return;
       }
       accWin += ev.pay;
-      renderGrid({ remove: ev.remove });
+      markWinners(ev.remove);
       BZG.sounds.pegHit();
       floatWin(Math.round(curBet * ev.pay * SCALE));
       winEl.className = "bonanza-win counting";
@@ -244,12 +262,12 @@
         Array.prototype.forEach.call(gridEl.querySelectorAll(".gem.win"), function (g) { g.classList.add("pop"); });
       }, spd(360));
       setTimeout(function () {
-        tumble(ev.remove, pBomb, st);
-        renderGrid({ drop: true });
+        var falls = tumble(ev.remove, pBomb, st);
+        renderGrid({ falls: falls });
         BZG.sounds.tick();
-        setTimeout(step, spd(260));
+        setTimeout(step, spd(470));
       }, spd(620));
-    }, spd(360));
+    }, spd(720));
   }
 
   function lockUI(lock) {

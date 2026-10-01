@@ -259,3 +259,68 @@
 @media (prefers-reduced-motion: reduce) {
   .gem.bomb.boom, .stage.scatter-tease .bonanza-frame, .stage.scatter-tease .gem.scatter { animation: none; }
 }
+
+/* ---------- v1.24: animacoes mais fluidas ----------
+   cascata: so cai quem desceu, cada um a sua distancia (--n linhas), com quique;
+   brilhos viram camadas fixas que so mudam de opacidade (sem redesenhar sombras) */
+.bonanza-grid { --gap: 5px; }
+.gem { will-change: transform; transform: translate3d(0, 0, 0); }
+.gem.fall {
+  animation: gem-fall calc(240ms + var(--n) * 55ms) cubic-bezier(0.33, 1.25, 0.55, 1) both;
+}
+@keyframes gem-fall {
+  from { transform: translate3d(0, calc(var(--n) * -1 * (100% + var(--gap))), 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.gem.win, .gem.scatter, .gem.bomb { animation-name: none; box-shadow: none; }
+.gem.fall.scatter, .gem.fall.bomb { animation-name: gem-fall; }
+.gem.win::before, .gem.scatter::before, .gem.bomb::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  will-change: opacity;
+  animation: gem-glow 0.8s ease-in-out infinite alternate;
+}
+.gem.win::before { box-shadow: inset 0 0 0 2px #ffe27a, 0 0 18px rgba(255, 210, 0, 0.8); animation-duration: 0.4s; }
+.gem.scatter::before { box-shadow: inset 0 0 0 3px #fff0a0, 0 0 24px rgba(255, 220, 120, 0.9); }
+.gem.bomb::before { box-shadow: inset 0 0 0 3px #fff0a0, 0 0 22px rgba(255, 120, 60, 0.9); }
+@keyframes gem-glow { from { opacity: 0.35; } to { opacity: 1; } }
+
+/* vencedor: pulsa (transform) e depois explode */
+.gem.win { animation: gem-win-pulse 0.4s ease-in-out infinite alternate; z-index: 2; }
+@keyframes gem-win-pulse { from { transform: scale(1); } to { transform: scale(1.12); } }
+.gem.win.pop { animation: gem-pop 0.26s ease-in forwards; }
+@keyframes gem-pop {
+  0% { transform: scale(1.12); opacity: 1; }
+  45% { transform: scale(1.36); opacity: 1; }
+  100% { transform: scale(0.1) rotate(25deg); opacity: 0; }
+}
+.gem.bomb.boom { animation: gem-boom 0.3s ease-in-out infinite alternate; }
+@keyframes gem-boom {
+  from { transform: scale(1); }
+  to { transform: scale(1.3) rotate(-8deg); }
+}
+.stage.scatter-tease .gem.scatter { animation: gem-boom 0.4s ease-in-out infinite alternate; }
+
+/* moldura: brilho das gratis/suspense por opacidade */
+.stage.free-mode .bonanza-frame, .stage.scatter-tease .bonanza-frame { animation: none; }
+.bonanza-frame::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 0 44px rgba(255, 46, 136, 0.95);
+}
+.stage.free-mode .bonanza-frame::after { opacity: 1; animation: gem-glow 1.4s ease-in-out infinite alternate; box-shadow: 0 0 44px rgba(255, 170, 240, 0.75); }
+.stage.scatter-tease .bonanza-frame::after { opacity: 1; animation: gem-glow 0.4s ease-in-out infinite alternate; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gem.fall { animation-duration: 1ms; }
+  .gem.win::before, .gem.scatter::before, .gem.bomb::before, .bonanza-frame::after { animation: none; }
+}
