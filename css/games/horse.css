@@ -82,3 +82,58 @@
 }
 
 .lane.winner { box-shadow: inset 0 0 0 2px var(--green), 0 0 16px rgba(46, 204, 113, 0.4); }
+
+/* cenario opcional (assets/jogos/horse/fundo.webp): o JS liga .has-bg quando a imagem
+   carrega; o degrade na cor do tema por cima mantem o jogo legivel */
+#horse-stage.has-bg {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-alt) 58%, transparent), color-mix(in srgb, var(--bg-alt) 84%, transparent)),
+    var(--stage-fundo) center / cover no-repeat,
+    var(--bg-alt);
+}
+
+/* corredores com imagem do Codex (sem imagem: emoji de sempre) */
+.horse-pick .pick-img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
+  animation: horse-idle 2.4s ease-in-out infinite;
+}
+
+.runner.has-img { gap: 0; }
+
+.runner-img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.45));
+  animation: horse-idle 2.4s ease-in-out infinite;
+}
+
+/* balanco de corrida: pula e inclina enquanto a corrida roda */
+.is-racing .runner-img { animation: horse-gallop 0.32s ease-in-out infinite alternate; }
+.lane:nth-child(2n) .runner-img { animation-delay: -0.12s; }
+.lane:nth-child(3n) .runner-img { animation-delay: -0.21s; }
+.lane.winner .runner-img { animation: horse-win 0.6s ease-in-out 3; }
+
+@keyframes horse-idle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-3deg); }
+}
+
+@keyframes horse-gallop {
+  from { transform: translateY(1px) rotate(4deg); }
+  to { transform: translateY(-5px) rotate(-6deg); }
+}
+
+@keyframes horse-win {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .horse-pick .pick-img, .runner-img, .is-racing .runner-img, .lane.winner .runner-img { animation: none; }
+}

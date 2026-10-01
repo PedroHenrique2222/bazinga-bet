@@ -21,7 +21,7 @@ BZG.layout = (function () {
     { href: "plinko.html", icon: "🎃", label: "Plinko da Abóbora", page: "plinko" },
     { href: "dice.html", icon: "🎲", label: "Dado 616", page: "dice" },
     { href: "hilo.html", icon: "🃏", label: "HiLo do Panetone", page: "hilo" },
-    { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette" },
+    { href: "roulette.html", icon: "🎯", label: "Roleta", page: "roulette", live: true },
     { href: "blackjack.html", icon: "🍑", label: "21 do Bogão", page: "blackjack" },
     { href: "bazinguinha.html", icon: "🐯", label: "Bazinguinha", page: "bazinguinha" },
     { href: "bonanza.html", icon: "💎", label: "Bazinga Bonanza", page: "bonanza", hot: true },
@@ -181,7 +181,11 @@ BZG.layout = (function () {
     if (maxwinEl) maxwinEl.textContent = BZG.ui.formatMoney(stats.maxWin || 0);
     if (avatarEl || nameEl || chipLvlEl) {
       var profile = BZG.storage.getProfile();
-      if (avatarEl) avatarEl.textContent = profile.avatar;
+      // so redesenha quando o avatar muda (evita recarregar a imagem a cada aposta)
+      if (avatarEl && avatarEl.getAttribute("data-avatar") !== profile.avatar) {
+        avatarEl.setAttribute("data-avatar", profile.avatar);
+        avatarEl.innerHTML = BZG.ui.avatarHTML ? BZG.ui.avatarHTML(profile.avatar, 0, { lazy: false }) : BZG.ui.escapeHtml(profile.avatar);
+      }
       if (nameEl) nameEl.innerHTML = BZG.ui.nameHTML(profile.nickname);
       if (chipLvlEl) chipLvlEl.textContent = "Lv " + lvl.level;
     }
@@ -194,7 +198,7 @@ BZG.layout = (function () {
     el.innerHTML = '' +
       '<button class="icon-btn topbar-menu" id="menu-btn" title="Menu" aria-label="Abrir menu">' + navIcon("menu", "☰") + '</button>' +
       '<a class="topbar-profile" id="topbar-profile-link" href="' + ROOT_PREFIX + 'profile.html" title="Ver perfil">' +
-        '<span class="topbar-profile-avatar" id="topbar-profile-avatar">😎</span>' +
+        '<span class="topbar-profile-avatar" id="topbar-profile-avatar" aria-hidden="true">😎</span>' +
         '<span class="topbar-profile-name" id="topbar-profile-name"></span>' +
         '<span class="topbar-profile-lvl" id="topbar-profile-lvl">Lv 1</span>' +
       '</a>' +
@@ -301,15 +305,30 @@ BZG.layout = (function () {
     }
   }
 
-  /* Contador de "jogadores online": varia com a hora do dia + ruido, atualiza sozinho */
-  function updateOnlineCount() {
+  /* Contador de jogadores online: agora e REAL (v1.34) - quem esta com o site aberto,
+     contado pela presence do Supabase em js/core/live.js. Sem conexao mostra "—". */
+  function updateOnlineCount(n) {
     var el = document.getElementById("online-count-value");
     if (!el) return;
-    var now = new Date();
-    var dayCycle = Math.sin(((now.getHours() * 60 + now.getMinutes()) / 1440) * Math.PI * 2 - Math.PI / 2);
-    var base = 1900 + Math.round(dayCycle * 700);
-    var slowNoise = Math.sin(now.getTime() / 47000) * 120 + Math.sin(now.getTime() / 13000) * 45;
-    el.textContent = (base + Math.round(slowNoise)).toLocaleString("pt-BR");
+    el.textContent = n > 0 ? n.toLocaleString("pt-BR") : "—";
+  }
+
+  /* Ao vivo: carrega live.js (se o jogo ainda nao trouxe) + chat.js quando o navegador
+     fica ocioso, liga o contador de online e monta o botao de chat. */
+  function setupLive() {
+    if (!BZG.storage.hasAccount || !BZG.storage.hasAccount()) return;
+    document.addEventListener("bzg:live-online", function (e) { updateOnlineCount(e.detail.total); });
+    var start = function () {
+      function withChat() {
+        if (BZG.live) BZG.live.startOnline();
+        if (BZG.chat) BZG.chat.mount();
+        else loadScriptOnce(ROOT_PREFIX + "js/core/chat.js", function () { if (BZG.chat) BZG.chat.mount(); });
+      }
+      if (BZG.live) withChat();
+      else loadScriptOnce(ROOT_PREFIX + "js/core/live.js", withChat);
+    };
+    if (window.requestIdleCallback) requestIdleCallback(start, { timeout: 2000 });
+    else setTimeout(start, 1000);
   }
 
   /* ---------- Ranking online em segundo plano ---------- */
@@ -505,8 +524,8 @@ BZG.layout = (function () {
     renderTopbar(title, icon);
     wireUiSounds();
 
-    updateOnlineCount();
-    setInterval(updateOnlineCount, 5000);
+    updateOnlineCount(0);
+    setupLive();
 
     // sempre que o saldo muda (apos apostas, bonus etc.): recarrega sozinho se zerou, e checa conquistas
     var pendingReloadTimer = null;

@@ -108,7 +108,24 @@ BZG.bots = (function () {
     return bots;
   }
 
+  /* Gera os bots de uma rodada de Roleta ao vivo: cada um aposta numa casa */
+  var ROULETTE_PICKS = ["red", "black", "red", "black", "even", "odd", "low", "high", "d1", "d2", "d3"];
+  function rouletteRoundBots() {
+    var count = 5 + rand(7);
+    var used = {};
+    var bots = [];
+    for (var i = 0; i < count; i++) {
+      var bot = randomBot();
+      if (used[bot.name]) continue;
+      used[bot.name] = true;
+      var key = Math.random() < 0.3 ? "n" + rand(37) : pick(ROULETTE_PICKS);
+      bots.push({ name: bot.name, avatar: bot.avatar, bet: randomBetAmount(), key: key });
+    }
+    return bots;
+  }
+
   return {
+    rouletteRoundBots: rouletteRoundBots,
     crashRoundBots: crashRoundBots,
     doubleRoundBots: doubleRoundBots
   };

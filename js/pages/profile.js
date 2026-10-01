@@ -99,21 +99,49 @@
     });
   }
 
+  // rotulo acessivel do botao de avatar (nome do personagem quando houver imagem)
+  function avatarAria(value, locked) {
+    var info = BZG.ui.avatarInfo(value);
+    if (!info) return locked ? ' aria-label="Avatar bloqueado"' : "";
+    return ' aria-label="Avatar ' + BZG.ui.escapeHtml(info.name) + (locked ? " (bloqueado)" : "") + '"';
+  }
+
+  // avatar grande do card (imagem do personagem ou emoji)
+  function renderBigAvatar(value) {
+    var el = document.getElementById("profile-avatar");
+    if (!el) return;
+    el.innerHTML = BZG.ui.avatarHTML(value, 0, { label: true, lazy: false });
+    el.classList.toggle("profile-avatar--img", !!BZG.ui.avatarInfo(value));
+  }
+
+  // faixa de fundo no topo do card (assets/turma.webp); sem a imagem, fica o visual de sempre
+  function renderProfileBanner() {
+    var card = document.querySelector(".profile-card");
+    if (!card || card.querySelector(".profile-banner")) return;
+    var wrap = document.createElement("div");
+    wrap.className = "profile-banner";
+    wrap.setAttribute("aria-hidden", "true");
+    wrap.innerHTML = BZG.ui.imgHTML(BZG.ui.assetPath("assets/turma.webp"), { cls: "profile-banner-img", lazy: false, onloadCls: "profile-card--banner" });
+    card.setAttribute("data-img-host", "");
+    if (wrap.innerHTML) card.insertBefore(wrap, card.firstChild);
+  }
+
   function renderAvatarPicker() {
     var picker = document.getElementById("avatar-picker");
     var list = avatarCatalog();
     picker.innerHTML = list.map(function (a) {
       if (!a.unlocked) {
-        return '<button class="avatar-option locked" disabled title="🔒 ' + BZG.ui.escapeHtml(a.lockLabel) + '">' +
-          '<span class="opt-icon">' + a.value + '</span><span class="lock-badge">🔒</span></button>';
+        return '<button class="avatar-option locked" disabled title="🔒 ' + BZG.ui.escapeHtml(a.lockLabel) + '"' + avatarAria(a.value, true) + '>' +
+          '<span class="opt-icon" aria-hidden="true">' + BZG.ui.avatarHTML(a.value) + '</span><span class="lock-badge" aria-hidden="true">🔒</span></button>';
       }
       var sel = a.value === selectedAvatar ? " selected" : "";
-      return '<button class="avatar-option' + sel + '" data-avatar="' + a.value + '"><span class="opt-icon">' + a.value + '</span></button>';
+      return '<button class="avatar-option' + sel + '" data-avatar="' + a.value + '"' + avatarAria(a.value, false) +
+        (sel ? ' aria-pressed="true"' : ' aria-pressed="false"') + '><span class="opt-icon" aria-hidden="true">' + BZG.ui.avatarHTML(a.value) + '</span></button>';
     }).join("");
     Array.prototype.forEach.call(picker.querySelectorAll(".avatar-option:not(.locked)"), function (btn) {
       btn.addEventListener("click", function () {
         selectedAvatar = btn.dataset.avatar;
-        document.getElementById("profile-avatar").textContent = selectedAvatar;
+        renderBigAvatar(selectedAvatar);
         renderAvatarPicker();
         BZG.sounds.click();
       });
@@ -205,7 +233,7 @@
       var items = BZG.collectibles.byCharacter(c.key).length;
       var complete = BZG.collectibles.isSetComplete(c.key);
       return '<div class="collection-mini' + (complete ? " complete" : "") + '" title="' + BZG.ui.escapeHtml(c.name) + ': ' + got + '/' + items + '">' +
-        '<span>' + c.avatar + '</span><span class="collection-mini-count">' + got + '/' + items + '</span></div>';
+        '<span class="collection-mini-avatar" aria-hidden="true">' + BZG.ui.avatarHTML(c.avatar) + '</span><span class="collection-mini-count">' + got + '/' + items + '</span></div>';
     }).join("");
     document.getElementById("collection-total").textContent = total;
     el.innerHTML = chars;
@@ -276,7 +304,10 @@
     var nameEl = document.getElementById("topbar-profile-name");
     var avatarEl = document.getElementById("topbar-profile-avatar");
     if (nameEl) nameEl.innerHTML = BZG.ui.nameHTML(nick);
-    if (avatarEl) avatarEl.textContent = selectedAvatar;
+    if (avatarEl) {
+      avatarEl.setAttribute("data-avatar", selectedAvatar);
+      avatarEl.innerHTML = BZG.ui.avatarHTML(selectedAvatar, 0, { lazy: false });
+    }
   }
 
   function renderAchievements() {
@@ -292,7 +323,7 @@
     el.innerHTML = list.map(function (a) {
       var isUnlocked = !!unlocked[a.id];
       return '<div class="achv' + (isUnlocked ? " unlocked" : "") + '" title="' + a.desc + '">' +
-        '<span class="achv-icon">' + (isUnlocked ? a.icon : "🔒") + '</span>' +
+        '<span class="achv-icon" aria-hidden="true">' + (isUnlocked ? BZG.ui.achievementIconHTML(a) : "🔒") + '</span>' +
         '<div class="achv-info">' +
           '<div class="achv-name">' + a.name + '</div>' +
           '<div class="achv-desc">' + a.desc + '</div>' +
@@ -304,7 +335,8 @@
   document.addEventListener("DOMContentLoaded", function () {
     var profile = BZG.storage.getProfile();
     selectedAvatar = profile.avatar;
-    document.getElementById("profile-avatar").textContent = profile.avatar;
+    renderBigAvatar(profile.avatar);
+    renderProfileBanner();
     document.getElementById("nickname-input").value = profile.nickname;
 
     renderAvatarPicker();

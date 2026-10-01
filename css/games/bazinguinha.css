@@ -1579,3 +1579,73 @@
   .ft-winlines .wl-glow { opacity: 0.5; }
   .ft-strip.blur .ft-cell .bzg-icon { transform: none; }
 }
+
+/* ---------- v1.32: Modo Auto na maquina ---------- */
+.ft-controls-side { display: flex; align-items: center; gap: calc(var(--u) * 10); }
+.ft-auto-txt {
+  font-weight: 900;
+  font-size: max(10px, calc(var(--u) * 12.5));
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.ft-auto.is-on {
+  color: #062b16;
+  background: radial-gradient(circle at 50% 32%, #5ef0a8, #14905a 78%);
+  animation: ft-auto-pulse 1.2s ease-in-out infinite;
+}
+.ft-auto.is-on .ft-auto-txt { font-size: max(12px, calc(var(--u) * 16)); }
+@keyframes ft-auto-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+.bz-auto-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: calc(var(--u) * 10) calc(var(--u) * 20) calc(var(--u) * 18);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--u) * 10);
+  font-size: max(13px, calc(var(--u) * 15));
+}
+.bz-auto-label { margin: calc(var(--u) * 4) 0 0; font-weight: 900; color: #7a2400; }
+.bz-auto-counts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: calc(var(--u) * 8); }
+.bz-auto-counts button {
+  min-height: 40px;
+  border: 0;
+  border-radius: calc(var(--u) * 12);
+  font: inherit;
+  font-weight: 900;
+  font-size: max(14px, calc(var(--u) * 18));
+  color: #ffe08a;
+  background: radial-gradient(circle at 50% 30%, #b3121e, #5e0510 80%);
+  box-shadow: 0 0 0 2px var(--gold);
+  cursor: pointer;
+}
+.bz-auto-counts button[aria-checked="true"] { color: #062b16; background: radial-gradient(circle at 50% 30%, #5ef0a8, #14905a 80%); }
+.bz-auto-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 700; }
+.bz-auto-row select, .bz-auto-row input {
+  width: 55%;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 2px solid #c98a1e;
+  background: #fffaf0;
+  color: #3d1600;
+  font: inherit;
+  font-weight: 700;
+  padding: 0 10px;
+}
+.bz-auto-check { display: flex; align-items: center; gap: 10px; font-weight: 700; min-height: 40px; cursor: pointer; }
+.bz-auto-check input { width: 22px; height: 22px; accent-color: #14905a; }
+.bz-auto-start {
+  margin-top: auto;
+  min-height: 52px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 900;
+  font-size: max(16px, calc(var(--u) * 20));
+  color: #fff;
+  background: radial-gradient(circle at 50% 30%, #2fd38a, #0b7a48 80%);
+  box-shadow: 0 0 0 3px var(--gold), 0 6px 14px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.bz-auto-start:hover { filter: brightness(1.1); }
+@media (prefers-reduced-motion: reduce) { .ft-auto.is-on { animation: none; } }

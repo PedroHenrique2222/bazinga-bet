@@ -189,9 +189,19 @@
       ctx.fillText(formatMult(mult), sx, L.slotY + L.slotH / 2);
     }
 
-    // bolinhas
+    // bolinhas (abobora do Codex girando conforme anda de lado; senao o desenho de sempre)
     for (var b = 0; b < balls.length; b++) {
       var ball = balls[b];
+      if (pumpkinImg) {
+        var d = L.ballR * 2.5;
+        ctx.save();
+        ctx.translate(ball.x, ball.y);
+        // giro so visual: deriva da posicao e da altura, nao toca na fisica
+        ctx.rotate((ball.x - L.centerX) / L.ballR * 0.35 + ball.y / L.ballR * 0.06);
+        ctx.drawImage(pumpkinImg, -d / 2, -d / 2, d, d);
+        ctx.restore();
+        continue;
+      }
       var grad = ctx.createRadialGradient(ball.x - 2, ball.y - 2, 1, ball.x, ball.y, L.ballR + 1);
       grad.addColorStop(0, "#ffcf8a");
       grad.addColorStop(1, "#f57c0c");
@@ -520,6 +530,28 @@
     betInput.value = Math.max(1, Math.round(next));
   }
 
+  /* ---------- imagens opcionais do Codex (plano B: desenho atual) ---------- */
+  var IMG_DIR = "../assets/jogos/plinko/";
+  var IMG = { fundo: IMG_DIR + "fundo.webp", abobora: IMG_DIR + "abobora.webp" };
+  var pumpkinImg = null; // Image ja carregado, reaproveitado em todo quadro
+
+  function loadImages() {
+    if (!BZG.assets) return;
+    BZG.assets.preload([IMG.fundo, IMG.abobora], function (ok) {
+      if (ok[IMG.fundo]) {
+        var url = IMG.fundo;
+        try { url = new URL(IMG.fundo, document.baseURI).href; } catch (e) {}
+        stageEl.style.setProperty("--stage-fundo", 'url("' + url + '")');
+        stageEl.classList.add("has-bg");
+      }
+      if (ok[IMG.abobora]) {
+        var img = new Image();
+        img.onload = function () { if (img.naturalWidth > 0) pumpkinImg = img; };
+        img.src = IMG.abobora;
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     betInput = document.getElementById("bet-amount");
     dropBtn = document.getElementById("drop-btn");
@@ -558,5 +590,6 @@
     });
 
     requestAnimationFrame(loop);
+    loadImages();
   });
 })();

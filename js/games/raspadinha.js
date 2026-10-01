@@ -13,6 +13,18 @@
   var ALL_SYMS = PRIZES.map(function (p) { return p.sym; });
   var REVEAL_RATIO = 0.55;   // % raspado para revelar a celula
 
+  /* imagens opcionais do Codex: simbolos e cenario (plano B = emoji / visual atual) */
+  var IMG_DIR = "../assets/jogos/raspadinha/";
+  var IMG_FUNDO = IMG_DIR + "fundo.webp";
+  var SYM_IMG = {
+    "🎃": { src: IMG_DIR + "sym-abobora.webp", alt: "Abóbora" },
+    "🥒": { src: IMG_DIR + "sym-picles.webp", alt: "Picles" },
+    "🔋": { src: IMG_DIR + "sym-pilha.webp", alt: "Pilha" },
+    "🍰": { src: IMG_DIR + "sym-panetone.webp", alt: "Panetone" },
+    "🍑": { src: IMG_DIR + "sym-pessego.webp", alt: "Pêssego" },
+    "⚡": { src: IMG_DIR + "sym-raio.webp", alt: "Raio" }
+  };
+
   var betInput, buyBtn, revealAllBtn, statusEl, historyListEl, cardEl, resultEl, stageEl;
   var cells = [];
   var revealed = [];
@@ -158,15 +170,54 @@
     if (revealed.every(Boolean)) resolve();
   }
 
+  /* ---------- imagens do Codex ---------- */
+
+  function absUrl(p) {
+    try { return new URL(p, document.baseURI).href; } catch (e) { return p; }
+  }
+
+  function symImgReady(sym) {
+    return !!(SYM_IMG[sym] && BZG.assets && BZG.assets.has(SYM_IMG[sym].src));
+  }
+
+  /* troca o emoji pela imagem em todo elemento [data-sym] (casas e tabela de premios) */
+  function applySymImages(root) {
+    Array.prototype.forEach.call((root || document).querySelectorAll("[data-sym]"), function (el) {
+      var sym = el.getAttribute("data-sym");
+      if (el.classList.contains("has-img") || !symImgReady(sym)) return;
+      var n = Number(el.getAttribute("data-n")) || 1;
+      var html = "";
+      for (var k = 0; k < n; k++) {
+        html += '<img src="' + SYM_IMG[sym].src + '" alt="' + (k === 0 ? SYM_IMG[sym].alt : "") + '" draggable="false" />';
+      }
+      el.innerHTML = html;
+      el.classList.add("has-img");
+    });
+  }
+
+  function loadImages() {
+    if (!BZG.assets) return;
+    var list = [IMG_FUNDO];
+    ALL_SYMS.forEach(function (s) { list.push(SYM_IMG[s].src); });
+    BZG.assets.preload(list, function (ok) {
+      if (ok[IMG_FUNDO]) {
+        stageEl.style.setProperty("--jogo-fundo", 'url("' + absUrl(IMG_FUNDO) + '")');
+        stageEl.classList.add("has-fundo");
+      }
+      applySymImages();
+    });
+  }
+
   /* ---------- render ---------- */
 
   function renderCard() {
     cardEl.innerHTML = cells.map(function (sym, i) {
       return '<div class="rasp-cell" data-i="' + i + '">' +
-        '<span class="rasp-sym">' + sym + '</span>' +
+        '<span class="rasp-sym" data-sym="' + sym + '">' + sym + '</span>' +
         '<canvas class="rasp-canvas"></canvas>' +
       '</div>';
     }).join("");
+    applySymImages(cardEl);
     // espera o layout para medir o tamanho real das celulas
     requestAnimationFrame(setupCanvases);
   }
@@ -299,6 +350,7 @@
     BZG.ui.refreshBalance();
     renderHistory();
     renderEmpty();
+    loadImages();
 
     /* raspagem: pointer events cobrem mouse, toque e caneta */
     cardEl.addEventListener("pointerdown", function (e) {

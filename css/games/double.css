@@ -221,3 +221,12 @@
 @media (max-width: 640px) {
   .round-countdown .time { font-size: 34px; }
 }
+
+/* cenario opcional (assets/jogos/double/fundo.webp): o JS liga .has-bg quando a imagem
+   carrega; o degrade na cor do tema por cima mantem o jogo legivel */
+#double-stage.has-bg {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-alt) 58%, transparent), color-mix(in srgb, var(--bg-alt) 84%, transparent)),
+    var(--stage-fundo) center / cover no-repeat,
+    var(--bg-alt);
+}

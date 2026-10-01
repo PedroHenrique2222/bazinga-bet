@@ -234,3 +234,33 @@
   font-weight: 800;
   color: var(--text-muted);
 }
+
+/* ---------- Imagens do Codex (com plano B) ---------- */
+
+/* avatar grande e grade de avatares */
+.profile-avatar { overflow: hidden; position: relative; z-index: 1; }
+.profile-avatar .bzg-avatar-img { width: 100%; height: 100%; }
+.avatar-option .opt-icon { display: flex; align-items: center; justify-content: center; min-height: 28px; }
+.avatar-option .bzg-avatar-img { width: 30px; height: 30px; }
+.collection-mini-avatar { display: flex; align-items: center; justify-content: center; min-height: 28px; }
+.collection-mini-avatar .bzg-avatar-img { width: 30px; height: 30px; }
+.achv-icon .bzg-achv-img { width: 38px; height: 38px; }
+
+/* faixa da turma (assets/turma.webp) no topo do card; so aparece se carregar */
+.profile-card { position: relative; }
+.profile-banner { display: none; }
+.profile-card--banner .profile-banner {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  margin-bottom: -64px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 55%, transparent);
+  mask-image: linear-gradient(#000 55%, transparent);
+}
+.profile-banner-img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+
+/* celular: as colunas do grid nao podem crescer alem da tela (evita rolagem lateral) */
+.profile-layout > *, .achv-grid > .achv { min-width: 0; }
+.profile-level-badge { position: relative; z-index: 2; }

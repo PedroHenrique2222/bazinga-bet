@@ -60,3 +60,44 @@
 
 .rasp-result.win { color: var(--green); text-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }
 .rasp-result.lose { color: var(--red); }
+
+/* ---------- cenario do Codex: assets/jogos/raspadinha/fundo.webp ----------
+   so entra quando a imagem carrega (classe has-fundo posta pelo JS); o degrade
+   escuro por cima deixa a mesa e os numeros legiveis. Sem imagem, fica como antes. */
+#rasp-stage.has-fundo {
+  --text: #ffffff;
+  --text-muted: rgba(236, 232, 248, 0.8);
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 48%, rgba(8, 6, 14, 0.28), rgba(8, 6, 14, 0.78) 100%),
+    linear-gradient(180deg, rgba(8, 6, 14, 0.6) 0%, rgba(8, 6, 14, 0.2) 38%, rgba(8, 6, 14, 0.2) 62%, rgba(8, 6, 14, 0.72) 100%),
+    var(--jogo-fundo, none) center / cover no-repeat,
+    #0b0912;
+}
+
+/* simbolos com as imagens do Codex (plano B = emoji) */
+.rasp-sym.has-img {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rasp-sym.has-img img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
+}
+.rasp-cell.win-cell .rasp-sym.has-img img {
+  filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.65));
+}
+.paytable-row span.has-img { gap: 3px; }
+.paytable-row span.has-img img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}

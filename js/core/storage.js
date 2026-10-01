@@ -7,9 +7,9 @@ BZG.storage = (function () {
   var MAX_HISTORY_ENTRIES = 25;
   // Custo de XP por nivel: progressivo (cada nivel pede mais que o anterior),
   // nao mais fixo - ver getLevel()/xpForLevel() abaixo. Subir de nivel ficou bem
-  // mais demorado: o custo base subiu de 1000 -> 3000 e o incremento de 100 -> 750.
-  var LEVEL_BASE_XP = 3000;
-  var LEVEL_STEP_XP = 750;
+  // mais demorado: v1.33 triplicou de novo (base 3000 -> 9000, incremento 750 -> 2250).
+  var LEVEL_BASE_XP = 9000;
+  var LEVEL_STEP_XP = 2250;
   // Marca de reset: ao mudar este valor, TODO jogador tem os niveis/XP zerados
   // uma unica vez ao abrir o site (o Passe de Batalha tambem reinicia).
   var RESET_TOKEN = "levels-reset-2026-07";
@@ -18,7 +18,7 @@ BZG.storage = (function () {
     return {
       account: null,        // { nickname, password, createdAt } - cadastro local, sem backend
       balance: STARTING_BALANCE,
-      reloadBonus: 0,        // aumenta o valor do botao "Recarregar", recompensa do Passe de Batalha
+      reloadBonus: 0,        // antigo bonus de recarga (desde v1.33 a recarga e SEMPRE BZ$ 10.000)
       profile: {
         nickname: "Jogador",
         avatar: "😎",
@@ -200,17 +200,13 @@ BZG.storage = (function () {
     return state.balance;
   }
 
-  // valor atual de recarga: base + bonus ganho no Passe de Batalha (recompensa "reloadBoost")
+  // valor de recarga: SEMPRE BZ$ 10.000 (v1.33 - nada aumenta mais a recarga)
   function getReloadAmount() {
-    return STARTING_BALANCE + (getState().reloadBonus || 0);
+    return STARTING_BALANCE;
   }
 
-  function addReloadBonus(amount) {
-    var state = getState();
-    state.reloadBonus = (state.reloadBonus || 0) + amount;
-    saveState(state);
-    return state.reloadBonus;
-  }
+  // mantido so por compatibilidade: nao faz mais nada
+  function addReloadBonus() { return 0; }
 
   // Anti-farm: cooldown entre recargas. Sem isso da pra apostar tudo num jogo de alta
   // variancia, zerar, recarregar de graca e repetir a jato ate acertar um multiplicador
@@ -224,7 +220,7 @@ BZG.storage = (function () {
 
   function resetBalance() {
     var state = getState();
-    state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    state.balance = STARTING_BALANCE;
     state.lastReload = Date.now();
     trackPeak(state);
     saveState(state);
@@ -235,7 +231,7 @@ BZG.storage = (function () {
   function autoReload() {
     var state = getState();
     state.stats.autoReloads = (state.stats.autoReloads || 0) + 1;
-    state.balance = STARTING_BALANCE + (state.reloadBonus || 0);
+    state.balance = STARTING_BALANCE;
     state.lastReload = Date.now();
     trackPeak(state);
     saveState(state);
@@ -425,9 +421,8 @@ BZG.storage = (function () {
     var amount = bonusAmountFor(newStreak);
     state.bonus.lastClaim = today;
     state.bonus.streak = newStreak;
-    state.reloadBonus = (state.reloadBonus || 0) + amount;
     saveState(state);
-    return { amount: amount, streak: newStreak, reloadAmount: STARTING_BALANCE + state.reloadBonus };
+    return { amount: amount, streak: newStreak, reloadAmount: STARTING_BALANCE };
   }
 
   /* ---------- Conquistas ---------- */

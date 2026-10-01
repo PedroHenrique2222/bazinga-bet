@@ -7,6 +7,36 @@
   var selectedSide = null;
   var flipping = false;
 
+  /* imagens opcionais do Codex: trocam sozinhas quando existirem (plano B = visual atual) */
+  var IMG_DIR = "../assets/jogos/coinflip/";
+  var IMG = { fundo: IMG_DIR + "fundo.webp", cara: IMG_DIR + "cara.webp", coroa: IMG_DIR + "coroa.webp" };
+
+  function absUrl(p) {
+    try { return new URL(p, document.baseURI).href; } catch (e) { return p; }
+  }
+
+  function loadImages() {
+    if (!BZG.assets) return;
+    BZG.assets.preload([IMG.fundo, IMG.cara, IMG.coroa], function (ok) {
+      if (ok[IMG.fundo]) {
+        stageEl.style.setProperty("--jogo-fundo", 'url("' + absUrl(IMG.fundo) + '")');
+        stageEl.classList.add("has-fundo");
+      }
+      // as duas faces so trocam juntas, para a moeda nunca ficar meio imagem, meio emoji
+      if (ok[IMG.cara] && ok[IMG.coroa]) {
+        coinEl.style.setProperty("--cf-cara", 'url("' + absUrl(IMG.cara) + '")');
+        coinEl.style.setProperty("--cf-coroa", 'url("' + absUrl(IMG.coroa) + '")');
+        coinEl.classList.add("has-img");
+        choiceBtns.forEach(function (b) {
+          var face = b.querySelector(".face");
+          if (!face) return;
+          face.innerHTML = '<img src="' + IMG[b.dataset.side] + '" alt="" />';
+          face.classList.add("has-img");
+        });
+      }
+    });
+  }
+
   function setStatus(t) { statusEl.textContent = t; }
 
   function renderHistory() {
@@ -119,6 +149,7 @@
 
     BZG.ui.refreshBalance();
     renderHistory();
+    loadImages();
 
     flipBtn.addEventListener("click", flip);
     choiceBtns.forEach(function (b) {

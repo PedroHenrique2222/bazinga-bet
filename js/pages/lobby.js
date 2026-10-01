@@ -32,7 +32,7 @@
     { id: "blackjack", color: "#0f5c3e", href: "blackjack.html", icon: "🍑", name: "21 do Bogão", desc: "Vença o Bogão no blackjack." },
     { id: "raspadinha", color: "#6b4bd6", href: "raspadinha.html", icon: "🎟️", name: "Raspadinha", desc: "Raspe e ache 3 iguais para ganhar.", badge: "NOVO" },
     { id: "limbo", color: "#1d5f99", href: "limbo.html", icon: "📉", name: "Limbo", desc: "Passou do seu alvo? Você ganha.", badge: "NOVO" },
-    { id: "roulette", color: "#8a1c1c", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x." }
+    { id: "roulette", color: "#8a1c1c", href: "roulette.html", icon: "🎯", name: "Roleta", desc: "0 a 36, número cheio paga 36x.", live: "roulette" }
   ];
 
   /* ---------- Banner rotativo ----------
@@ -118,21 +118,21 @@
 
   /* ---------- Cards de jogos ---------- */
 
+  // jogadores de verdade em cada mesa ao vivo (presence do site, js/core/live.js)
+  var livePages = {};
+  function playersText(id) {
+    var n = livePages[id] || 0;
+    return n > 0 ? "👥 " + n + " jogando agora" : "Rodadas ao vivo";
+  }
+  document.addEventListener("bzg:live-online", function (e) {
+    livePages = e.detail.pages || {};
+    Array.prototype.forEach.call(document.querySelectorAll("[data-live-count]"), function (el) {
+      el.textContent = playersText(el.getAttribute("data-live-count"));
+    });
+  });
+
   function lastResultHTML(card) {
-    if (card.live === "crash") {
-      var recent = BZG.storage.getRecent("crash");
-      if (recent.length) return "Último: " + Number(recent[0]).toFixed(2) + "x";
-      return "Rodadas ao vivo";
-    }
-    if (card.live === "double") {
-      var recentD = BZG.storage.getRecent("double");
-      if (recentD.length) {
-        var r = recentD[0];
-        var emoji = r.color === "white" ? "⚪" : (r.color === "red" ? "🔴" : "⚫");
-        return "Último: " + emoji + " " + r.n;
-      }
-      return "Roleta ao vivo";
-    }
+    if (card.live) return '<span data-live-count="' + card.live + '">' + playersText(card.live) + '</span>';
     return "";
   }
 

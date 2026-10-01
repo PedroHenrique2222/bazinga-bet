@@ -138,6 +138,11 @@ BZG.collectibles = (function () {
       'onerror="var s=document.createElement(\'span\');s.textContent=this.dataset.emoji;this.replaceWith(s);" data-emoji="' + item.icon + '">';
   }
 
+  // avatar do personagem (imagem redonda ou emoji, ver BZG.ui.avatarHTML)
+  function avatarHTML(emoji) {
+    return BZG.ui && BZG.ui.avatarHTML ? BZG.ui.avatarHTML(emoji, 0, { lazy: false }) : emoji;
+  }
+
   // pool ponderada por raridade pro sorteio do drop (lendarios repetem menos)
   var WEIGHTED_POOL = [];
   ALL_ITEMS.forEach(function (it) {
@@ -193,6 +198,21 @@ BZG.collectibles = (function () {
     reveal(item, character, justCompleted);
   }
 
+  // da 1 figurinha que o jogador ainda NAO tem (bonus de capitulo do Passe) e mostra
+  // o popup. Retorna o item, ou null se ja tem todas.
+  function grantRandomNew() {
+    var missing = ALL_ITEMS.filter(function (it) { return !BZG.storage.ownsCollectible(it.id); });
+    if (!missing.length) return null;
+    var item = missing[Math.floor(Math.random() * missing.length)];
+    var wasComplete = isSetComplete(item.char);
+    BZG.storage.grantCollectible(item.id);
+    var character = characterByKey(item.char);
+    var justCompleted = !wasComplete && isSetComplete(item.char);
+    if (justCompleted) BZG.storage.unlockCosmetic("avatars", character.avatar);
+    reveal(item, character, justCompleted);
+    return item;
+  }
+
   // popup animado de "novo colecionavel" - bem mais chamativo que um toast.
   // Nao bloqueia o jogo (overlay com pointer-events:none; so o card fecha ao clicar).
   function reveal(item, character, justCompleted) {
@@ -210,8 +230,8 @@ BZG.collectibles = (function () {
         '<div class="cr-sticker"><span class="cr-icon">' + iconHTML(item) + '</span><span class="cr-shine"></span></div>' +
         '<div class="cr-rarity">' + meta.label + '</div>' +
         '<div class="cr-name">' + BZG.ui.escapeHtml(item.name) + '</div>' +
-        '<div class="cr-album">' + character.avatar + ' ' + BZG.ui.escapeHtml(character.name) + ' · <strong>' + got + '/' + total + '</strong></div>' +
-        (justCompleted ? '<div class="cr-unlock">Avatar ' + character.avatar + ' desbloqueado!</div>' : '') +
+        '<div class="cr-album"><span class="cr-album-avatar" aria-hidden="true">' + avatarHTML(character.avatar) + '</span> ' + BZG.ui.escapeHtml(character.name) + ' · <strong>' + got + '/' + total + '</strong></div>' +
+        (justCompleted ? '<div class="cr-unlock">Avatar <span class="cr-album-avatar" aria-hidden="true">' + avatarHTML(character.avatar) + '</span> desbloqueado!</div>' : '') +
         '<div class="cr-hint">toque para fechar</div>' +
       '</div>';
     document.body.appendChild(overlay);
@@ -244,6 +264,7 @@ BZG.collectibles = (function () {
     DROP_CHANCE: DROP_CHANCE,
     RARITY: RARITY,
     rarityFor: rarityFor,
+    grantRandomNew: grantRandomNew,
     rarityMeta: rarityMeta,
     iconHTML: iconHTML,
     characters: characters,

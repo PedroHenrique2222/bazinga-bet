@@ -83,3 +83,45 @@
 
 .coin-result.win { color: var(--green); }
 .coin-result.lose { color: var(--red); }
+
+/* ---------- cenario do Codex: assets/jogos/coinflip/fundo.webp ----------
+   so entra quando a imagem carrega (classe has-fundo posta pelo JS); o degrade
+   escuro por cima deixa a mesa e os numeros legiveis. Sem imagem, fica como antes. */
+#coin-stage.has-fundo {
+  --text: #ffffff;
+  --text-muted: rgba(236, 232, 248, 0.8);
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 48%, rgba(8, 6, 14, 0.28), rgba(8, 6, 14, 0.78) 100%),
+    linear-gradient(180deg, rgba(8, 6, 14, 0.6) 0%, rgba(8, 6, 14, 0.2) 38%, rgba(8, 6, 14, 0.2) 62%, rgba(8, 6, 14, 0.72) 100%),
+    var(--jogo-fundo, none) center / cover no-repeat,
+    #0b0912;
+}
+
+/* faces da moeda com as imagens do Codex (cara = raio, coroa = pilha) */
+.coin.has-img .coin-face {
+  font-size: 0;
+  color: transparent;
+  background-color: transparent;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+.coin.has-img .coin-front { background-image: var(--cf-cara); }
+.coin.has-img .coin-back { background-image: var(--cf-coroa); }
+
+.coin-choice .face.has-img {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.coin-choice .face.has-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+}

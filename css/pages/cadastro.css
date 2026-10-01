@@ -89,3 +89,26 @@ body[data-page="cadastro"] {
   margin: 12px 0 0;
   line-height: 1.4;
 }
+
+/* arte da turma no topo do card (assets/turma.webp); escondida ate carregar
+   e removida pelo onerror se a imagem ainda nao existir */
+.cadastro-hero {
+  height: 0;
+  overflow: hidden;
+  margin: -30px -26px 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.cadastro-hero.is-loaded {
+  height: auto;
+  margin-bottom: 18px;
+}
+.cadastro-hero img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+@media (min-width: 900px) {
+  .cadastro-card { max-width: 480px; }
+}

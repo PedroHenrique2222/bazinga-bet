@@ -1,4 +1,7 @@
-/* Bazinga BET - Roleta europeia (0-36) com mesa de apostas multiplas */
+/* Bazinga BET - Roleta europeia (0-36) com mesa de apostas multiplas.
+   v1.34: modo AO VIVO (padrao) - a roleta gira sozinha a cada 25s para todo mundo
+   (relogio do servidor, BZG.live): 15s de apostas, 6s de giro, 4s de resultado.
+   O numero e o giro saem do numero da rodada, iguais em todo aparelho. Solo = o de sempre. */
 (function () {
   var WHEEL_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
   var RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
@@ -11,6 +14,22 @@
   var bets = {};        // chave -> valor apostado (ex: "n17", "red", "d2")
   var spinning = false;
   var wheelRotation = 0;
+
+  /* modo ao vivo */
+  var LIVE_BET_MS = 15000;
+  var LIVE_SPIN_MS = 6000;
+  var LIVE_RESULT_MS = 4000;
+  var LIVE_SLOT_MS = LIVE_BET_MS + LIVE_SPIN_MS + LIVE_RESULT_MS;
+  var live = false;
+  var liveRound = null;
+  var livePhase = null;    // "betting" | "spinning" | "result"
+  var liveTable = null;
+  var liveBar = null;
+  var others = [];
+  var bots = [];
+  var botLimit = 99;
+  var liveCdEl = null, liveBetsEl = null, liveTimer = null;
+  var lastBeep = -1;
 
   function colorOf(n) {
     if (n === 0) return "green";
@@ -194,6 +213,7 @@
 
   function placeBet(key) {
     if (spinning) return;
+    if (live && livePhase !== "betting") { BZG.ui.toast("Apostas fechadas. Espere a próxima rodada.", "info"); return; }
     var amount = Math.round(Number(betInput.value));
     if (!amount || amount <= 0) {
       BZG.ui.toast("Digite um valor de ficha válido.", "error");
@@ -206,12 +226,15 @@
     bets[key] = (bets[key] || 0) + amount;
     BZG.sounds.click();
     renderChips();
+    sendLiveBet();
   }
 
   function clearBets() {
     if (spinning) return;
+    if (live && livePhase !== "betting") return;
     bets = {};
     renderChips();
+    sendLiveBet();
     setStatus("Apostas limpas. Monte de novo e gire.");
     BZG.sounds.click();
   }
@@ -234,8 +257,17 @@
 
   /* ---------- Resultados anteriores ---------- */
 
+  function liveNumberOf(r) { return Math.floor(BZG.live.rng("roulette:" + r)() * 37); }
+
   function renderResults() {
     var recent = BZG.storage.getRecent("roulette");
+    if (live && liveRound !== null) {
+      recent = [];
+      for (var k = (livePhase === "result" ? 0 : 1); recent.length < 12; k++) {
+        var ln = liveNumberOf(liveRound - k);
+        recent.push({ n: ln, color: colorOf(ln) });
+      }
+    }
     resultsEl.innerHTML = recent.map(function (r) {
       return '<span class="roulette-dot roulette-dot--' + r.color + '">' + r.n + '</span>';
     }).join("");
@@ -280,7 +312,7 @@
      sorteado - dai em diante gira junto com a roda. O numero e sorteado ANTES (RNG justo);
      a animacao so leva a bolinha ate ele. */
   function spin() {
-    if (spinning) return;
+    if (spinning || live) return;
     var total = totalStaked();
     if (total <= 0) {
       BZG.ui.toast("Coloque pelo menos uma ficha na mesa.", "error");
@@ -291,31 +323,34 @@
       return;
     }
 
+    animateSpin(Math.floor(Math.random() * 37), Math.random, SPIN_MS * BZG.modes.speed(), 0, total);
+  }
+
+  /* anima o giro ate o numero n. rand: sorteio do visual (fixo no ao vivo);
+     T: duracao; elapsed: quanto do giro ja passou (quem entra no meio do giro ao vivo) */
+  function animateSpin(resultNumber, rand, T, elapsed, total) {
     spinning = true;
     spinBtn.disabled = true;
     clearBtn.disabled = true;
     betInput.disabled = true;
     setStatus("A roleta está girando...");
-    BZG.sounds.bet();
+    if (total > 0) BZG.sounds.bet();
     landedIdx = -1;
     resultBadge = null;
     Array.prototype.forEach.call(boardEl.querySelectorAll(".winner"), function (c) { c.classList.remove("winner"); });
 
-    var resultNumber = Math.floor(Math.random() * 37);
     var idx = WHEEL_ORDER.indexOf(resultNumber);
     var seg = (Math.PI * 2) / WHEEL_ORDER.length;
     var g = geom();
-    var sp = BZG.modes.speed();
-    var T = SPIN_MS * sp;
     var T_DROP = 0.55 * T;   // a bolinha sai da pista e comeca a descer
     var T_SETTLE = 0.8 * T;  // a bolinha ja esta na casa
     var wheelStart = wheelRotation;
-    var wheelTurns = Math.PI * 2 * (1.6 + Math.random() * 0.4);
+    var wheelTurns = Math.PI * 2 * (1.6 + rand() * 0.4);
     // angulo da bolinha RELATIVO a roda: termina no centro da casa sorteada
     var relEnd = idx * seg - Math.PI / 2;
-    var relSpan = Math.PI * 2 * (3 + Math.random()); // voltas da bolinha contra a roda
-    var bounceSeed = Math.random() * 10;
-    var start = performance.now();
+    var relSpan = Math.PI * 2 * (3 + rand()); // voltas da bolinha contra a roda
+    var bounceSeed = rand() * 10;
+    var start = performance.now() - (elapsed || 0);
     var lastRelSeg = null;
     var zoomed = false;
     var roll = BZG.sounds.ballRoll ? BZG.sounds.ballRoll() : null; // bolinha rolando na pista
@@ -367,6 +402,16 @@
   }
 
   function finishSpin(n, total) {
+    if (live && total <= 0) {
+      // ao vivo sem aposta: so mostra o numero
+      var c0 = colorOf(n);
+      renderResults();
+      highlightLiveWinners(n);
+      setStatus("Caiu " + n + " (" + (c0 === "green" ? "verde" : (c0 === "red" ? "vermelho" : "preto")) + "). Aposte na próxima rodada!");
+      if (BZG.sounds.landChime) BZG.sounds.landChime();
+      spinning = false;
+      return;
+    }
     var totalReturn = 0;
     Object.keys(bets).forEach(function (key) {
       totalReturn += payoutFor(key, n);
@@ -383,11 +428,13 @@
       won: won,
       detail: n + " " + colorLabel
     });
-    BZG.storage.pushRecent("roulette", { n: n, color: color });
+    if (!live) BZG.storage.pushRecent("roulette", { n: n, color: color });
     BZG.ui.refreshBalance();
     document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
     renderResults();
     renderHistory();
+    if (live && liveTable) liveTable.update({ r: liveRound, bet: total, pick: pickSummary(), win: totalReturn });
+    highlightLiveWinners(n);
 
     // destaca casas vencedoras na mesa
     Array.prototype.forEach.call(boardEl.querySelectorAll("[data-bet]"), function (cell) {
@@ -416,9 +463,9 @@
 
     bets = {};
     spinning = false;
-    spinBtn.disabled = false;
-    clearBtn.disabled = false;
-    betInput.disabled = false;
+    spinBtn.disabled = live;
+    clearBtn.disabled = live;
+    betInput.disabled = live;
     totalEl.textContent = BZG.ui.formatMoney(0);
 
     // limpa fichas depois de um tempo para o jogador ver onde ganhou
@@ -427,11 +474,206 @@
     }, 2500);
   }
 
+  /* ---------- Ao vivo ---------- */
+
+  var KEY_LABELS = { red: "Vermelho", black: "Preto", even: "Par", odd: "Ímpar", low: "1-18", high: "19-36",
+    d1: "1ª dúzia", d2: "2ª dúzia", d3: "3ª dúzia" };
+  function keyLabel(k) { return KEY_LABELS[k] || (k.charAt(0) === "n" ? "Nº " + k.slice(1) : k); }
+
+  function pickSummary() {
+    var keys = Object.keys(bets).sort(function (a, b) { return bets[b] - bets[a]; });
+    var txt = keys.slice(0, 2).map(keyLabel).join(", ");
+    return keys.length > 2 ? txt + " +" + (keys.length - 2) : txt;
+  }
+
+  function esc(s) { return BZG.ui.escapeHtml ? BZG.ui.escapeHtml(String(s == null ? "" : s)) : String(s); }
+
+  function sendLiveBet() {
+    if (!live || !liveTable) return;
+    var total = totalStaked();
+    liveTable.update(total > 0 ? { r: liveRound, bet: total, pick: pickSummary() } : { r: liveRound });
+  }
+
+  var lastWinN = null;
+  function highlightLiveWinners(n) { lastWinN = n; renderLiveBets(); }
+
+  function renderLiveBets() {
+    if (!liveBetsEl) return;
+    var rows = [];
+    var shownN = livePhase === "result" ? lastWinN : null;
+    function row(avatar, nameHTML, amount, pick, won, cls) {
+      return '<div class="bet-row' + (cls || "") + (won ? " cashed" : "") + '">' +
+        '<span class="avatar">' + avatar + '</span><span class="name">' + nameHTML + '</span>' +
+        '<span class="bet-amount">' + BZG.ui.formatMoney(amount) + '</span>' +
+        '<span class="result">' + esc(pick) + '</span></div>';
+    }
+    var total = totalStaked();
+    if (total > 0) {
+      var prof = BZG.storage.getProfile();
+      rows.push(row(prof.avatar, esc(prof.nickname) + " (você)", total, pickSummary(), false, " is-user"));
+    }
+    others.forEach(function (o) {
+      if (o.r !== liveRound || !o.bet) return;
+      var colorCls = o.color && o.color !== "default" ? "bzg-name color-" + esc(o.color) : "";
+      rows.push(row(esc(o.avatar), '<span class="' + colorCls + '">' + esc(o.nick) + '</span><span class="real-tag" title="Jogador ao vivo"></span>',
+        Number(o.bet) || 0, o.pick || "", shownN !== null && o.win > 0, " is-real"));
+    });
+    bots.forEach(function (b) {
+      var won = shownN !== null && payoutForKey(b.key, shownN) > 0;
+      rows.push(row(b.avatar, esc(b.name) + '<span class="bot-tag">BOT</span>', b.bet, keyLabel(b.key), won));
+    });
+    liveBetsEl.innerHTML = rows.join("") || '<p style="color:var(--text-muted); font-size:13px;">Aguardando apostas...</p>';
+  }
+
+  function payoutForKey(key, n) {
+    var saved = bets; bets = {}; bets[key] = 1;
+    var p = payoutFor(key, n);
+    bets = saved;
+    return p;
+  }
+
+  function liveTick() {
+    if (!live) return;
+    var t = BZG.live.now();
+    var r = Math.floor(t / LIVE_SLOT_MS);
+    var off = t - r * LIVE_SLOT_MS;
+    var ph = off < LIVE_BET_MS ? "betting" : (off < LIVE_BET_MS + LIVE_SPIN_MS ? "spinning" : "result");
+
+    if (r !== liveRound) {
+      // aposta da rodada anterior ainda sem resultado (aba em segundo plano): resolve agora
+      if (liveRound !== null && totalStaked() > 0 && !spinning) finishSpin(liveNumberOf(liveRound), totalStaked());
+      liveRound = r;
+      livePhase = null;
+      botLimit = Math.max(0, 8 - 2 * others.length);
+      bots = BZG.live.withSeed("roulette-bots:" + r, BZG.bots.rouletteRoundBots).slice(0, botLimit);
+      if (!spinning) {
+        landedIdx = -1;
+        resultBadge = null;
+        canvas.classList.remove("zoom");
+        drawWheel(wheelRotation);
+        renderChips();
+      }
+    }
+    if (ph !== livePhase) {
+      var prev = livePhase;
+      livePhase = ph;
+      if (ph === "betting") {
+        betInput.disabled = false;
+        clearBtn.disabled = false;
+        setStatus("Apostas abertas! Clique nas casas da mesa.");
+      } else if (ph === "spinning" && !spinning) {
+        var rand = BZG.live.rng("roulette:" + r);
+        var n = Math.floor(rand() * 37);
+        animateSpin(n, rand, LIVE_SPIN_MS, off - LIVE_BET_MS, totalStaked());
+      } else if (ph === "result" && prev === null && !spinning) {
+        // entrou no fim da rodada: mostra o numero direto
+        var n2 = liveNumberOf(r);
+        resultBadge = { n: n2 };
+        landedIdx = WHEEL_ORDER.indexOf(n2);
+        ball = null;
+        drawWheel(wheelRotation);
+        lastWinN = n2;
+      }
+      renderResults();
+      renderLiveBets();
+    }
+
+    // contador
+    if (liveCdEl) {
+      var left = ph === "betting" ? LIVE_BET_MS - off : 0;
+      liveCdEl.classList.toggle("is-open", ph === "betting");
+      liveCdEl.querySelector(".rl-cd-label").textContent = ph === "betting" ? "Apostas fecham em" : (ph === "spinning" ? "Girando…" : "Próxima rodada em");
+      var shown = ph === "betting" ? left : (ph === "result" ? LIVE_SLOT_MS - off : 0);
+      liveCdEl.querySelector(".rl-cd-time").textContent = ph === "spinning" ? "" : (shown / 1000).toFixed(0) + "s";
+      liveCdEl.querySelector(".rl-cd-fill").style.width = (ph === "betting" ? (left / LIVE_BET_MS) * 100 : 0) + "%";
+      var whole = Math.ceil(left / 1000);
+      if (ph === "betting" && whole <= 3 && whole > 0 && whole !== lastBeep) { lastBeep = whole; BZG.sounds.countdownBeep(); }
+    }
+  }
+
+  function mountLiveUI() {
+    if (!liveCdEl) {
+      liveCdEl = document.createElement("div");
+      liveCdEl.className = "rl-cd";
+      liveCdEl.innerHTML = '<span class="rl-cd-label">Apostas fecham em</span> <b class="rl-cd-time"></b>' +
+        '<span class="rl-cd-bar"><span class="rl-cd-fill"></span></span>';
+      stageEl.insertBefore(liveCdEl, canvas);
+    }
+    if (!liveBetsEl) {
+      var sec = document.createElement("section");
+      sec.className = "panel rl-live-bets";
+      sec.style.marginTop = "20px";
+      sec.innerHTML = '<h2 class="section-title">Apostas da rodada</h2><div class="rl-live-list"></div>';
+      boardEl.parentNode.parentNode.insertBefore(sec, boardEl.parentNode.nextSibling);
+      liveBetsEl = sec.querySelector(".rl-live-list");
+    }
+    liveCdEl.hidden = false;
+    liveBetsEl.parentNode.hidden = false;
+    spinBtn.hidden = true;
+  }
+
+  function setLive(on) {
+    if (spinning || totalStaked() > 0) {
+      BZG.ui.toast("Espere o giro acabar e limpe as fichas para trocar de modo.", "info");
+      return false;
+    }
+    live = on;
+    BZG.live.setLiveMode("roulette", on);
+    if (on) {
+      liveRound = null;
+      livePhase = null;
+      others = [];
+      mountLiveUI();
+      liveTable = BZG.live.table("roulette", function (list, count) {
+        others = list;
+        if (liveBar) liveBar.setCount(count);
+        renderLiveBets();
+      });
+      BZG.live.setChatTable("roulette");
+      liveTick();
+      if (!liveTimer) liveTimer = setInterval(liveTick, 200);
+    } else {
+      if (liveTable) liveTable.leave();
+      liveTable = null;
+      others = [];
+      BZG.live.setChatTable(null);
+      if (liveCdEl) liveCdEl.hidden = true;
+      if (liveBetsEl) liveBetsEl.parentNode.hidden = true;
+      spinBtn.hidden = false;
+      spinBtn.disabled = false;
+      clearBtn.disabled = false;
+      betInput.disabled = false;
+      resultBadge = null;
+      landedIdx = -1;
+      drawWheel(wheelRotation);
+      renderResults();
+      setStatus("Monte suas apostas e gire.");
+    }
+  }
+
   function quickBet(fn) {
     var current = Number(betInput.value) || 0;
     var balance = BZG.storage.getBalance();
     var next = fn(current, balance);
     betInput.value = Math.max(1, Math.round(next));
+  }
+
+  /* ---------- imagens opcionais do Codex (cenario) ----------
+     trocam sozinhas quando existirem; sem elas fica o visual de sempre */
+  var IMG_FUNDO = "../assets/jogos/roulette/fundo.webp";
+
+  function absUrl(p) {
+    try { return new URL(p, document.baseURI).href; } catch (e) { return p; }
+  }
+
+  function loadImages() {
+    if (!BZG.assets || !stageEl) return;
+    BZG.assets.preload([IMG_FUNDO], function (ok) {
+      if (ok[IMG_FUNDO]) {
+        stageEl.style.setProperty("--jogo-fundo", 'url("' + absUrl(IMG_FUNDO) + '")');
+        stageEl.classList.add("has-fundo");
+      }
+    });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -453,8 +695,14 @@
     BZG.ui.refreshBalance();
     renderResults();
     renderHistory();
+    loadImages();
 
     spinBtn.addEventListener("click", spin);
+    live = BZG.live ? BZG.live.isLiveMode("roulette") : false;
+    if (BZG.live) {
+      liveBar = BZG.live.bar(stageEl.parentNode, live, setLive);
+      if (live) setLive(true);
+    }
     clearBtn.addEventListener("click", clearBets);
     document.addEventListener("bzg:theme-changed", function () { drawWheel(wheelRotation); });
     document.getElementById("bet-half").addEventListener("click", function () {

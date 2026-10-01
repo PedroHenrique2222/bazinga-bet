@@ -155,3 +155,25 @@
   .bj-card--back { font-size: 24px; }
   .bj-cards { gap: 7px; min-height: 92px; }
 }
+
+/* ---------- cenario do Codex: assets/jogos/blackjack/fundo.webp ----------
+   so entra quando a imagem carrega (classe has-fundo posta pelo JS); o degrade
+   escuro por cima deixa a mesa e os numeros legiveis. Sem imagem, fica como antes. */
+#bj-stage.has-fundo {
+  --text: #ffffff;
+  --text-muted: rgba(236, 232, 248, 0.8);
+  color: var(--text);
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 48%, rgba(8, 6, 14, 0.28), rgba(8, 6, 14, 0.78) 100%),
+    linear-gradient(180deg, rgba(8, 6, 14, 0.6) 0%, rgba(8, 6, 14, 0.2) 38%, rgba(8, 6, 14, 0.2) 62%, rgba(8, 6, 14, 0.72) 100%),
+    var(--jogo-fundo, none) center / cover no-repeat,
+    #0b0912;
+}
+
+/* verso da carta escondida do dealer com a imagem do Codex (plano B = verso vermelho com raio) */
+#bj-stage.has-verso .bj-card--back {
+  background: var(--carta-verso, none) center / cover no-repeat, #7c040d;
+  border-color: rgba(255, 204, 0, 0.5);
+  color: transparent;
+  font-size: 0;
+}

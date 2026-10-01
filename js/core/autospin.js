@@ -8,7 +8,8 @@ window.BZG = window.BZG || {};
 BZG.autospin = (function () {
   var COUNTS = [10, 25, 50, 100];
 
-  function create(container, onSpin) {
+  function create(container, onSpin, opts) {
+    opts = opts || {};
     var left = 0;
     var timer = null;
 
@@ -26,8 +27,9 @@ BZG.autospin = (function () {
     function sync() {
       var on = left > 0;
       stopBtn.style.display = on ? "" : "none";
-      leftEl.textContent = left;
+      leftEl.textContent = left === Infinity ? "∞" : left;
       btns.forEach(function (b) { b.disabled = on; });
+      if (opts.onChange) opts.onChange(left); // o jogo pode mostrar a contagem em outro lugar
     }
 
     function stop() {
@@ -66,7 +68,15 @@ BZG.autospin = (function () {
       })();
     }
 
-    return { done: done, stop: stop, active: function () { return left > 0; } };
+    // comeca um automatico de n giros (Infinity = ate parar) por outro botao do jogo
+    // busy=true: um giro ainda esta rodando; o automatico continua quando ele acabar (done)
+    function start(n, busy) {
+      if (left > 0 || busy) { left = n; sync(); return; } // ja girando: so troca a contagem
+      left = n;
+      next();
+    }
+
+    return { done: done, stop: stop, start: start, left: function () { return left; }, active: function () { return left > 0; } };
   }
 
   return { create: create };

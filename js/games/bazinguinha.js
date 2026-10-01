@@ -573,7 +573,89 @@
 
     spinning = false;
     setControlsLocked(false);
-    if (auto) auto.done(true);
+    if (auto) {
+      var why = autoStopReason(totalPay, fullScreen);
+      if (why && auto.active()) {
+        auto.stop();
+        BZG.ui.toast("AUTO parado: " + why, "info");
+      } else {
+        auto.done(true);
+      }
+    }
+  }
+
+  /* ---------- Modo Auto (botao AUTO na maquina) ----------
+     Quantos giros (10/25/50/100/infinito) e quando parar: ganho de Nx ou mais,
+     saldo abaixo de um valor ou tela cheia. As regras so valem para o automatico
+     iniciado por aqui (o do painel da esquerda continua simples). */
+  var autoCfg = null;
+
+  function autoStopReason(totalPay, fullScreen) {
+    if (!autoCfg) return "";
+    if (autoCfg.full && fullScreen) return "saiu a tela cheia ×10!";
+    if (autoCfg.winX > 0 && totalPay >= autoCfg.winX) return "ganho de " + totalPay.toFixed(2) + "x!";
+    if (autoCfg.minBal > 0 && BZG.storage.getBalance() < autoCfg.minBal) return "saldo abaixo de " + BZG.ui.formatMoney(autoCfg.minBal) + ".";
+    return "";
+  }
+
+  function syncAutoBtn(left) {
+    var btn = document.getElementById("bz-auto");
+    if (!btn) return;
+    var on = left > 0;
+    btn.classList.toggle("is-on", on);
+    btn.querySelector(".ft-auto-txt").textContent = on ? (left === Infinity ? "∞" : String(left)) : "AUTO";
+    btn.setAttribute("aria-label", on ? "Parar Modo Auto" : "Modo Auto");
+    btn.title = on ? "Parar Modo Auto" : "Modo Auto";
+    if (!on) autoCfg = null;
+  }
+
+  function openAutoPanel() {
+    var panel = document.getElementById("bz-autopanel");
+    panel.hidden = false;
+    document.getElementById("bz-auto").setAttribute("aria-expanded", "true");
+    document.getElementById("bz-auto-start").focus();
+  }
+  function closeAutoPanel(restoreFocus) {
+    var panel = document.getElementById("bz-autopanel");
+    if (!panel || panel.hidden) return;
+    panel.hidden = true;
+    document.getElementById("bz-auto").setAttribute("aria-expanded", "false");
+    if (restoreFocus) document.getElementById("bz-auto").focus();
+  }
+
+  function initAutoPanel() {
+    var btn = document.getElementById("bz-auto");
+    if (!btn || !auto) return;
+    var counts = Array.prototype.slice.call(document.querySelectorAll(".bz-auto-counts [data-n]"));
+    counts.forEach(function (c) {
+      c.addEventListener("click", function () {
+        counts.forEach(function (o) { o.setAttribute("aria-checked", o === c ? "true" : "false"); });
+        BZG.sounds.click();
+      });
+    });
+    btn.addEventListener("click", function () {
+      if (auto.active()) { auto.stop(); BZG.sounds.click(); return; } // AUTO ligado: o botao para
+      var panel = document.getElementById("bz-autopanel");
+      if (panel.hidden) { closeInfo(false); openAutoPanel(); } else closeAutoPanel(true);
+    });
+    document.getElementById("bz-auto-close").addEventListener("click", function () { closeAutoPanel(true); });
+    document.getElementById("bz-auto-start").addEventListener("click", function () {
+      var sel = document.querySelector('.bz-auto-counts [aria-checked="true"]');
+      var n = sel && sel.dataset.n === "inf" ? Infinity : Number(sel ? sel.dataset.n : 25);
+      autoCfg = {
+        winX: Number(document.getElementById("bz-auto-win").value) || 0,
+        minBal: Math.max(0, Math.round(Number(document.getElementById("bz-auto-min").value) || 0)),
+        full: document.getElementById("bz-auto-full").checked
+      };
+      closeAutoPanel(false);
+      BZG.sounds.click();
+      var cfg = autoCfg;
+      auto.start(n, spinning);
+      autoCfg = auto.active() || spinning ? cfg : null;
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeAutoPanel(true);
+    });
   }
 
   function quickBet(fn) {
@@ -773,7 +855,8 @@
 
     spinBtn.addEventListener("click", function () { if (auto) auto.stop(); closeInfo(false); spin(); });
     var autoEl = document.getElementById("autospin");
-    if (autoEl && BZG.autospin) auto = BZG.autospin.create(autoEl, spin);
+    if (autoEl && BZG.autospin) auto = BZG.autospin.create(autoEl, spin, { onChange: syncAutoBtn });
+    initAutoPanel();
     Array.prototype.forEach.call(document.querySelectorAll(".paytable-row span, #round-status"), symbolizeText);
     minusBtn.addEventListener("click", function () { stepBet(-1); });
     plusBtn.addEventListener("click", function () { stepBet(1); });

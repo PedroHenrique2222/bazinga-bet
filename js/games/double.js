@@ -1,4 +1,7 @@
-/* Bazinga BET - Double com rodadas continuas: a roleta gira para todo mundo */
+/* Bazinga BET - Double com rodadas continuas: a roleta gira para todo mundo.
+   v1.34: modo AO VIVO (padrao) - as rodadas seguem o relogio do servidor (BZG.live)
+   e o resultado sai do numero da rodada, entao todo mundo ve a MESMA roleta e as
+   apostas dos outros jogadores de verdade. O modo Solo e o de sempre (rodadas locais). */
 (function () {
   var CYCLES = 6;
   var LANDING_CYCLE = 4;
@@ -8,6 +11,8 @@
   var BETTING_MS = 10000;
   var SPIN_MS = 3400;
   var RESULT_PAUSE_MS = 3000;
+  var LIVE_RESULT_MS = 3600;
+  var SLOT_MS = BETTING_MS + SPIN_MS + LIVE_RESULT_MS; // 17s por rodada ao vivo
 
   var betInput, betBtn, statusEl, trackEl, historyListEl, colorButtons, stageEl,
       countdownEl, countdownTimeEl, countdownFillEl, resultsEl;
@@ -25,6 +30,15 @@
 
   var spinTarget = null; // { number, color, tileIndex, offset }
   var lastCrossed = 0;
+
+  /* modo ao vivo */
+  var rnd = Math.random;   // sorteio da rodada (fixo por rodada no ao vivo)
+  var live = false;
+  var liveRound = null;    // numero da rodada ao vivo atual
+  var liveTable = null;    // presence da mesa (BZG.live.table)
+  var liveBar = null;
+  var others = [];         // outros jogadores na mesa
+  var botLimit = 99;
 
   /* numero da rodada persistido: da a sensacao de plataforma "vivida" */
   function nextRoundId() {
@@ -57,7 +71,7 @@
     var arr = [];
     for (var i = 0; i < 15; i++) arr.push(i);
     for (var i2 = arr.length - 1; i2 > 0; i2--) {
-      var j = Math.floor(Math.random() * (i2 + 1));
+      var j = Math.floor(rnd() * (i2 + 1));
       var tmp = arr[i2]; arr[i2] = arr[j]; arr[j] = tmp;
     }
     return arr;
@@ -87,8 +101,23 @@
 
   /* ---------- Resultados anteriores (bolinhas) ---------- */
 
+  // resultado de uma rodada ao vivo (mesma conta que a rodada faz ao girar)
+  function liveResultOf(r) {
+    var saved = rnd;
+    rnd = BZG.live.rng("double:" + r);
+    var order = shuffledNumbers();
+    var n = Math.floor(rnd() * 15);
+    rnd = saved;
+    return { n: n, color: colorOf(n), order: order };
+  }
+
   function renderResults() {
     var recent = BZG.storage.getRecent("double");
+    if (live && liveRound !== null) {
+      recent = [];
+      // fase de resultado: a rodada atual ja saiu
+      for (var k = (phase === "result" ? 0 : 1); recent.length < 12; k++) recent.push(liveResultOf(liveRound - k));
+    }
     resultsEl.innerHTML = recent.map(function (r) {
       return '<span class="double-dot double-dot--' + r.color + '">' + r.n + '</span>';
     }).join("");
@@ -109,10 +138,20 @@
       );
       sums[userBet.color] += userBet.amount;
     }
+    if (live) others.forEach(function (o) {
+      if (o.r !== liveRound || !o.bet || !cols[o.pick]) return;
+      var colorCls = o.color && o.color !== "default" ? " bzg-name color-" + esc(o.color) : "";
+      cols[o.pick].push(
+        '<div class="bet-row is-real"><span class="avatar">' + esc(o.avatar) + '</span>' +
+        '<span class="name' + colorCls + '">' + esc(o.nick) + '<span class="real-tag" title="Jogador ao vivo"></span></span>' +
+        '<span class="bet-amount">' + BZG.ui.formatMoney(o.bet) + '</span></div>'
+      );
+      sums[o.pick] += Number(o.bet) || 0;
+    });
     bots.forEach(function (b) {
       cols[b.color].push(
         '<div class="bet-row"><span class="avatar">' + b.avatar + '</span>' +
-        '<span class="name">' + b.name + '</span>' +
+        '<span class="name">' + b.name + (live ? '<span class="bot-tag">BOT</span>' : '') + '</span>' +
         '<span class="bet-amount">' + BZG.ui.formatMoney(b.bet) + '</span></div>'
       );
       sums[b.color] += b.bet;
@@ -148,14 +187,21 @@
 
   /* ---------- Maquina de estados ---------- */
 
-  function startBettingPhase() {
+  function startBettingPhase(round) {
     phase = "betting";
     phaseStart = performance.now();
     lastBeepSecond = -1;
-    bots = BZG.bots.doubleRoundBots();
+    if (live) {
+      rnd = BZG.live.rng("double:" + round);
+      bots = BZG.live.withSeed("double-bots:" + round, BZG.bots.doubleRoundBots).slice(0, botLimit);
+    } else {
+      rnd = Math.random;
+      bots = BZG.bots.doubleRoundBots();
+    }
     userBet = null;
     spinTarget = null;
-    if (roundIdEl) roundIdEl.textContent = "Rodada #" + nextRoundId();
+    if (roundIdEl) roundIdEl.textContent = "Rodada #" + (live ? round % 1000000 : nextRoundId());
+    if (live) renderResults();
 
     buildTrack();
     highlightWinnerColumn(null);
@@ -173,7 +219,7 @@
     phaseStart = performance.now();
     lastCrossed = 0;
 
-    var targetNumber = Math.floor(Math.random() * 15);
+    var targetNumber = Math.floor(rnd() * 15);
     var color = colorOf(targetNumber);
     var idxInCycle = wheelOrder.indexOf(targetNumber);
     var targetTileIndex = LANDING_CYCLE * wheelOrder.length + idxInCycle;
@@ -201,7 +247,7 @@
 
     if (tileEls[spinTarget.tileIndex]) tileEls[spinTarget.tileIndex].classList.add("landed");
     highlightWinnerColumn(color);
-    BZG.storage.pushRecent("double", { n: number, color: color });
+    if (!live) BZG.storage.pushRecent("double", { n: number, color: color });
     renderResults();
 
     if (userBet) {
@@ -219,6 +265,7 @@
       BZG.ui.refreshBalance();
       document.dispatchEvent(new CustomEvent("bzg:balance-changed"));
       renderHistory();
+      if (live && liveTable) liveTable.update({ r: liveRound, bet: userBet.amount, pick: userBet.color, win: payout });
 
       if (won) {
         setStatus("Caiu " + number + " (" + colorLabel(color) + ")! Você ganhou " + BZG.ui.formatMoney(payout) + ".");
@@ -239,7 +286,29 @@
     }
   }
 
+  /* ao vivo: a fase e o tempo vem do relogio do servidor; aqui so acompanha */
+  function liveSync(now) {
+    var t = BZG.live.now();
+    var r = Math.floor(t / SLOT_MS);
+    var off = t - r * SLOT_MS;
+    var ph = off < BETTING_MS ? "betting" : (off < BETTING_MS + SPIN_MS ? "spinning" : "result");
+    if (r !== liveRound) {
+      // a rodada anterior ainda tinha aposta sem resultado (aba em segundo plano): resolve
+      if (liveRound !== null && userBet) {
+        if (phase === "betting") startSpinningPhase();
+        if (phase === "spinning") startResultPhase();
+      }
+      botLimit = Math.max(0, 10 - 2 * others.length);
+      liveRound = r;
+      startBettingPhase(r);
+    }
+    if (ph !== "betting" && phase === "betting") startSpinningPhase();
+    if (ph === "result" && phase === "spinning") startResultPhase();
+    phaseStart = now - (ph === "betting" ? off : (ph === "spinning" ? off - BETTING_MS : off - BETTING_MS - SPIN_MS));
+  }
+
   function loop(now) {
+    if (live) liveSync(now);
     if (phase === "betting") {
       var remaining = Math.max(0, BETTING_MS - (now - phaseStart));
       var secs = remaining / 1000;
@@ -252,7 +321,7 @@
         lastBeepSecond = whole;
       }
 
-      if (remaining <= 0) startSpinningPhase();
+      if (remaining <= 0 && !live) startSpinningPhase();
     } else if (phase === "spinning") {
       var t = Math.min(1, (now - phaseStart) / SPIN_MS);
       var eased = easeOutCubic(t);
@@ -265,9 +334,9 @@
         lastCrossed = crossed;
       }
 
-      if (t >= 1) startResultPhase();
+      if (t >= 1 && !live) startResultPhase();
     } else if (phase === "result") {
-      if (now - phaseStart >= RESULT_PAUSE_MS) startBettingPhase();
+      if (now - phaseStart >= RESULT_PAUSE_MS && !live) startBettingPhase();
     }
 
     requestAnimationFrame(loop);
@@ -309,7 +378,38 @@
     colorButtons.forEach(function (b) { b.disabled = true; });
     setStatus("Aposta de " + BZG.ui.formatMoney(amount) + " no " + colorLabel(selectedColor) + " confirmada!");
     BZG.sounds.bet();
+    if (live && liveTable) liveTable.update({ r: liveRound, bet: amount, pick: selectedColor });
     renderRoundBets();
+  }
+
+  function esc(s) { return BZG.ui.escapeHtml ? BZG.ui.escapeHtml(String(s == null ? "" : s)) : String(s); }
+
+  /* ---------- Ao Vivo / Solo ---------- */
+
+  function setLive(on) {
+    if (userBet && phase !== "result") {
+      BZG.ui.toast("Espere sua aposta desta rodada terminar para trocar de modo.", "info");
+      return false;
+    }
+    live = on;
+    BZG.live.setLiveMode("double", on);
+    if (on) {
+      liveRound = null;
+      others = [];
+      liveTable = BZG.live.table("double", function (list, count) {
+        others = list;
+        if (liveBar) liveBar.setCount(count);
+        renderRoundBets();
+      });
+      BZG.live.setChatTable("double");
+    } else {
+      if (liveTable) liveTable.leave();
+      liveTable = null;
+      others = [];
+      BZG.live.setChatTable(null);
+      startBettingPhase();
+      renderResults();
+    }
   }
 
   function quickBet(fn) {
@@ -317,6 +417,20 @@
     var balance = BZG.storage.getBalance();
     var next = fn(current, balance);
     betInput.value = Math.max(1, Math.round(next));
+  }
+
+  /* ---------- imagens opcionais do Codex (plano B: visual atual) ---------- */
+  var IMG_FUNDO = "../assets/jogos/double/fundo.webp";
+
+  function loadImages() {
+    if (!BZG.assets) return;
+    BZG.assets.preload([IMG_FUNDO], function (ok) {
+      if (!ok[IMG_FUNDO] || !stageEl) return;
+      var url = IMG_FUNDO;
+      try { url = new URL(IMG_FUNDO, document.baseURI).href; } catch (e) {}
+      stageEl.style.setProperty("--stage-fundo", 'url("' + url + '")');
+      stageEl.classList.add("has-bg");
+    });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -351,7 +465,14 @@
       quickBet(function (v, balance) { return balance; });
     });
 
-    startBettingPhase();
+    live = BZG.live ? BZG.live.isLiveMode("double") : false;
+    if (BZG.live) {
+      liveBar = BZG.live.bar(stageEl.parentNode, live, setLive);
+      if (live) setLive(true);
+    }
+    if (!live) startBettingPhase();
     requestAnimationFrame(loop);
+
+    loadImages();
   });
 })();

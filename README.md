@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.31
+# 🎰 Bazinga BET — v1.34
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,25 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.34 (2026-10-01) — 🔴 Ao Vivo de verdade: Canoa, Double e Roleta + chat
+- **Canoa, Double e Roleta ao vivo:** todo mundo joga a mesma rodada, na mesma hora. As rodadas seguem o relógio do servidor (`server_now()` no Supabase) e o resultado sai do número da rodada — todo aparelho calcula igual, sem servidor pago.
+- **Apostas de jogadores reais** aparecem na mesa (bolinha verde). Bots continuam aparecendo quando tem pouca gente, marcados com **BOT**.
+- Chave **Ao Vivo / Solo** em cada um dos 3 jogos (Solo = como era antes). A Roleta ao vivo gira sozinha a cada 25s.
+- **Chat:** botão flutuante em todas as páginas, com abas **Global** e **Mesa** (nos jogos ao vivo). Guarda as últimas 100 mensagens por sala, 1 mensagem a cada 2s, palavrões viram *** e links viram [link].
+- **Contador real** de jogadores online (menu lateral e chat) e "👥 X na mesa" nos jogos; o lobby mostra quantos estão jogando cada mesa.
+- Arquivos novos: `js/core/live.js` (relógio, presença, mesa, chat) e `js/core/chat.js` (janela do chat). Tabela nova no Supabase: `chat_messages`.
+- Política de Privacidade atualizada (ranking, chat e ao vivo).
+
+### v1.33 (2026-10-01) — 📈 Progresso mais difícil, recarga fixa
+- Subir de nível ficou **3x mais difícil** (perfil e Passe de Batalha: 7.500 XP por nível do Passe).
+- A recarga é **sempre BZ$ 10.000** — nada aumenta mais esse valor (bônus antigos foram zerados).
+- Completar um capítulo do Passe agora dá **1 figurinha nova garantida** (antes aumentava a recarga).
+
+### v1.32 (2026-10-01) — 🤖 Modo Auto no Bazinguinha
+- Botão **AUTO** na máquina: escolha 10, 25, 50, 100 ou ∞ giros.
+- Regras para parar: ganho de 10x/25x/100x ou mais, saldo abaixo de um valor, ou tela cheia ×10.
+- O botão mostra os giros restantes; toque nele para parar.
 
 ### v1.31 (2026-10-01) — 🔇 Sem música de fundo, figurinhas e vitórias com imagem
 - **Música de fundo removida**: saem o player do YouTube, o botão de música da topbar e os controles de música em Configurações (`startMusic`/`toggleMusic` etc. viram funções vazias). A moldura `app.html` (que só existia para a música não parar) deixou de ser usada: as páginas abrem direto de novo e links antigos `app.html#<página>` redirecionam para a página.

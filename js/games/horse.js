@@ -7,13 +7,21 @@
 
   /* corredores da equipe BZG (todos com a mesma chance para o jogador) */
   var HORSES = [
-    { name: "BZG Abóbora", emoji: "🎃" },
-    { name: "BZG Pikles", emoji: "🥒" },
-    { name: "BZG 616", emoji: "🔢" },
-    { name: "BZG Panetone", emoji: "🍞" },
-    { name: "BZG Pilha", emoji: "🔋" },
-    { name: "BZG Bogão", emoji: "🍑" }
+    { name: "BZG Abóbora", emoji: "🎃", img: "abobora" },
+    { name: "BZG Pikles", emoji: "🥒", img: "pikles" },
+    { name: "BZG 616", emoji: "🔢", img: "seis16" },
+    { name: "BZG Panetone", emoji: "🍞", img: "panetone" },
+    { name: "BZG Pilha", emoji: "🔋", img: "pilha" },
+    { name: "BZG Bogão", emoji: "🍑", img: "bogao" }
   ];
+
+  /* imagens opcionais do Codex (plano B: emoji e visual atual) */
+  var IMG_DIR = "../assets/jogos/horse/";
+  var IMG_FUNDO = IMG_DIR + "fundo.webp";
+  var imgOk = HORSES.map(function () { return false; });
+  var pendingArt = false; // imagens chegaram no meio da corrida: aplica no fim
+
+  function imgPath(i) { return IMG_DIR + HORSES[i].img + ".webp"; }
 
   var betInput, raceBtn, statusEl, historyListEl, picksEl, trackEl, stageEl;
   var selected = -1;
@@ -26,7 +34,9 @@
   function renderPicks() {
     picksEl.innerHTML = HORSES.map(function (h, i) {
       return '<button class="horse-pick' + (i === selected ? " selected" : "") + '" data-i="' + i + '">' +
-        '<span class="emoji">' + h.emoji + '</span>' +
+        (imgOk[i]
+          ? '<img class="pick-img" src="' + imgPath(i) + '" alt="" />'
+          : '<span class="emoji">' + h.emoji + '</span>') +
         '<span class="name">' + h.name + '</span>' +
         '<span class="odds">2x</span>' +
       '</button>';
@@ -46,7 +56,9 @@
     trackEl.innerHTML = HORSES.map(function (h, i) {
       return '<div class="lane" data-i="' + i + '">' +
         '<div class="lane-finish"></div>' +
-        '<div class="runner"><span>🏇</span><span class="tag">' + h.emoji + '</span></div>' +
+        (imgOk[i]
+          ? '<div class="runner has-img"><img class="runner-img" src="' + imgPath(i) + '" alt="" /></div>'
+          : '<div class="runner"><span>🏇</span><span class="tag">' + h.emoji + '</span></div>') +
       '</div>';
     }).join("");
     laneEls = Array.prototype.slice.call(trackEl.querySelectorAll(".lane"));
@@ -65,7 +77,7 @@
   function setPositions(progs) {
     for (var i = 0; i < runnerEls.length; i++) {
       var lane = laneEls[i];
-      var travel = lane.clientWidth - 52; // largura util
+      var travel = lane.clientWidth - (imgOk[i] ? Math.max(52, runnerEls[i].offsetWidth + 14) : 52); // largura util
       runnerEls[i].style.transform = "translateX(" + (progs[i] * travel) + "px)";
     }
   }
@@ -104,6 +116,7 @@
     raceBtn.disabled = true;
     picksEl.style.pointerEvents = "none";
     setStatus("E lá vão eles!");
+    stageEl.classList.add("is-racing");
     BZG.sounds.bet();
     BZG.sounds.raceStart();
 
@@ -144,6 +157,7 @@
   }
 
   function finish(winner, bet) {
+    stageEl.classList.remove("is-racing");
     laneEls[winner].classList.add("winner");
     BZG.sounds.crowdCheer();
     var won = winner === selected;
@@ -175,6 +189,32 @@
     betInput.disabled = false;
     raceBtn.disabled = false;
     picksEl.style.pointerEvents = "";
+    if (pendingArt) {
+      // aplica as imagens sem apagar o destaque do vencedor
+      pendingArt = false;
+      renderPicks();
+      buildTrack();
+      laneEls[winner].classList.add("winner");
+    }
+  }
+
+  function loadImages() {
+    if (!BZG.assets) return;
+    var list = [IMG_FUNDO].concat(HORSES.map(function (_, i) { return imgPath(i); }));
+    BZG.assets.preload(list, function (ok) {
+      if (ok[IMG_FUNDO]) {
+        var url = IMG_FUNDO;
+        try { url = new URL(IMG_FUNDO, document.baseURI).href; } catch (e) {}
+        stageEl.style.setProperty("--stage-fundo", 'url("' + url + '")');
+        stageEl.classList.add("has-bg");
+      }
+      var any = false;
+      HORSES.forEach(function (_, i) { if (ok[imgPath(i)]) { imgOk[i] = true; any = true; } });
+      if (!any) return;
+      if (racing) { pendingArt = true; return; }
+      renderPicks();
+      buildTrack();
+    });
   }
 
   function quickBet(fn) {
@@ -201,5 +241,6 @@
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
     document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    loadImages();
   });
 })();
