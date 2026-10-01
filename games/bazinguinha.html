@@ -283,10 +283,49 @@
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13" /></svg>
                       </button>
                     </div>
+                    <div class="ft-controls-side">
+                    <button type="button" class="ft-round ft-auto" id="bz-auto" aria-label="Modo Auto" aria-expanded="false" aria-controls="bz-autopanel" title="Modo Auto">
+                      <span class="ft-auto-txt">AUTO</span>
+                    </button>
                     <button type="button" class="ft-round ft-turbo" id="bz-turbo" aria-label="Modo Turbo" aria-pressed="false" title="Modo Turbo">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2.5L5 13.5h6.2l-1.2 8l8.5-11h-6.3z" /></svg>
                       <b class="ft-turbo-lock" aria-hidden="true">🔒</b>
                     </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Modo Auto: quantos giros e quando parar -->
+                <div class="bz-info bz-autopanel" id="bz-autopanel" role="dialog" aria-labelledby="bz-auto-title" hidden>
+                  <div class="bz-info-head">
+                    <h2 id="bz-auto-title">Modo Auto</h2>
+                    <button type="button" class="bz-info-close" id="bz-auto-close" aria-label="Fechar Modo Auto">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                    </button>
+                  </div>
+                  <div class="bz-auto-body">
+                    <p class="bz-auto-label" id="bz-auto-count-label">Quantos giros?</p>
+                    <div class="bz-auto-counts" role="radiogroup" aria-labelledby="bz-auto-count-label">
+                      <button type="button" role="radio" aria-checked="false" data-n="10">10</button>
+                      <button type="button" role="radio" aria-checked="true" data-n="25">25</button>
+                      <button type="button" role="radio" aria-checked="false" data-n="50">50</button>
+                      <button type="button" role="radio" aria-checked="false" data-n="100">100</button>
+                      <button type="button" role="radio" aria-checked="false" data-n="inf" aria-label="Sem limite">∞</button>
+                    </div>
+                    <p class="bz-auto-label">Parar quando…</p>
+                    <label class="bz-auto-row" for="bz-auto-win">Ganhar
+                      <select id="bz-auto-win">
+                        <option value="0">qualquer valor (não para)</option>
+                        <option value="10">10x ou mais</option>
+                        <option value="25" selected>25x ou mais</option>
+                        <option value="100">100x ou mais</option>
+                      </select>
+                    </label>
+                    <label class="bz-auto-row" for="bz-auto-min">Saldo abaixo de (BZ$)
+                      <input type="number" id="bz-auto-min" min="0" step="100" placeholder="não para" />
+                    </label>
+                    <label class="bz-auto-check"><input type="checkbox" id="bz-auto-full" checked /> Sair a tela cheia ×10</label>
+                    <button type="button" class="bz-auto-start" id="bz-auto-start">Iniciar AUTO</button>
                   </div>
                 </div>
 

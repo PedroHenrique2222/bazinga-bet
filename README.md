@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.31
+# 🎰 Bazinga BET — v1.32
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,11 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.32 (2026-10-01) — 🤖 Modo Auto no Bazinguinha
+- Botão **AUTO** na máquina: escolha 10, 25, 50, 100 ou ∞ giros.
+- Regras para parar: ganho de 10x/25x/100x ou mais, saldo abaixo de um valor, ou tela cheia ×10.
+- O botão mostra os giros restantes; toque nele para parar.
 
 ### v1.31 (2026-10-01) — 🔇 Sem música de fundo, figurinhas e vitórias com imagem
 - **Música de fundo removida**: saem o player do YouTube, o botão de música da topbar e os controles de música em Configurações (`startMusic`/`toggleMusic` etc. viram funções vazias). A moldura `app.html` (que só existia para a música não parar) deixou de ser usada: as páginas abrem direto de novo e links antigos `app.html#<página>` redirecionam para a página.
