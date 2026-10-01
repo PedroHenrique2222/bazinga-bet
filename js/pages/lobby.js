@@ -1,6 +1,21 @@
 /* Bazinga BET - logica da pagina inicial (lobby) */
 (function () {
   var GAMES_DIR = "games/";
+  var COVERS_DIR = "assets/capas/"; // capas 768x1024 (geradas pelo Codex, v1.26)
+
+  /* capa do cartao: se a imagem nao carregar, o cartao volta ao visual com icone */
+  function coverHTML(id) {
+    return '<img class="card-cover" src="' + COVERS_DIR + id + '.webp" alt="" loading="lazy" decoding="async" ' +
+      'onerror="this.parentNode.classList.remove(\'game-card--cover\'); this.remove();">';
+  }
+
+  /* minigames sem aposta (nao mexem no saldo) */
+  var MINIGAME_CARDS = [
+    { id: "torre", href: "minigames/torre.html", name: "Torre do CBPB_Gamer" },
+    { id: "arcoiris", href: "minigames/arcoiris.html", name: "Sequência Arco-íris" },
+    { id: "sombra", href: "minigames/sombra.html", name: "Sombra Rápida" },
+    { id: "alien", href: "minigames/alien.html", name: "Fuga Alienígena" }
+  ];
 
   var GAME_CARDS = [
     { id: "bazinguinha", color: "#e08a00", href: "bazinguinha.html", icon: "🐯", name: "Bazinguinha", desc: "O tigrinho do Bazinga: wild grudento com respin e tela cheia ×10!", badge: "NOVO" },
@@ -89,12 +104,27 @@
       }
       var liveInfo = card.live ? '<div class="card-live"><span class="last-result">' + lastResultHTML(card) + '</span></div>' : "";
       var badge = card.badge ? '<span class="card-badge">' + card.badge + '</span>' : "";
-      return '<a class="game-card" href="' + GAMES_DIR + card.href + '" style="--card-c:' + card.color + '">' +
+      return '<a class="game-card game-card--cover" href="' + GAMES_DIR + card.href + '" style="--card-c:' + card.color + '">' +
+        coverHTML(card.id) +
         badge +
         '<div class="icon">' + (BZG.icons && BZG.icons.has(card.id) ? BZG.icons.art(card.id, 84) : card.icon) + '</div>' +
         '<h2>' + card.name + '</h2>' +
         '<p>' + card.desc + '</p>' +
         liveInfo +
+        '</a>';
+    }).join("");
+  }
+
+  function renderMinigameCards() {
+    var grid = document.getElementById("minigames-grid");
+    if (!grid) return;
+    grid.innerHTML = MINIGAME_CARDS.map(function (card) {
+      var color = BZG.icons ? BZG.icons.color(card.id) : "#1a242d";
+      return '<a class="game-card game-card--cover" href="' + card.href + '" style="--card-c:' + color + '">' +
+        coverHTML(card.id) +
+        '<span class="card-badge card-badge--free">SEM APOSTA</span>' +
+        '<div class="icon">' + (BZG.icons ? BZG.icons.art(card.id, 84) : "") + '</div>' +
+        '<h2>' + card.name + '</h2>' +
         '</a>';
     }).join("");
   }
@@ -169,6 +199,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     initBanner();
     renderGameCards();
+    renderMinigameCards();
     renderStats();
     renderRecentBets();
     showBlockedNotice();
