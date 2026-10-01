@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.28
+# 🎰 Bazinga BET — v1.29
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,10 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.29 (2026-10-01) — 🖼️ Logo novo e imagens dos caça-níqueis
+- **Logo em imagem** (`assets/logo/logo.webp`, gerado pelo Codex) no menu lateral, com zoom leve no hover; se não carregar, volta o desenho SVG antigo. Ícone da aba (`app.html`) agora é `assets/logo/icone.webp`.
+- **Imagens do Codex nos caça-níqueis**: cenário, logo, topo, mascotes e símbolos em `assets/bazinguinha/` e `assets/bonanza/` — carregados automaticamente pelo `assets.js` da v1.28.
 
 ### v1.28 (2026-10-01) — 🏮 Bazinguinha e 🍭 Bonanza com tela imersiva
 - **Bazinguinha no estilo "tigrinho"** (arte própria): máquina em retrato com telhado de telhas verde-jade, lanternas balançando e o mascote O Menor Quentão sentado em cima dos rolos; rolos creme com moldura dourada e moedinhas com os números das 5 linhas; faixa vermelha e dourada com o ganho grande; pílulas de Saldo/Aposta/Ganho; botão de girar redondo verde-jade, −/+, menu "Prêmios e regras" e turbo ⚡. A área do jogo ocupa a altura da tela e a máquina cresce junto; em telas largas aparecem pergaminhos com as regras dos lados. Cenário de pátio de festa à noite, linhas vencedoras douradas se desenhando, símbolos vencedores pulsando, mascote reagindo.

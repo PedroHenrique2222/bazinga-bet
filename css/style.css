@@ -2678,3 +2678,10 @@ body[style*="--game-c"] .game-layout .stage { --game-c: inherit; }
 @media (max-width: 1600px) {
   .topbar-stats .mini-stat:not(:first-child) { display: none; }
 }
+
+/* ---------- v1.29: logo em imagem (Codex) ---------- */
+.logo-card.has-img { background: none; box-shadow: none; padding: 0; overflow: visible; }
+.logo-card.has-img .logo-svg, .logo-card.has-img .logo-bet { display: none; }
+.logo-img { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45)); transition: transform 0.2s ease; }
+.logo-card.has-img:hover { box-shadow: none; }
+.logo-card.has-img:hover .logo-img { transform: scale(1.04) rotate(-1deg); }
