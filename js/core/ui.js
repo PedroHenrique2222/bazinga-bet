@@ -56,9 +56,17 @@ BZG.ui = (function () {
   }
 
   function escapeHtml(s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
+  }
+
+  // classe da cor do nome vinda de OUTROS jogadores (ranking, chat, mesas ao vivo):
+  // so aceita nomes simples (ex.: "gold", "rainbow"). Qualquer outra coisa vira "" -
+  // impede que alguem injete codigo ou classes no HTML de quem esta olhando (v1.35).
+  function safeColorClass(c) {
+    c = String(c == null ? "" : c);
+    return c && c !== "default" && /^[a-z0-9-]{1,24}$/.test(c) ? "color-" + c : "";
   }
 
   // envolve o apelido do jogador com a cor desbloqueada e (opcional) titulo
@@ -187,6 +195,7 @@ BZG.ui = (function () {
   }
 
   return {
+    safeColorClass: safeColorClass,
     imgHTML: imgHTML,
     imgFail: imgFail,
     imgLoad: imgLoad,

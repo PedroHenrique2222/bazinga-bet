@@ -147,11 +147,11 @@
 
     if (userBet) {
       var profile = BZG.storage.getProfile();
-      rows.push(betRowHTML(profile.avatar, profile.nickname + " (você)", userBet.amount, userBet, true));
+      rows.push(betRowHTML(esc(profile.avatar), esc(profile.nickname) + " (você)", userBet.amount, userBet, true));
     }
     if (live) others.forEach(function (o) {
       if (!liveR || o.r !== liveR.id || !o.bet) return;
-      var colorCls = o.color && o.color !== "default" ? " bzg-name color-" + esc(o.color) : "";
+      var colorCls = BZG.ui.safeColorClass(o.color) ? " bzg-name " + BZG.ui.safeColorClass(o.color) : "";
       rows.push(betRowHTML(esc(o.avatar), '<span class="' + colorCls + '">' + esc(o.nick) + '</span><span class="real-tag" title="Jogador ao vivo"></span>',
         Number(o.bet) || 0, { status: o.st || "in", cashMult: Number(o.m) || 1 }, false));
     });

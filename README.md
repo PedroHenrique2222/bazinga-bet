@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.34
+# 🎰 Bazinga BET — v1.35
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,15 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.35 (2026-10-01) — 🔒 Revisão de segurança + aviso "só brincadeira"
+- **Aviso na primeira visita:** explica que tudo é de brincadeira, que as fichas não valem dinheiro, que não dá para depositar/sacar, que ninguém vai pedir Pix/cartão/senha, que o site é para maiores de 18 anos e indica o CVV (188). Aparece uma vez por navegador.
+- **Corrigida falha grave no ranking:** a "cor do nome" vinda de outros jogadores ia direto para o HTML; alguém poderia rodar código no navegador de quem abrisse o ranking. Agora só nomes de cor simples são aceitos (ranking, chat e mesas ao vivo).
+- Números do ranking sempre tratados como número; aposta do Double ao vivo só aceita as 3 cores; o próprio apelido também é protegido nas mesas.
+- `app.html` não redireciona mais para fora do site.
+- A biblioteca do Supabase agora fica no próprio site (`js/vendor/`), sem depender de CDN de terceiros.
+- `vercel.json` com cabeçalhos de segurança (CSP, anti-iframe, nosniff, etc.).
+- Bot "ReiDoPix" virou "ReiDaSorte" (nada que lembre dinheiro real).
 
 ### v1.34 (2026-10-01) — 🔴 Ao Vivo de verdade: Canoa, Double e Roleta + chat
 - **Canoa, Double e Roleta ao vivo:** todo mundo joga a mesma rodada, na mesma hora. As rodadas seguem o relógio do servidor (`server_now()` no Supabase) e o resultado sai do número da rodada — todo aparelho calcula igual, sem servidor pago.

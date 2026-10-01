@@ -7,7 +7,7 @@ window.BZG = window.BZG || {};
 BZG.bots = (function () {
   var NAMES = [
     // apelidos de bet brasileiros
-    "ReiDoPix", "PatraoDoCrash", "SortudoBR", "LendaDoGreen", "VidaDeGreen", "SoGreenHoje",
+    "ReiDaSorte", "PatraoDoCrash", "SortudoBR", "LendaDoGreen", "VidaDeGreen", "SoGreenHoje",
     "BetadorRaiz", "CriaDa7", "MalandroDoRJ", "PaiDoDouble", "TubaraoDaBet", "MilGrau013",
     // nome + numero, estilo usuario comum
     "Carlao_77", "Leozin013", "Nathy22", "Bruxao66", "Luquinhas777", "Betao_10",

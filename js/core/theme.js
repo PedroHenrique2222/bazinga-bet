@@ -41,6 +41,20 @@
   if (!THEMES[saved]) saved = "dark";
   apply(saved);
 
+  // aviso de primeira visita ("so brincadeira, sem dinheiro real"): carrega aviso.js
+  // so para quem ainda nao confirmou (nao aparece na propria Politica de Privacidade)
+  (function () {
+    var ok = null;
+    try { ok = localStorage.getItem("bzgAvisoOk"); } catch (e) {}
+    if (ok === "1" || /privacidade\.html$/.test(location.pathname)) return;
+    var me = document.currentScript && document.currentScript.getAttribute("src");
+    if (!me) return;
+    var s = document.createElement("script");
+    s.src = me.replace(/theme\.js.*$/, "aviso.js");
+    s.async = true;
+    document.head.appendChild(s);
+  })();
+
   window.BZG = window.BZG || {};
   BZG.theme = {
     THEMES: THEMES,

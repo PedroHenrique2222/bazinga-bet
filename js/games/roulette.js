@@ -510,11 +510,11 @@
     var total = totalStaked();
     if (total > 0) {
       var prof = BZG.storage.getProfile();
-      rows.push(row(prof.avatar, esc(prof.nickname) + " (você)", total, pickSummary(), false, " is-user"));
+      rows.push(row(esc(prof.avatar), esc(prof.nickname) + " (você)", total, pickSummary(), false, " is-user"));
     }
     others.forEach(function (o) {
       if (o.r !== liveRound || !o.bet) return;
-      var colorCls = o.color && o.color !== "default" ? "bzg-name color-" + esc(o.color) : "";
+      var colorCls = BZG.ui.safeColorClass(o.color) ? "bzg-name " + BZG.ui.safeColorClass(o.color) : "";
       rows.push(row(esc(o.avatar), '<span class="' + colorCls + '">' + esc(o.nick) + '</span><span class="real-tag" title="Jogador ao vivo"></span>',
         Number(o.bet) || 0, o.pick || "", shownN !== null && o.win > 0, " is-real"));
     });
