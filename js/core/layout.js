@@ -309,43 +309,6 @@ BZG.layout = (function () {
     el.textContent = (base + Math.round(slowNoise)).toLocaleString("pt-BR");
   }
 
-  /* Bonus diario: mostra um modal se o bonus de hoje ainda nao foi coletado */
-  function showDailyBonus() {
-    if (!BZG.storage.getBonusInfo) return;
-    var info = BZG.storage.getBonusInfo();
-    if (!info.available) return;
-
-    var modal = document.createElement("div");
-    modal.className = "modal-backdrop";
-    modal.innerHTML =
-      '<div class="modal-card bonus-card">' +
-        '<div class="bonus-gift">🍰</div>' +
-        '<h2>Panetone diário</h2>' +
-        '<p class="bonus-sub">Cortesia do <strong>BZG Panetone</strong> · dia <strong>' + info.nextStreak + '</strong> de sequência</p>' +
-        '<div class="bonus-amount">+' + BZG.ui.formatMoney(info.amount) + '</div>' +
-        '<p class="bonus-hint">Aumenta o seu <strong>limite de recarga</strong>! Cada dia de sequência sobe mais. Volte amanhã para um panetone maior.</p>' +
-        '<button class="btn btn--gold" id="claim-bonus-btn" style="width:100%; padding:13px; font-size:16px; margin-top:6px;">Coletar 🍰</button>' +
-      '</div>';
-    document.body.appendChild(modal);
-    requestAnimationFrame(function () { modal.classList.add("show"); });
-
-    document.getElementById("claim-bonus-btn").addEventListener("click", function () {
-      var res = BZG.storage.claimBonus();
-      if (res) {
-        BZG.sounds.coin();
-        BZG.ui.toast("🍰 Limite de recarga +" + BZG.ui.formatMoney(res.amount) + "! Agora recarrega " + BZG.ui.formatMoney(res.reloadAmount) + ".", "success");
-        // atualiza o tooltip do botao Recarregar com o novo valor
-        var rb = document.getElementById("reset-balance-btn");
-        if (rb) rb.title = "Recarrega o saldo para " + BZG.ui.formatMoney(res.reloadAmount);
-        var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-        BZG.effects.confetti(cx, cy, 80);
-      }
-      if (BZG.achievements) BZG.achievements.check();
-      modal.classList.remove("show");
-      setTimeout(function () { if (modal.parentNode) modal.parentNode.removeChild(modal); }, 300);
-    });
-  }
-
   /* ---------- Ranking online em segundo plano ---------- */
 
   function loadScriptOnce(src, done) {
@@ -605,8 +568,6 @@ BZG.layout = (function () {
       document.addEventListener("bzg:bet-recorded", save);
     })();
 
-    // bonus diario aparece pouco depois de carregar
-    setTimeout(showDailyBonus, 700);
   }
 
   document.addEventListener("DOMContentLoaded", init);

@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.22
+# 🎰 Bazinga BET — v1.23
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -172,7 +172,7 @@ Só esses dois jogos mostram **outros apostadores simulados** entrando na rodada
 
 ## 🏆 Conquistas
 
-**80 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, bônus diário, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis (Equipe, Amigos e tudo junto) e recordes nos 4 minigames sem aposta. São verificadas automaticamente a cada aposta.
+**76 conquistas** em `js/core/achievements.js`, cobrindo: primeira aposta, sequências de vitória/derrota, multiplicadores altos, marcos de saldo e de volume apostado, níveis do perfil e do Passe, cosméticos desbloqueados, recargas automáticas, marcos específicos de cada jogo (ex.: acertar o branco no Double, número cheio na Roleta, blackjack natural), progresso na Coleção de colecionáveis (Equipe, Amigos e tudo junto) e recordes nos 4 minigames sem aposta. São verificadas automaticamente a cada aposta.
 
 ---
 
@@ -200,6 +200,15 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.23 (2026-10-01) — 🎰 Bazinguinha e Bonanza turbinados, reset geral, sem bônus diário
+- **Reset geral**: `RESET_TOKEN` em `theme.js` trocado para `v1.23-reset` — na próxima visita, todo jogador recomeça do zero (saldo, nível, passe, coleção e cadastro). O ranking online (Supabase) é zerado junto, quando esta versão entra no ar.
+- **Bônus diário (Panetone diário) removido**: sai o modal de coleta (`showDailyBonus` em `layout.js`) e as 4 conquistas que dependiam dele (Fiel à casa, 7/14/30 dias). O limite de recarga continua subindo pelo Passe.
+- **Símbolos desenhados nos caça-níqueis**: abóbora, pilha, picles, bolo, pêssego, diamante, carta, dado, raio (WILD), bônus e bomba agora são SVG (`s-*` em `icons.js`), na grade e nas tabelas de prêmios.
+- **Bazinguinha**: **suspense na 3ª coluna** (quando as duas primeiras já formam meia linha, ela gira mais devagar, brilhando, com o banner "Será?!"), símbolos vencedores pulam, o ganho **sobe contando** na barra e prêmios de 5x+ tremem a máquina.
+- **Bazinga Bonanza**: vencedores **explodem** antes da cascata, "+BZ$" sobe a cada cascata e o ganho do giro aparece ao vivo; **"FALTA 1!"** quando falta 1 bônus para as rodadas grátis (a grade pulsa); as **bombas acendem e explodem** antes de multiplicar, com tremor; a barra das rodadas grátis mostra o ganho acumulado.
+- **Giro automático** nos dois jogos (novo `js/core/autospin.js`): 10, 25, 50 ou 100 giros, botão Parar, espera a animação de vitória grande fechar e para sozinho sem saldo.
+- **Tabela de prêmios** com nome à esquerda e prêmio à direita (vale também para a Raspadinha).
 
 ### v1.22 (2026-10-01) — 🎃 Ícone novo da Abóbora
 - **Plinko da Abóbora**: ícone redesenhado — abóbora redonda e brilhante, com folha e carinha sorrindo (bochechas rosadas), no lugar da abóbora de Halloween.

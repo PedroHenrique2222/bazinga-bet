@@ -505,3 +505,38 @@
   .ft-spin-btn { width: 64px; height: 64px; font-size: 30px; }
   .ft-controls { gap: 12px; }
 }
+
+/* ---------- v1.23: simbolos desenhados, suspense na 3a coluna, vitoria mais viva ---------- */
+.ft-cell .bzg-icon {
+  width: 74%;
+  height: 74%;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
+}
+.ft-cell-wild > i .bzg-icon { width: calc(var(--ftcell) * 0.5); height: calc(var(--ftcell) * 0.5); }
+.ft-cell.hit .bzg-icon { animation: ft-sym-bounce 0.55s ease-in-out infinite alternate; }
+@keyframes ft-sym-bounce {
+  from { transform: scale(1) rotate(-4deg); }
+  to { transform: scale(1.14) rotate(4deg); }
+}
+
+/* suspense: a ultima coluna brilha enquanto ainda gira */
+.ft-col.tease {
+  box-shadow: 0 0 0 3px #ffd400, 0 0 26px rgba(255, 190, 0, 0.9);
+  animation: ft-tease 0.35s ease-in-out infinite alternate;
+}
+@keyframes ft-tease {
+  from { box-shadow: 0 0 0 3px #ffd400, 0 0 14px rgba(255, 190, 0, 0.6); }
+  to { box-shadow: 0 0 0 4px #ff8a00, 0 0 34px rgba(255, 150, 0, 1); }
+}
+.ft-banner.tease {
+  background: linear-gradient(120deg, #ff8a00, #ffd400);
+  color: #241a00;
+  animation: ft-banner-pop 0.3s cubic-bezier(0.2, 1.6, 0.4, 1), live-pulse 0.5s ease-in-out infinite;
+}
+.sym-inline { display: inline-flex; vertical-align: middle; }
+.sym-inline .bzg-icon { width: 22px; height: 22px; }
+.paytable-row span { display: inline-flex; align-items: center; gap: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-col.tease, .ft-cell.hit .bzg-icon { animation: none; }
+}

@@ -24,7 +24,7 @@
      jogador a recomecar do zero. Roda antes de qualquer leitura de dados (theme.js e o
      1o script de toda pagina). Pra fazer outro reset no futuro, basta trocar o token. */
   try {
-    var RESET_TOKEN = "v1.15-launch";
+    var RESET_TOKEN = "v1.23-reset";
     if (localStorage.getItem("bzgResetToken") !== RESET_TOKEN) {
       localStorage.clear();
       localStorage.setItem("bzgResetToken", RESET_TOKEN);

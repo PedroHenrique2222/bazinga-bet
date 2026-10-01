@@ -49,6 +49,7 @@
   }
 
   var spinning = false;
+  var auto = null; // giro automatico (autospin.js)
   var BET_STEPS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
 
   function setStatus(t) { statusEl.textContent = t; }
@@ -97,11 +98,45 @@
     }
   }
 
+  /* simbolo desenhado (icons.js) de cada emoji; sem icons.js, mostra o emoji */
+  var SYM_ART = { "🎃": "s-abobora", "🔋": "s-pilha", "🥒": "s-picles", "🍰": "s-bolo", "🍑": "s-pessego", "⚡": "s-raio" };
+  function symArt(icon, size) {
+    return BZG.icons && SYM_ART[icon] ? BZG.icons.art(SYM_ART[icon], size || 64) : icon;
+  }
+
   function cellHTML(icon) {
     if (icon === "⚡") {
-      return '<div class="ft-cell ft-cell-wild"><i>⚡</i><em>WILD</em></div>';
+      return '<div class="ft-cell ft-cell-wild"><i>' + symArt("⚡") + '</i><em>WILD</em></div>';
     }
-    return '<div class="ft-cell">' + icon + '</div>';
+    return '<div class="ft-cell">' + symArt(icon) + '</div>';
+  }
+
+  /* troca os emojis de um texto pelos simbolos desenhados (tabela de premios) */
+  function symbolizeText(el) {
+    if (!BZG.icons) return;
+    Object.keys(SYM_ART).forEach(function (emo) {
+      el.innerHTML = el.innerHTML.split(emo).join('<span class="sym-inline">' + symArt(emo, 22) + '</span>');
+    });
+  }
+
+  /* suspense: as duas primeiras colunas ja formam meia linha (iguais ou com wild)?
+     entao a 3a coluna gira mais devagar, brilhando */
+  function teaseLine(grid) {
+    return LINES.some(function (ln) {
+      var byCol = ln.slice().sort(function (a, b) { return (a % 3) - (b % 3); });
+      var a = grid[byCol[0]], b = grid[byCol[1]];
+      return a === b || a === "⚡" || b === "⚡";
+    });
+  }
+
+  /* o ganho sobe contando na barra */
+  function countUp(el, to) {
+    var start = performance.now(), dur = Math.min(1600, 500 + to / 40) * BZG.modes.speed();
+    (function step(now) {
+      var p = Math.min(1, (now - start) / dur);
+      el.textContent = BZG.ui.formatMoney(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
   }
 
   function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
@@ -157,11 +192,11 @@
   }
 
   function spin() {
-    if (spinning) return;
+    if (spinning) return false;
     var bet = Math.round(Number(betInput.value));
     var balance = BZG.storage.getBalance();
-    if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return; }
-    if (bet > balance) { BZG.ui.toast("Você não tem saldo suficiente.", "error"); return; }
+    if (!bet || bet <= 0) { BZG.ui.toast("Digite um valor de aposta válido.", "error"); return false; }
+    if (bet > balance) { BZG.ui.toast("Você não tem saldo suficiente.", "error"); return false; }
 
     spinning = true;
     betInput.disabled = true;
@@ -197,6 +232,10 @@
     }
     reactMascot(null); // volta o mascote ao repouso ao começar
 
+    var tease = teaseLine(grid);
+    var durs = COL_DURATIONS.slice();
+    if (tease) durs[2] += 1500; // a 3a coluna demora mais quando pode fechar linha
+
     var start = performance.now();
     var lastTicks = [0, 0, 0];
     var done = [false, false, false];
@@ -204,18 +243,28 @@
     function frame(now) {
       var allDone = true;
       for (var c2 = 0; c2 < 3; c2++) {
-        var t = Math.min(1, (now - start) / (COL_DURATIONS[c2] * BZG.modes.speed()));
+        var t = Math.min(1, (now - start) / (durs[c2] * BZG.modes.speed()));
         var eased = easeOutQuart(t);
         stripEls[c2].style.transform = "translateY(-" + (distances[c2] * eased).toFixed(1) + "px)";
         var cellH = distances[c2] / (STRIP_LEN - 3);
         var crossed = Math.floor((distances[c2] * eased) / cellH);
-        if (crossed > lastTicks[c2] && t < 1) { if (c2 === 0) BZG.sounds.tick(); lastTicks[c2] = crossed; }
+        if (crossed > lastTicks[c2] && t < 1) {
+          if (c2 === 0 || (tease && c2 === 2 && done[1])) BZG.sounds.tick();
+          lastTicks[c2] = crossed;
+        }
         if (t >= 1 && !done[c2]) {
           done[c2] = true;
           BZG.sounds.click();
           stripEls[c2].classList.remove("blur");       // tira o blur ao parar
           var col = stripEls[c2].parentElement;         // flash de "quique" na coluna
-          if (col) { col.classList.remove("bump"); void col.offsetWidth; col.classList.add("bump"); }
+          if (col) { col.classList.remove("bump", "tease"); void col.offsetWidth; col.classList.add("bump"); }
+          // 2a coluna parou e pode sair linha: a 3a brilha e o banner faz suspense
+          if (c2 === 1 && tease && stripEls[2]) {
+            stripEls[2].parentElement.classList.add("tease");
+            bannerEl.className = "ft-banner tease";
+            bannerEl.textContent = "Será?! 👀";
+            BZG.sounds.countdownBeep();
+          }
         }
         if (t < 1) allDone = false;
       }
@@ -316,7 +365,8 @@
     renderHistory();
 
     if (won) {
-      barWinEl.textContent = BZG.ui.formatMoney(payout);
+      countUp(barWinEl, payout);
+      if (totalPay >= 5) BZG.effects.shake(stageEl);
       var bigWin = fullScreen || totalPay >= 15 || payout >= 25000;
       if (fullScreen) {
         bannerEl.className = "ft-banner fullscreen";
@@ -352,6 +402,7 @@
     minusBtn.disabled = false;
     plusBtn.disabled = false;
     spinBtn.classList.remove("spinning");
+    if (auto) auto.done(true);
   }
 
   function quickBet(fn) {
@@ -388,7 +439,10 @@
     renderHistory();
     updateBar();
 
-    spinBtn.addEventListener("click", spin);
+    spinBtn.addEventListener("click", function () { if (auto) auto.stop(); spin(); });
+    var autoEl = document.getElementById("autospin");
+    if (autoEl && BZG.autospin) auto = BZG.autospin.create(autoEl, spin);
+    Array.prototype.forEach.call(document.querySelectorAll(".paytable-row span, #round-status"), symbolizeText);
     minusBtn.addEventListener("click", function () { stepBet(-1); });
     plusBtn.addEventListener("click", function () { stepBet(1); });
     betInput.addEventListener("input", updateBar);
