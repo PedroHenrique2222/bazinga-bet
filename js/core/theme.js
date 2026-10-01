@@ -1,6 +1,23 @@
 /* Bazinga BET - temas (carregar no <head> para evitar flash).
    Cada "skin" tem uma base (dark/light) que dita os ajustes de contraste,
    e um id que troca a paleta de cores via data-skin. */
+/* Moldura da musica (app.html): toda pagina aberta direto vai para dentro da moldura,
+   que guarda o player de musica e troca so o conteudo (num iframe). Assim a musica
+   nunca para nem recomeca ao trocar de pagina. Fora do ar (file://) segue sem moldura. */
+(function () {
+  try {
+    if (window.top !== window || location.protocol === "file:") return;
+    var path = location.pathname;
+    if (/\/app\.html$/.test(path)) return;
+    var m = path.match(/^(.*\/)(?:games|minigames)\/[^\/]*$/);
+    var rootDir = m ? m[1] : path.replace(/[^\/]*$/, "");
+    var rel = path.slice(rootDir.length) || "index.html";
+    // para de carregar esta pagina (nenhum outro script roda) e abre a moldura
+    window.stop();
+    location.replace(rootDir + "app.html#" + rel + location.search);
+  } catch (e) {}
+})();
+
 (function () {
   /* Reset de lancamento: quando este token muda (novo deploy), apaga TUDO do navegador
      UMA vez - progresso, cadastro, preferencias, sessao do ranking - forcando todo

@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.19
+# 🎰 Bazinga BET — v1.21
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,18 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.21 (2026-10-01) — 🎨 Ícones desenhados + telas de jogo novas
+- **Ícones desenhados (SVG) no lugar dos emojis**: novo `js/core/icons.js` (`BZG.icons.tile/art/nav`) com um ícone para cada um dos 15 jogos e 4 minigames, mais os ícones de linha do menu e do topo (Lobby, Ranking, Coleção, Passe, Perfil, Configurações, música, efeitos, tema, menu, nível, saldo). Aparecem iguais em qualquer aparelho. Usados no menu lateral, no título da topbar, nos cartões do lobby e na tabela de últimas apostas. Se o arquivo faltar, tudo volta para os emojis antigos.
+- **Telas de jogo novas (todas)**: aposta à esquerda (340px) e jogo à direita; campos maiores, botão de apostar vermelho pulsando, botão de colher/retirar verde, opções ativas em vermelho, histórico em linhas alternadas e área do jogo com brilho na **cor do jogo** (`--game-c`, definida pelo `layout.js`). No celular o jogo fica em cima e a aposta embaixo.
+- **Mines**: casas com cara de botão, picles e bomba desenhados no lugar dos emojis 🥒/💣.
+
+### v1.20 (2026-10-01) — 🟥 Visual novo estilo Blaze + vitórias em 3 níveis
+- **Visual cinza-escuro + vermelho** (tema escuro, estilo Blaze): nova paleta em `:root[data-theme="dark"]`, vermelho `#f12c4c`, item ativo do menu lateral em vermelho sólido, saldo grudado no botão vermelho **Recarregar** na topbar. Os outros temas/skins continuam funcionando.
+- **Lobby**: banner maior com ícone flutuando e botão pulsando; **cartões de jogo coloridos** (uma cor por jogo, ícone grande, nome em destaque); nova tabela **"Suas últimas apostas"** com as 8 apostas mais recentes do próprio jogador (dados reais do histórico, sem jogadores falsos).
+- **Big Win em 3 níveis** (`BZG.effects.bigWin` reescrito): **Grande Vitória** (azul), **Mega Vitória** (rosa) e **BAZINGA!** (dourado). O valor **sobe contando e tremendo**, e o nível **sobe ao vivo** durante a contagem com flash, anel e aviso "SUBIU DE NÍVEL!". **Confete, moedas e fogos** aumentam a cada nível e a tela **treme** no BAZINGA. Botão **Pular**/**COLETAR**, fecha sozinho, mais rápido no modo turbo, e respeita `prefers-reduced-motion`. Faixas: BAZINGA ≥ 100x, Mega ≥ 25x (ou prêmio ≥ BZ$ 100 mil), senão Grande.
+- **Música sem parar ao trocar de página**: nova moldura `app.html` guarda o player do YouTube e mostra as páginas num iframe. Toda página aberta direto (link, favorito, `/`) é redirecionada por `theme.js` para `app.html#<página>`; o endereço e o título da aba acompanham a página, e o botão Voltar funciona. As páginas pedem a música para a moldura (`BZG.musicHost` em `sounds.js`). Aberto via `file://`, segue sem moldura.
+- **Big Win em todos os jogos**: o evento `bzg:bet-recorded` agora leva `won/payout/multiplier/bet`, e qualquer vitória ≥ 10x (ou prêmio ≥ BZ$ 25 mil) abre a animação automaticamente — antes só 5 jogos chamavam.
 
 ### v1.19 (2026-07-11) — 🔥 Bazinguinha: mascote O Menor Quentão + novas animações
 - **Mascote novo: O Menor Quentão** (personagem do Arthur, desenhado 100% em **CSS** — cabeça amarela, óculos escuros, bracinhos), no topo da máquina da Bazinguinha. Ele **reage aos giros**: pula e gira feliz na vitória (`hype` na tela cheia / grandes prêmios, `happy` nas vitórias e a cada wild novo do respin), fica de nariz torto na derrota (`sad`), com aura de calor. Ver `.mq-*` em `css/games/bazinguinha.css` e `reactMascot()` em `js/games/bazinguinha.js`.

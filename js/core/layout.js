@@ -39,6 +39,14 @@ BZG.layout = (function () {
     { href: "alien.html", icon: "👽", label: "Fuga Alienígena", page: "alien-minigame", minigame: true }
   ];
 
+  function navIcon(id, fallback) {
+    return BZG.icons ? BZG.icons.nav(id, 20) : fallback;
+  }
+
+  function iconFor(item) {
+    return BZG.icons && BZG.icons.has(item.page) ? BZG.icons.tile(item.page, 24) : item.icon;
+  }
+
   function navHref(item) {
     var prefix = item.root ? ROOT_PREFIX : (item.minigame ? MINIGAMES_PREFIX : GAMES_PREFIX);
     return prefix + item.href;
@@ -84,7 +92,7 @@ BZG.layout = (function () {
     var nav = NAV_ITEMS.map(function (item) {
       if (item.dev) {
         return '<span class="nav-item nav-item--dev" title="Em desenvolvimento">' +
-          '<span class="nav-icon">' + item.icon + '</span>' +
+          '<span class="nav-icon">' + iconFor(item) + '</span>' +
           '<span class="nav-label">' + item.label + '</span>' +
           '<span class="nav-dev">EM BREVE</span>' +
           '</span>';
@@ -93,7 +101,7 @@ BZG.layout = (function () {
       var badge = item.live ? '<span class="nav-live">AO VIVO</span>'
         : (item.hot ? '<span class="nav-hot">HOT</span>' : "");
       return '<a class="' + cls + '" href="' + navHref(item) + '">' +
-        '<span class="nav-icon">' + item.icon + '</span>' +
+        '<span class="nav-icon">' + iconFor(item) + '</span>' +
         '<span class="nav-label">' + item.label + '</span>' +
         badge +
         '</a>';
@@ -102,7 +110,7 @@ BZG.layout = (function () {
     var minigameNav = MINIGAME_ITEMS.map(function (item) {
       var cls = "nav-item" + (item.page === activePage ? " active" : "");
       return '<a class="' + cls + '" href="' + navHref(item) + '">' +
-        '<span class="nav-icon">' + item.icon + '</span>' +
+        '<span class="nav-icon">' + iconFor(item) + '</span>' +
         '<span class="nav-label">' + item.label + '</span>' +
         '</a>';
     }).join("");
@@ -117,25 +125,25 @@ BZG.layout = (function () {
       '<div class="sidebar-footer">' +
         '<div class="online-count"><span class="online-dot"></span><span id="online-count-value">—</span> online</div>' +
         '<a class="nav-item' + (activePage === "ranking" ? " active" : "") + '" href="' + ROOT_PREFIX + 'ranking.html">' +
-          '<span class="nav-icon">🏆</span>' +
+          '<span class="nav-icon">' + navIcon("ranking", "🏆") + '</span>' +
           '<span class="nav-label">Ranking</span>' +
           '<span class="nav-hot">NOVO</span>' +
         '</a>' +
         '<a class="nav-item' + (activePage === "colecao" ? " active" : "") + '" href="' + ROOT_PREFIX + 'colecao.html">' +
-          '<span class="nav-icon">🎴</span>' +
+          '<span class="nav-icon">' + navIcon("colecao", "🎴") + '</span>' +
           '<span class="nav-label">Coleção</span>' +
         '</a>' +
         '<a class="nav-item' + (activePage === "passe" ? " active" : "") + '" href="' + ROOT_PREFIX + 'passe.html">' +
-          '<span class="nav-icon">🎫</span>' +
+          '<span class="nav-icon">' + navIcon("passe", "🎫") + '</span>' +
           '<span class="nav-label">Passe de Batalha</span>' +
           '<span class="nav-bp-dot" id="bp-dot" style="display:none;"></span>' +
         '</a>' +
         '<a class="nav-item' + (activePage === "profile" ? " active" : "") + '" href="' + ROOT_PREFIX + 'profile.html">' +
-          '<span class="nav-icon">👤</span>' +
+          '<span class="nav-icon">' + navIcon("perfil", "👤") + '</span>' +
           '<span class="nav-label">Perfil</span>' +
         '</a>' +
         '<a class="nav-item' + (activePage === "settings" ? " active" : "") + '" href="' + ROOT_PREFIX + 'settings.html">' +
-          '<span class="nav-icon">⚙️</span>' +
+          '<span class="nav-icon">' + navIcon("config", "⚙️") + '</span>' +
           '<span class="nav-label">Configurações</span>' +
         '</a>' +
       '</div>';
@@ -175,25 +183,25 @@ BZG.layout = (function () {
     if (!el) return;
 
     el.innerHTML = '' +
-      '<button class="icon-btn topbar-menu" id="menu-btn" title="Menu" aria-label="Abrir menu">☰</button>' +
+      '<button class="icon-btn topbar-menu" id="menu-btn" title="Menu" aria-label="Abrir menu">' + navIcon("menu", "☰") + '</button>' +
       '<a class="topbar-profile" id="topbar-profile-link" href="' + ROOT_PREFIX + 'profile.html" title="Ver perfil">' +
         '<span class="topbar-profile-avatar" id="topbar-profile-avatar">😎</span>' +
         '<span class="topbar-profile-name" id="topbar-profile-name"></span>' +
         '<span class="topbar-profile-lvl" id="topbar-profile-lvl">Lv 1</span>' +
       '</a>' +
-      '<div class="topbar-title">' + (icon ? icon + " " : "") + (title || "") + '</div>' +
+      '<div class="topbar-title">' + (icon ? '<span class="topbar-title-icon">' + icon + '</span>' : "") + (title || "") + '</div>' +
       '<div class="topbar-spacer"></div>' +
       '<div class="topbar-stats">' +
         '<div class="mini-stat" title="Seu nível atual">' +
-          '<span class="mini-stat-icon">⭐</span>' +
+          '<span class="mini-stat-icon">' + navIcon("nivel", "⭐") + '</span>' +
           '<span id="topbar-level">Lv 1</span>' +
         '</div>' +
         '<div class="mini-stat" title="Recorde: maior saldo que você já teve">' +
-          '<span class="mini-stat-icon">📈</span>' +
+          '<span class="mini-stat-icon">' + navIcon("saldo", "📈") + '</span>' +
           '<span id="topbar-peak">BZ$ 0</span>' +
         '</div>' +
         '<div class="mini-stat" title="Maior prêmio ganho numa única aposta">' +
-          '<span class="mini-stat-icon">🏆</span>' +
+          '<span class="mini-stat-icon">' + navIcon("ranking", "🏆") + '</span>' +
           '<span id="topbar-maxwin">BZ$ 0</span>' +
         '</div>' +
       '</div>' +
@@ -202,8 +210,8 @@ BZG.layout = (function () {
         '<span id="balance-value">BZ$ 0</span>' +
       '</div>' +
       '<button id="reset-balance-btn" class="btn btn--gold btn--sm" title="Recarrega o saldo para ' + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + '">Recarregar</button>' +
-      '<button class="icon-btn" id="music-btn" title="Música ligada/desligada">🎵</button>' +
-      '<button class="icon-btn" id="sfx-btn" title="Efeitos sonoros ligados/desligados">🔊</button>' +
+      '<button class="icon-btn" id="music-btn" title="Música ligada/desligada" aria-label="Música">' + navIcon("musica", "🎵") + '</button>' +
+      '<button class="icon-btn" id="sfx-btn" title="Efeitos sonoros ligados/desligados" aria-label="Efeitos sonoros">' + navIcon("som", "🔊") + '</button>' +
       '<button class="icon-btn" id="theme-btn" title="Tema claro/escuro"></button>';
 
     BZG.ui.refreshBalance();
@@ -239,7 +247,7 @@ BZG.layout = (function () {
     var sfxBtn = document.getElementById("sfx-btn");
     function syncSoundIcons() {
       musicBtn.classList.toggle("off", !BZG.sounds.isMusicEnabled());
-      sfxBtn.textContent = BZG.sounds.isSfxEnabled() ? "🔊" : "🔇";
+      if (!BZG.icons) sfxBtn.textContent = BZG.sounds.isSfxEnabled() ? "🔊" : "🔇";
       sfxBtn.classList.toggle("off", !BZG.sounds.isSfxEnabled());
     }
     syncSoundIcons();
@@ -263,7 +271,7 @@ BZG.layout = (function () {
     }
     function syncThemeIcon() {
       var meta = BZG.theme.THEMES[BZG.theme.get()] || BZG.theme.THEMES.dark;
-      themeBtn.textContent = meta.icon;
+      if (BZG.icons) themeBtn.innerHTML = BZG.icons.nav("tema", 20); else themeBtn.textContent = meta.icon;
       themeBtn.title = "Tema: " + meta.name + " (clique para trocar)";
     }
     syncThemeIcon();
@@ -484,6 +492,9 @@ BZG.layout = (function () {
     var page = body.dataset.page || "";
     var title = body.dataset.title || "";
     var icon = body.dataset.icon || "";
+    if (BZG.icons && BZG.icons.has(page)) icon = BZG.icons.tile(page, 30);
+    // cor do jogo: usada no brilho de fundo da area do jogo (css --game-c)
+    if (BZG.icons && BZG.icons.color(page)) document.body.style.setProperty("--game-c", BZG.icons.color(page));
 
     // sem cadastro, nao entra: manda pra tela de cadastro/login antes de tudo
     if (!BZG.storage.hasAccount()) {

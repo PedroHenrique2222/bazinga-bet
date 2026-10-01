@@ -120,8 +120,19 @@ BZG.sounds = (function () {
     } catch (e) { /* falha silenciosa */ }
   }
 
+  /* dentro da moldura (app.html) quem toca a musica e a moldura: o player dela
+     nao e recriado a cada pagina, entao a musica continua sem parar */
+  function musicHost() {
+    try {
+      if (window.parent !== window && window.parent.BZG && window.parent.BZG.musicHost) return window.parent.BZG.musicHost;
+    } catch (e) {}
+    return null;
+  }
+
   function startMusic() {
     if (!musicOn) return;
+    var host = musicHost();
+    if (host) { host.startMusic(); return; }
     wantPlaying = true;
     if (ytReady && ytPlayer) {
       try { ytPlayer.playVideo(); } catch (e) {}
@@ -131,6 +142,8 @@ BZG.sounds = (function () {
   }
 
   function stopMusic() {
+    var host = musicHost();
+    if (host) { host.stopMusic(); return; }
     wantPlaying = false;
     if (ytReady && ytPlayer) {
       try { ytPlayer.pauseVideo(); } catch (e) {}
@@ -174,7 +187,9 @@ BZG.sounds = (function () {
   function setMusicEnabled(value) {
     musicOn = !!value;
     try { localStorage.setItem("bzgMusic", musicOn ? "on" : "off"); } catch (e) {}
-    if (musicOn) startMusic();
+    var host = musicHost();
+    if (host) host.setMusicEnabled(musicOn);
+    else if (musicOn) startMusic();
     else stopMusic();
     return musicOn;
   }
@@ -317,6 +332,7 @@ BZG.sounds = (function () {
     setMusicEnabled: setMusicEnabled,
     toggleMusic: toggleMusic,
     startMusic: startMusic,
-    armMusicAutostart: armMusicAutostart
+    armMusicAutostart: armMusicAutostart,
+    stopMusic: stopMusic
   };
 })();
