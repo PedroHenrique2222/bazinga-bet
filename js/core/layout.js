@@ -65,7 +65,10 @@ BZG.layout = (function () {
 
   function logoHTML() {
     return '' +
-      '<a class="logo-card" href="' + ROOT_PREFIX + 'index.html" aria-label="Bazinga BET">' +
+      '<a class="logo-card has-img" href="' + ROOT_PREFIX + 'index.html" aria-label="Bazinga BET">' +
+        /* logo em imagem (Codex); se nao carregar, volta para o desenho SVG abaixo */
+        '<img class="logo-img" src="' + ROOT_PREFIX + 'assets/logo/logo.webp" alt="" ' +
+          'onerror="this.parentNode.classList.remove(\'has-img\'); this.remove();">' +
         '<svg class="logo-svg" viewBox="0 0 200 132" aria-hidden="true">' +
           /* explosao comic em duas camadas simetricas (raios menores para nao cortar nas bordas) */
           '<polygon class="logo-burst" points="' + starPoints(100, 62, 12, 58, 42) + '"/>' +
