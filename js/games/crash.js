@@ -24,7 +24,6 @@
   var engine = null;      // som continuo do motor durante a rodada
   var lastBeepSecond = -1;
 
-  var bots = [];
   var userBet = null;   // { amount, auto, status: "in"|"cashed"|"lost", cashMult, payout }
   var queuedBet = null; // aposta feita durante uma rodada, entra na proxima
   var cashMarkers = []; // pontos de retirada exibidos no grafico
@@ -36,7 +35,6 @@
   var liveTable = null;
   var liveBar = null;
   var others = [];         // outros jogadores na mesa
-  var botLimit = 99;
 
   /* imagens opcionais do Codex (plano B: desenho/visual atual) */
   var IMG_DIR = "../assets/jogos/crash/";
@@ -154,9 +152,6 @@
       var colorCls = BZG.ui.safeColorClass(o.color) ? " bzg-name " + BZG.ui.safeColorClass(o.color) : "";
       rows.push(betRowHTML(esc(o.avatar), '<span class="' + colorCls + '">' + esc(o.nick) + '</span><span class="real-tag" title="Jogador ao vivo"></span>',
         Number(o.bet) || 0, { status: o.st || "in", cashMult: Number(o.m) || 1 }, false));
-    });
-    bots.forEach(function (b) {
-      rows.push(betRowHTML(b.avatar, b.name + (live ? '<span class="bot-tag">BOT</span>' : ''), b.bet, b, false));
     });
 
     roundBetsEl.innerHTML = rows.join("") ||
@@ -342,7 +337,6 @@
     phase = "betting";
     phaseStart = performance.now();
     lastBeepSecond = -1;
-    bots = live ? BZG.live.withSeed("crash-bots:" + r.id, BZG.bots.crashRoundBots).slice(0, botLimit) : BZG.bots.crashRoundBots();
     userBet = null;
     cashMarkers = [];
     if (roundIdEl) roundIdEl.textContent = "Rodada #" + (live ? r.id % 1000000 : nextRoundId());
@@ -411,11 +405,6 @@
     phase = "crashed";
     phaseStart = performance.now();
     if (engine) { engine.stop(0.06); engine = null; }
-
-    // resolve bots que nao retiraram
-    bots.forEach(function (b) {
-      if (b.status === "in") b.status = "lost";
-    });
 
     // resolve o usuario se ainda estava em jogo
     if (userBet && userBet.status === "in") {
@@ -496,16 +485,7 @@
         updateMultiplierColor(mult);
         drawCurve(elapsedSec, mult);
 
-        // bots retiram ao atingir o alvo
         var changed = false;
-        bots.forEach(function (b) {
-          if (b.status === "in" && mult >= b.target) {
-            b.status = "cashed";
-            b.cashMult = b.target;
-            cashMarkers.push({ mult: b.target });
-            changed = true;
-          }
-        });
 
         // retirada automatica do usuario
         if (userBet && userBet.status === "in") {
@@ -544,7 +524,6 @@
       // rodada anterior ainda em andamento (aba em segundo plano): a canoa ja afundou
       if (liveR && phase === "running") startCrashedPhase(crashPoint);
       if (liveR && phase === "betting" && userBet) { startRunningPhase(); startCrashedPhase(crashPoint); }
-      botLimit = Math.max(0, 10 - 2 * others.length);
       liveR = r;
       startBettingPhase(r);
     }
@@ -627,7 +606,7 @@
   function doCashOut(mult) {
     if (!userBet || userBet.status !== "in" || phase !== "running") return;
 
-    var payout = Math.round(userBet.amount * mult);
+    var payout = BZG.ui.cents(userBet.amount * mult);
     userBet.status = "cashed";
     userBet.cashMult = mult;
     userBet.payout = payout;
@@ -749,7 +728,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
 
     live = BZG.live ? BZG.live.isLiveMode("crash") : false;

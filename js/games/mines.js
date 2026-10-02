@@ -149,7 +149,7 @@
   function endRound(won, multOverride) {
     state = "idle";
     var mult = won ? (multOverride || currentMultiplier(revealedCount)) : 0;
-    var payout = won ? Math.round(currentBet * mult) : 0;
+    var payout = won ? BZG.ui.cents(currentBet * mult) : 0;
 
     // revela todas as celulas restantes (efeito cascata) para mostrar bombas e picles
     var delay = 0;
@@ -250,7 +250,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
 
     loadImages();

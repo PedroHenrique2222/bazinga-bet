@@ -26,8 +26,6 @@
   var liveTable = null;
   var liveBar = null;
   var others = [];
-  var bots = [];
-  var botLimit = 99;
   var liveCdEl = null, liveBetsEl = null, liveTimer = null;
   var lastBeep = -1;
 
@@ -416,7 +414,7 @@
     Object.keys(bets).forEach(function (key) {
       totalReturn += payoutFor(key, n);
     });
-    totalReturn = Math.round(totalReturn);
+    totalReturn = BZG.ui.cents(totalReturn);
     var won = totalReturn > 0;
     var color = colorOf(n);
     var colorLabel = color === "green" ? "verde" : (color === "red" ? "vermelho" : "preto");
@@ -518,18 +516,7 @@
       rows.push(row(esc(o.avatar), '<span class="' + colorCls + '">' + esc(o.nick) + '</span><span class="real-tag" title="Jogador ao vivo"></span>',
         Number(o.bet) || 0, o.pick || "", shownN !== null && o.win > 0, " is-real"));
     });
-    bots.forEach(function (b) {
-      var won = shownN !== null && payoutForKey(b.key, shownN) > 0;
-      rows.push(row(b.avatar, esc(b.name) + '<span class="bot-tag">BOT</span>', b.bet, keyLabel(b.key), won));
-    });
     liveBetsEl.innerHTML = rows.join("") || '<p style="color:var(--text-muted); font-size:13px;">Aguardando apostas...</p>';
-  }
-
-  function payoutForKey(key, n) {
-    var saved = bets; bets = {}; bets[key] = 1;
-    var p = payoutFor(key, n);
-    bets = saved;
-    return p;
   }
 
   function liveTick() {
@@ -544,8 +531,6 @@
       if (liveRound !== null && totalStaked() > 0 && !spinning) finishSpin(liveNumberOf(liveRound), totalStaked());
       liveRound = r;
       livePhase = null;
-      botLimit = Math.max(0, 8 - 2 * others.length);
-      bots = BZG.live.withSeed("roulette-bots:" + r, BZG.bots.rouletteRoundBots).slice(0, botLimit);
       if (!spinning) {
         landedIdx = -1;
         resultBadge = null;
@@ -712,7 +697,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
   });
 })();

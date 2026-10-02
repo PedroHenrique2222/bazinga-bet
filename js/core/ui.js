@@ -2,10 +2,14 @@
 window.BZG = window.BZG || {};
 
 BZG.ui = (function () {
+  // valores sempre com centavos: 1.000,00 (v1.36)
   function formatChips(value) {
-    var n = Math.round(value || 0);
-    return n.toLocaleString("pt-BR");
+    var n = Math.round((Number(value) || 0) * 100) / 100;
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+
+  // arredonda um premio para centavos (ex.: 10 x 1,25 = 12,50)
+  function cents(v) { return Math.round((Number(v) || 0) * 100) / 100; }
 
   function formatMoney(value) {
     return "BZ$ " + formatChips(value);
@@ -205,6 +209,7 @@ BZG.ui = (function () {
     avatarHTML: avatarHTML,
     achievementIconHTML: achievementIconHTML,
     formatChips: formatChips,
+    cents: cents,
     formatMoney: formatMoney,
     refreshBalance: refreshBalance,
     toast: toast,

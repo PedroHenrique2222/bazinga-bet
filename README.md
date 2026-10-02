@@ -1,4 +1,4 @@
-# 🎰 Bazinga BET — v1.35
+# 🎰 Bazinga BET — v1.36
 
 Simulador de casa de apostas **sem dinheiro real** — só diversão! Cadastre-se, receba fichas fictícias (BZ$) e jogue os jogos de cassino da equipe BZG.
 
@@ -200,6 +200,13 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 ---
 
 ## 📝 Changelog
+
+### v1.36 (2026-10-02) — 🤖 Sem bots, valores mais reais
+- **Bots removidos** de Canoa, Double e Roleta (Ao Vivo e Solo): a mesa mostra só pessoas reais. `js/core/bots.js` apagado.
+- **Saldo inicial e recarga: BZ$ 1.000** (era 10.000). **Aposta padrão: BZ$ 10** (era 100).
+- **Valores com centavos** em todo o site (ex.: BZ$ 1.019,20); prêmios agora pagam centavos (BZ$ 10 × 1,25 = BZ$ 12,50). Apostas continuam em valores inteiros.
+- XP: 1 ponto a cada BZ$ 1 apostado (as apostas ficaram 10x menores, então o ritmo de nível continua o mesmo).
+- Conquistas de dinheiro, "vitória grande" e degraus de aposta do Bazinguinha ajustados para a escala nova.
 
 ### v1.35 (2026-10-01) — 🔒 Revisão de segurança + aviso "só brincadeira"
 - **Aviso na primeira visita:** explica que tudo é de brincadeira, que as fichas não valem dinheiro, que não dá para depositar/sacar, que ninguém vai pedir Pix/cartão/senha, que o site é para maiores de 18 anos e indica o CVV (188). Aparece uma vez por navegador.

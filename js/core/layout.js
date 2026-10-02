@@ -211,16 +211,16 @@ BZG.layout = (function () {
         '</div>' +
         '<div class="mini-stat" title="Recorde: maior saldo que você já teve">' +
           '<span class="mini-stat-icon">' + navIcon("saldo", "📈") + '</span>' +
-          '<span id="topbar-peak">BZ$ 0</span>' +
+          '<span id="topbar-peak">BZ$ 0,00</span>' +
         '</div>' +
         '<div class="mini-stat" title="Maior prêmio ganho numa única aposta">' +
           '<span class="mini-stat-icon">' + navIcon("ranking", "🏆") + '</span>' +
-          '<span id="topbar-maxwin">BZ$ 0</span>' +
+          '<span id="topbar-maxwin">BZ$ 0,00</span>' +
         '</div>' +
       '</div>' +
       '<div class="balance-box">' +
         '<span class="balance-label">Saldo</span>' +
-        '<span id="balance-value">BZ$ 0</span>' +
+        '<span id="balance-value">BZ$ 0,00</span>' +
       '</div>' +
       '<button id="reset-balance-btn" class="btn btn--gold btn--sm" title="Recarrega o saldo para ' + BZG.ui.formatMoney(BZG.storage.getReloadAmount()) + '">Recarregar</button>' +
       '<button class="icon-btn" id="sfx-btn" title="Efeitos sonoros ligados/desligados" aria-label="Efeitos sonoros">' + navIcon("som", "🔊") + '</button>' +
@@ -537,7 +537,7 @@ BZG.layout = (function () {
       BZG.ui.toast("💳 Saldo recarregado automaticamente: " + BZG.ui.formatMoney(amount), "info");
     }
     document.addEventListener("bzg:balance-changed", function () {
-      if (BZG.storage.getBalance() <= 0) {
+      if (BZG.storage.getBalance() < 1) { // menos de BZ$ 1 nao paga nenhuma aposta
         var cd = BZG.storage.reloadCooldownLeft();
         if (cd <= 0) {
           doAutoReload();
@@ -546,7 +546,7 @@ BZG.layout = (function () {
           BZG.ui.toast("⏳ Saldo zerado. Recarga automática em " + Math.ceil(cd / 1000) + "s.", "info");
           pendingReloadTimer = setTimeout(function () {
             pendingReloadTimer = null;
-            if (BZG.storage.getBalance() <= 0) doAutoReload();
+            if (BZG.storage.getBalance() < 1) doAutoReload();
           }, cd + 100);
         }
       }
@@ -589,7 +589,7 @@ BZG.layout = (function () {
       if (!betInput) return;
       var balance = BZG.storage.getBalance();
       var v = Math.round(Number(betInput.value) || 0);
-      var capped = Math.max(1, Math.min(v, Math.max(1, balance)));
+      var capped = Math.max(1, Math.min(v, Math.max(1, Math.floor(balance))));
       if (capped !== v) {
         betInput.value = capped;
         // avisa o jogo pra atualizar previews (ganho potencial etc.) se ele escutar input
@@ -602,7 +602,7 @@ BZG.layout = (function () {
     (function () {
       var betInput = document.getElementById("bet-amount");
       if (!betInput) return;
-      var key = "bzgBet:" + window.location.pathname;
+      var key = "bzgBet2:" + window.location.pathname; // v1.36: chave nova = todos voltam para a aposta padrao (BZ$ 10)
       try {
         var saved = localStorage.getItem(key);
         if (saved !== null && !isNaN(Number(saved)) && Number(saved) >= 1) {

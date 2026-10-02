@@ -178,7 +178,7 @@
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, 60);
-      if (payout >= 25000) BZG.effects.bigWin(payout, PAYOUT);
+      if (payout >= 2500) BZG.effects.bigWin(payout, PAYOUT);
     } else {
       setStatus("Venceu " + HORSES[winner].name + ". Não foi dessa vez.");
       BZG.sounds.lose();
@@ -240,7 +240,7 @@
     raceBtn.addEventListener("click", race);
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
-    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return Math.floor(b); }); });
     loadImages();
   });
 })();

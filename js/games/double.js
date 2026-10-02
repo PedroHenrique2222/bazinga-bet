@@ -25,7 +25,6 @@
 
   var selectedColor = null;
   var userBet = null; // { amount, color }
-  var bots = [];
   var roundIdEl = null;
 
   var spinTarget = null; // { number, color, tileIndex, offset }
@@ -38,7 +37,6 @@
   var liveTable = null;    // presence da mesa (BZG.live.table)
   var liveBar = null;
   var others = [];         // outros jogadores na mesa
-  var botLimit = 99;
 
   /* numero da rodada persistido: da a sensacao de plataforma "vivida" */
   function nextRoundId() {
@@ -148,14 +146,6 @@
       );
       sums[o.pick] += Number(o.bet) || 0;
     });
-    bots.forEach(function (b) {
-      cols[b.color].push(
-        '<div class="bet-row"><span class="avatar">' + b.avatar + '</span>' +
-        '<span class="name">' + b.name + (live ? '<span class="bot-tag">BOT</span>' : '') + '</span>' +
-        '<span class="bet-amount">' + BZG.ui.formatMoney(b.bet) + '</span></div>'
-      );
-      sums[b.color] += b.bet;
-    });
 
     ["red", "black", "white"].forEach(function (color) {
       document.getElementById("bets-" + color).innerHTML = cols[color].join("") ||
@@ -191,13 +181,7 @@
     phase = "betting";
     phaseStart = performance.now();
     lastBeepSecond = -1;
-    if (live) {
-      rnd = BZG.live.rng("double:" + round);
-      bots = BZG.live.withSeed("double-bots:" + round, BZG.bots.doubleRoundBots).slice(0, botLimit);
-    } else {
-      rnd = Math.random;
-      bots = BZG.bots.doubleRoundBots();
-    }
+    rnd = live ? BZG.live.rng("double:" + round) : Math.random;
     userBet = null;
     spinTarget = null;
     if (roundIdEl) roundIdEl.textContent = "Rodada #" + (live ? round % 1000000 : nextRoundId());
@@ -253,7 +237,7 @@
     if (userBet) {
       var won = userBet.color === color;
       var mult = won ? multiplierFor(color) : 0;
-      var payout = won ? Math.round(userBet.amount * mult) : 0;
+      var payout = won ? BZG.ui.cents(userBet.amount * mult) : 0;
 
       BZG.storage.recordBet("double", {
         bet: userBet.amount,
@@ -298,7 +282,6 @@
         if (phase === "betting") startSpinningPhase();
         if (phase === "spinning") startResultPhase();
       }
-      botLimit = Math.max(0, 10 - 2 * others.length);
       liveRound = r;
       startBettingPhase(r);
     }
@@ -462,7 +445,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
 
     live = BZG.live ? BZG.live.isLiveMode("double") : false;

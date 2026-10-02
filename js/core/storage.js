@@ -3,7 +3,10 @@ window.BZG = window.BZG || {};
 
 BZG.storage = (function () {
   var STORAGE_KEY = "bazingaBetState";
-  var STARTING_BALANCE = 10000;
+  var STARTING_BALANCE = 1000; // v1.36: valores menores e mais reais (era 10.000)
+  // dinheiro com centavos: arredonda para 2 casas (evita 0,1 + 0,2 = 0,30000004)
+  function cents(v) { return Math.round((Number(v) || 0) * 100) / 100; }
+
   var MAX_HISTORY_ENTRIES = 25;
   // Custo de XP por nivel: progressivo (cada nivel pede mais que o anterior),
   // nao mais fixo - ver getLevel()/xpForLevel() abaixo. Subir de nivel ficou bem
@@ -18,7 +21,7 @@ BZG.storage = (function () {
     return {
       account: null,        // { nickname, password, createdAt } - cadastro local, sem backend
       balance: STARTING_BALANCE,
-      reloadBonus: 0,        // antigo bonus de recarga (desde v1.33 a recarga e SEMPRE BZ$ 10.000)
+      reloadBonus: 0,        // antigo bonus de recarga (a recarga e SEMPRE o saldo inicial)
       profile: {
         nickname: "Jogador",
         avatar: "😎",
@@ -194,13 +197,13 @@ BZG.storage = (function () {
 
   function adjustBalance(delta) {
     var state = getState();
-    state.balance = Math.max(0, Math.round(state.balance + delta));
+    state.balance = Math.max(0, cents(state.balance + delta));
     trackPeak(state);
     saveState(state);
     return state.balance;
   }
 
-  // valor de recarga: SEMPRE BZ$ 10.000 (v1.33 - nada aumenta mais a recarga)
+  // valor de recarga: SEMPRE o saldo inicial, BZ$ 1.000 (nada aumenta a recarga)
   function getReloadAmount() {
     return STARTING_BALANCE;
   }
@@ -257,7 +260,7 @@ BZG.storage = (function () {
     var state = getState();
 
     var debit = entry.alreadyDebited ? 0 : entry.bet;
-    state.balance = Math.max(0, Math.round(state.balance - debit + entry.payout));
+    state.balance = Math.max(0, cents(state.balance - debit + entry.payout));
     trackPeak(state);
 
     state.stats.totalWagered += entry.bet;
@@ -280,8 +283,8 @@ BZG.storage = (function () {
       if (entry.payout > (state.gameBest[game] || 0)) state.gameBest[game] = entry.payout;
     }
 
-    // XP: 1 ponto a cada BZ$ 10 apostados
-    state.profile.xp += entry.bet / 10;
+    // XP: 1 ponto a cada BZ$ 1 apostado (v1.36: as apostas ficaram 10x menores)
+    state.profile.xp += entry.bet;
 
     // ganhos do dia (para o ranking)
     var today = todayKey();
@@ -334,7 +337,7 @@ BZG.storage = (function () {
      (L>=1, nivel 1 = 0 XP): cada nivel custa LEVEL_BASE_XP + LEVEL_STEP_XP a
      mais que o anterior (nivel 1->2 custa 3000, 2->3 custa 3750, 3->4 custa
      4500...) - fica bem mais dificil nos niveis altos, e ja bem mais demorado
-     no comeco (1 XP a cada BZ$10 apostados: o nivel 2 pede BZ$30.000). */
+     no comeco (1 XP a cada BZ$ 1 apostado). */
   function xpForLevel(level) {
     var stepsIn = level - 1;
     return stepsIn * LEVEL_BASE_XP + LEVEL_STEP_XP * (stepsIn * (stepsIn - 1) / 2);

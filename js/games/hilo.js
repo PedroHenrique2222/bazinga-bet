@@ -192,7 +192,7 @@
     clearPendingCard();
     state = "idle";
     var mult = won ? (multOverride || currentMultiplier()) : 0;
-    var payout = won ? Math.round(currentBet * mult) : 0;
+    var payout = won ? BZG.ui.cents(currentBet * mult) : 0;
 
     BZG.storage.recordBet("hilo", {
       bet: currentBet,
@@ -289,7 +289,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
   });
 })();

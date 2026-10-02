@@ -216,7 +216,7 @@
   function endRound(won, multOverride) {
     state = "idle";
     var mult = won ? (multOverride || multiplierAt(currentLevel)) : 0;
-    var payout = won ? Math.round(currentBet * mult) : 0;
+    var payout = won ? BZG.ui.cents(currentBet * mult) : 0;
 
     updateActiveRow();
     revealAllLevels();
@@ -319,7 +319,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
     window.addEventListener("resize", placeLinden);
     loadImages();

@@ -30,7 +30,7 @@
     var chance = Math.min(100, (RTP / t) * 100);
     winChanceEl.textContent = chance.toFixed(2) + "%";
     var bet = Math.round(Number(betInput.value)) || 0;
-    winPayoutEl.textContent = BZG.ui.formatMoney(Math.round(bet * t));
+    winPayoutEl.textContent = BZG.ui.formatMoney(BZG.ui.cents(bet * t));
     targetLabelEl.textContent = "Alvo: " + fmtMult(t);
   }
 
@@ -96,7 +96,7 @@
 
   function finish(mult, target, bet) {
     var won = mult >= target;
-    var payout = won ? Math.round(bet * target) : 0;
+    var payout = won ? BZG.ui.cents(bet * target) : 0;
 
     resultEl.textContent = fmtMult(mult);
     resultEl.className = "limbo-result " + (won ? "win" : "lose");
@@ -116,7 +116,7 @@
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, target >= 10 ? 90 : 50);
-      if (payout >= 25000 || target >= 25) BZG.effects.bigWin(payout, target);
+      if (payout >= 2500 || target >= 25) BZG.effects.bigWin(payout, target);
     } else {
       setStatus("Saiu " + fmtMult(mult) + ". Precisava de " + fmtMult(target) + ".");
       BZG.sounds.lose();
@@ -177,6 +177,6 @@
     betInput.addEventListener("input", updateInfo);
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
-    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return Math.floor(b); }); });
   });
 })();
