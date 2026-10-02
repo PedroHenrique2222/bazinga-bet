@@ -205,6 +205,7 @@ O site é 100% estático. Publicado no [Vercel](https://vercel.com), com deploy 
 - **Bots removidos** de Canoa, Double e Roleta (Ao Vivo e Solo): a mesa mostra só pessoas reais. `js/core/bots.js` apagado.
 - **Saldo inicial e recarga: BZ$ 1.000** (era 10.000). **Aposta padrão: BZ$ 10** (era 100).
 - **Valores com centavos** em todo o site (ex.: BZ$ 1.019,20); prêmios agora pagam centavos (BZ$ 10 × 1,25 = BZ$ 12,50). Apostas continuam em valores inteiros.
+- **Uma única vez, todo saldo antigo volta para BZ$ 1.000** (o recorde de saldo também recomeça; nível, conquistas e coleção continuam).
 - XP: 1 ponto a cada BZ$ 1 apostado (as apostas ficaram 10x menores, então o ritmo de nível continua o mesmo).
 - Conquistas de dinheiro, "vitória grande" e degraus de aposta do Bazinguinha ajustados para a escala nova.
 

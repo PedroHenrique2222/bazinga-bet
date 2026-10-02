@@ -16,6 +16,9 @@ BZG.storage = (function () {
   // Marca de reset: ao mudar este valor, TODO jogador tem os niveis/XP zerados
   // uma unica vez ao abrir o site (o Passe de Batalha tambem reinicia).
   var RESET_TOKEN = "levels-reset-2026-07";
+  // v1.36: valores 10x menores - uma unica vez, todo saldo antigo volta para BZ$ 1.000
+  // (nivel, conquistas e colecao continuam). O recorde de saldo tambem recomeca.
+  var BALANCE_RESET_TOKEN = "balance-1000-2026-10";
 
   function defaultState() {
     return {
@@ -54,6 +57,7 @@ BZG.storage = (function () {
       collectibles: { owned: {} },   // colecionaveis tematicos dos Bazingas: owned[itemId] = timestamp
       minigames: { torre: { best: 0 }, rainbow: { best: 0 }, shadow: { best: 0 }, alien: { best: 0 } }, // recordes pessoais dos minigames sem aposta (best = andares/rodadas/acertos/segundos, conforme o jogo)
       resetToken: RESET_TOKEN,
+      balanceResetToken: BALANCE_RESET_TOKEN,
       stats: {
         totalWagered: 0,
         totalWon: 0,
@@ -157,6 +161,12 @@ BZG.storage = (function () {
         parsed.profile.xp = 0;
         parsed.battlepass.claimed = {};
         parsed.resetToken = RESET_TOKEN;
+        saveState(parsed);
+      }
+      if (parsed.balanceResetToken !== BALANCE_RESET_TOKEN) {
+        parsed.balance = STARTING_BALANCE;
+        parsed.stats.peakBalance = STARTING_BALANCE;
+        parsed.balanceResetToken = BALANCE_RESET_TOKEN;
         saveState(parsed);
       }
       return parsed;
