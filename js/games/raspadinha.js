@@ -265,7 +265,7 @@
     var prize = current.prize;
     var bet = current.bet;
     var mult = prize ? prize.mult : 0;
-    var payout = Math.round(bet * mult);
+    var payout = BZG.ui.cents(bet * mult);
     var won = mult > 0;
 
     if (prize) {
@@ -295,7 +295,7 @@
       BZG.effects.flash(stageEl, "gold");
       var r = stageEl.getBoundingClientRect();
       BZG.effects.confetti(r.left + r.width / 2, r.top + r.height / 2, mult >= 20 ? 100 : 55);
-      if (payout >= 25000 || mult >= 50) BZG.effects.bigWin(payout, mult);
+      if (payout >= 2500 || mult >= 50) BZG.effects.bigWin(payout, mult);
     } else {
       resultEl.className = "rasp-result lose";
       resultEl.textContent = "Sem prêmio dessa vez.";
@@ -371,6 +371,6 @@
     revealAllBtn.addEventListener("click", revealAll);
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
-    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return Math.floor(b); }); });
   });
 })();

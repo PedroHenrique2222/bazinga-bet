@@ -99,7 +99,7 @@
   function finish(result, bet) {
     var won = result === selectedSide;
     BZG.sounds.coinLand();
-    var payout = won ? Math.round(bet * PAYOUT) : 0;
+    var payout = won ? BZG.ui.cents(bet * PAYOUT) : 0;
     var label = result === "cara" ? "Cara ⚡" : "Coroa 🔋";
 
     BZG.storage.recordBet("coinflip", {
@@ -157,6 +157,6 @@
     });
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
-    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return Math.floor(b); }); });
   });
 })();

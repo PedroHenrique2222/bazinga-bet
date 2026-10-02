@@ -43,8 +43,8 @@ BZG.achievements = (function () {
     },
     {
       id: "high-roller", icon: "💵", name: "Aposta grande",
-      desc: "Aposte BZ$ 1.000 numa única jogada",
-      check: function (s) { return (s.stats.maxBet || 0) >= 1000; }
+      desc: "Aposte BZ$ 100 numa única jogada",
+      check: function (s) { return (s.stats.maxBet || 0) >= 100; }
     },
     {
       id: "hot-streak", icon: "🔥", name: "Sequência quente",
@@ -77,18 +77,18 @@ BZG.achievements = (function () {
     },
     {
       id: "millionaire", icon: "🤑", name: "Alto lá, milionário",
-      desc: "Tenha BZ$ 100.000 de saldo",
-      check: function (s) { return s.balance >= 100000; }
+      desc: "Tenha BZ$ 10.000 de saldo",
+      check: function (s) { return s.balance >= 10000; }
     },
     {
       id: "whale", icon: "🐋", name: "Baleia",
-      desc: "Aposte BZ$ 50.000 no total",
-      check: function (s) { return s.stats.totalWagered >= 50000; }
+      desc: "Aposte BZ$ 5.000 no total",
+      check: function (s) { return s.stats.totalWagered >= 5000; }
     },
     {
       id: "big-win", icon: "💥", name: "Prêmio gordo",
-      desc: "Ganhe BZ$ 25.000 numa única jogada",
-      check: function (s) { return (s.stats.maxWin || 0) >= 25000; }
+      desc: "Ganhe BZ$ 2.500 numa única jogada",
+      check: function (s) { return (s.stats.maxWin || 0) >= 2500; }
     },
 
     /* ---------- Progressao de nivel ---------- */
@@ -109,23 +109,23 @@ BZG.achievements = (function () {
       check: function () { return BZG.battlepass && BZG.battlepass.reachedCount() > 0 && BZG.battlepass.unclaimedCount() === 0; } },
 
     /* ---------- Saldo ---------- */
-    { id: "bal-20k", icon: "💰", name: "Primeiros 20 mil", desc: "Tenha BZ$ 20.000 de saldo", check: function (s) { return s.balance >= 20000; } },
-    { id: "bal-50k", icon: "💰", name: "Bolso cheio", desc: "Tenha BZ$ 50.000 de saldo", check: function (s) { return s.balance >= 50000; } },
-    { id: "bal-250k", icon: "💰", name: "Alto padrão", desc: "Tenha BZ$ 250.000 de saldo", check: function (s) { return s.balance >= 250000; } },
-    { id: "bal-500k", icon: "💰", name: "Multimilionário", desc: "Tenha BZ$ 500.000 de saldo", check: function (s) { return s.balance >= 500000; } },
-    { id: "bal-1m", icon: "🏆", name: "Bilionário do Bazinga", desc: "Tenha BZ$ 1.000.000 de saldo", check: function (s) { return s.balance >= 1000000; } },
+    { id: "bal-20k", icon: "💰", name: "Primeiros 2 mil", desc: "Tenha BZ$ 2.000 de saldo", check: function (s) { return s.balance >= 2000; } },
+    { id: "bal-50k", icon: "💰", name: "Bolso cheio", desc: "Tenha BZ$ 5.000 de saldo", check: function (s) { return s.balance >= 5000; } },
+    { id: "bal-250k", icon: "💰", name: "Alto padrão", desc: "Tenha BZ$ 25.000 de saldo", check: function (s) { return s.balance >= 25000; } },
+    { id: "bal-500k", icon: "💰", name: "Multimilionário", desc: "Tenha BZ$ 50.000 de saldo", check: function (s) { return s.balance >= 50000; } },
+    { id: "bal-1m", icon: "🏆", name: "Bilionário do Bazinga", desc: "Tenha BZ$ 100.000 de saldo", check: function (s) { return s.balance >= 100000; } },
 
     /* ---------- Volume de apostas ---------- */
-    { id: "wager-100k", icon: "📈", name: "Grinder", desc: "Aposte BZ$ 100.000 no total", check: function (s) { return s.stats.totalWagered >= 100000; } },
-    { id: "wager-500k", icon: "📈", name: "Rodagem pesada", desc: "Aposte BZ$ 500.000 no total", check: function (s) { return s.stats.totalWagered >= 500000; } },
-    { id: "wager-1m", icon: "📈", name: "Máquina de apostar", desc: "Aposte BZ$ 1.000.000 no total", check: function (s) { return s.stats.totalWagered >= 1000000; } },
+    { id: "wager-100k", icon: "📈", name: "Grinder", desc: "Aposte BZ$ 10.000 no total", check: function (s) { return s.stats.totalWagered >= 10000; } },
+    { id: "wager-500k", icon: "📈", name: "Rodagem pesada", desc: "Aposte BZ$ 50.000 no total", check: function (s) { return s.stats.totalWagered >= 50000; } },
+    { id: "wager-1m", icon: "📈", name: "Máquina de apostar", desc: "Aposte BZ$ 100.000 no total", check: function (s) { return s.stats.totalWagered >= 100000; } },
     { id: "bets-100", icon: "🔁", name: "100 rodadas", desc: "Faça 100 apostas no total", check: function (s) { return totalBetsCount(s) >= 100; } },
     { id: "bets-500", icon: "🔁", name: "500 rodadas", desc: "Faça 500 apostas no total", check: function (s) { return totalBetsCount(s) >= 500; } },
 
     /* ---------- Tamanho de aposta e premio ---------- */
-    { id: "bet-5k", icon: "💵", name: "Big spender", desc: "Aposte BZ$ 5.000 numa única jogada", check: function (s) { return (s.stats.maxBet || 0) >= 5000; } },
-    { id: "bet-20k", icon: "💵", name: "Baleia suprema", desc: "Aposte BZ$ 20.000 numa única jogada", check: function (s) { return (s.stats.maxBet || 0) >= 20000; } },
-    { id: "win-100k", icon: "🎊", name: "Prêmio histórico", desc: "Ganhe BZ$ 100.000 numa única jogada", check: function (s) { return (s.stats.maxWin || 0) >= 100000; } },
+    { id: "bet-5k", icon: "💵", name: "Big spender", desc: "Aposte BZ$ 500 numa única jogada", check: function (s) { return (s.stats.maxBet || 0) >= 500; } },
+    { id: "bet-20k", icon: "💵", name: "Baleia suprema", desc: "Aposte BZ$ 2.000 numa única jogada", check: function (s) { return (s.stats.maxBet || 0) >= 2000; } },
+    { id: "win-100k", icon: "🎊", name: "Prêmio histórico", desc: "Ganhe BZ$ 10.000 numa única jogada", check: function (s) { return (s.stats.maxWin || 0) >= 10000; } },
 
     /* ---------- Sequencias ---------- */
     { id: "lossstreak-5", icon: "🌧️", name: "Fase ruim", desc: "Perca 5 vezes seguidas", check: function (s) { return s.stats.bestLossStreak >= 5; } },

@@ -119,7 +119,7 @@
   function finishRoll(result, threshold, chance, mult, bet) {
     var won = mode === "under" ? result < threshold : result > threshold;
     BZG.sounds.diceLand();
-    var payout = won ? Math.round(bet * mult) : 0;
+    var payout = won ? BZG.ui.cents(bet * mult) : 0;
 
     resultEl.textContent = result.toFixed(2);
     resultEl.classList.add(won ? "win" : "lose");
@@ -211,7 +211,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
 
     loadImages();

@@ -341,7 +341,7 @@
 
   function resolveBall(ball, slotIndex, now) {
     var mult = currentTable()[slotIndex];
-    var payout = Math.round(ball.bet * mult);
+    var payout = BZG.ui.cents(ball.bet * mult);
     var won = payout >= ball.bet;
 
     slotFlashes[slotIndex] = now;
@@ -586,7 +586,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
 
     requestAnimationFrame(loop);

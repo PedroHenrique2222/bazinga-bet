@@ -4,8 +4,7 @@
    aposta, em QUALQUER jogo (evento bzg:bet-recorded, disparado por
    storage.recordBet) - o sorteio e sempre entre TODOS os itens de TODOS os
    personagens, sem nenhum vinculo com o jogo que estava sendo jogado. Completar
-   o album de um personagem desbloqueia o avatar exclusivo dele (mesmo avatar
-   usado pelo bot da equipe no painel ao vivo - ver bots.js CREW). */
+   o album de um personagem desbloqueia o avatar exclusivo dele. */
 window.BZG = window.BZG || {};
 
 BZG.collectibles = (function () {

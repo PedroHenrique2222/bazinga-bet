@@ -68,7 +68,7 @@
 
   var spinning = false;
   var auto = null; // giro automatico (autospin.js)
-  var BET_STEPS = [10, 25, 50, 100, 250, 500, 1000, 2500, 5000];
+  var BET_STEPS = [1, 2, 5, 10, 25, 50, 100, 250, 500];
   var countToken = 0; // invalida contadores de ganho antigos quando um giro novo comeca
   var mascotWinTimer = null;
 
@@ -377,7 +377,7 @@
     setControlsLocked(true);
     clearWinFx();
     machineEl.classList.add("is-spinning");
-    barWinEl.textContent = barWinEl.dataset.final = "BZ$ 0";
+    barWinEl.textContent = barWinEl.dataset.final = BZG.ui.formatMoney(0);
     fitText(barWinEl);
     bannerMsg("", "Boa sorte! 🍀");
     setStatus("Girando...");
@@ -520,7 +520,7 @@
       nonWild.every(function (x) { return x === nonWild[0]; }));
     if (fullScreen) totalPay *= 10;
 
-    var payout = Math.round(bet * totalPay);
+    var payout = BZG.ui.cents(bet * totalPay);
     var won = payout > 0;
 
     // grade final estatica: celulas vencedoras brilham, wilds ficam realcados
@@ -545,7 +545,7 @@
     if (won) {
       countUp(barWinEl, payout);
       if (totalPay >= 5) BZG.effects.shake(machineEl);
-      var bigWin = fullScreen || totalPay >= 15 || payout >= 25000;
+      var bigWin = fullScreen || totalPay >= 15 || payout >= 2500;
       if (fullScreen) {
         bannerWin("fullscreen", "💥 Tela cheia ×10", payout);
         BZG.sounds.roar();
@@ -886,7 +886,7 @@
 
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
-    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return Math.floor(b); }); });
 
     loadImages();
   });

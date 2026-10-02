@@ -2854,11 +2854,6 @@ body:has(.chat-root) #toast-container { bottom: 88px; }
 .live-switch button[aria-pressed="true"] .live-dot { animation: live-pulse 1.6s ease-in-out infinite; }
 .live-people { font-size: 13px; font-weight: 800; color: var(--text-muted); }
 .live-people b { color: var(--text); }
-.bot-tag {
-  display: inline-block; margin-left: 5px; padding: 0 5px; border-radius: 5px;
-  font-size: 9.5px; font-weight: 900; letter-spacing: 0.04em; line-height: 15px; vertical-align: 1px;
-  background: rgba(140, 154, 166, 0.22); color: var(--text-muted);
-}
 .real-tag {
   display: inline-block; margin-left: 5px; width: 7px; height: 7px; border-radius: 50%;
   background: var(--green); box-shadow: 0 0 6px var(--green); vertical-align: 1px;

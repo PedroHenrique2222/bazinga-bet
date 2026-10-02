@@ -251,7 +251,7 @@
       mult = 0; won = false; label = "Bogão venceu."; msgCls = "lose";
     }
 
-    var payout = Math.round(currentBet * mult);
+    var payout = BZG.ui.cents(currentBet * mult);
     var detail = handTotal(playerHand) + " vs " + handTotal(dealerHand);
 
     BZG.storage.recordBet("blackjack", {
@@ -362,7 +362,7 @@
       quickBet(function (v) { return v * 2; });
     });
     document.getElementById("bet-max").addEventListener("click", function () {
-      quickBet(function (v, balance) { return balance; });
+      quickBet(function (v, balance) { return Math.floor(balance); });
     });
   });
 })();

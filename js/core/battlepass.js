@@ -1,5 +1,5 @@
 /* Bazinga BET - Passe de Batalha: tiers desbloqueados por XP, recompensas cosmeticas.
-   O XP é o mesmo do perfil (1 XP a cada BZ$10 apostados). 100 niveis organizados
+   O XP é o mesmo do perfil (1 XP a cada BZ$ 1 apostado). 100 niveis organizados
    em 10 capitulos de 10 niveis: o 1o e dos Amigos dos Bazingas, os outros 9 sao
    um pra cada membro da Equipe BZG (ver TIER_PER_CHAPTER/CHAPTER_BONUS abaixo). */
 window.BZG = window.BZG || {};
@@ -11,7 +11,7 @@ BZG.battlepass = (function () {
   var TIER_PER_CHAPTER = 10; // precisa bater com js/pages/passe.js
 
   // bonus ao resgatar o ultimo nivel de um capitulo: 1 figurinha NOVA garantida
-  // (v1.33 - antes aumentava a recarga, que agora e fixa em BZ$ 10.000)
+  // (v1.33 - antes aumentava a recarga, que agora e fixa)
   var CHAPTER_BONUS = 1;
 
   var TITLES = {

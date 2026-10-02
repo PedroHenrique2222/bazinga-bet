@@ -347,7 +347,7 @@
         numEl.classList.add("bump");
         freeShown = freeLeft;
       }
-      freeEl.querySelector(".bz-free-total b").textContent = fmt(Math.round(curBet * (totalWin + (extra || 0)) * SCALE));
+      freeEl.querySelector(".bz-free-total b").textContent = fmt(BZG.ui.cents(curBet * (totalWin + (extra || 0)) * SCALE));
     } else {
       stageEl.classList.remove("free-mode");
       freeEl.style.display = "none";
@@ -357,7 +357,7 @@
   }
 
   function showRunningWin() {
-    var payoutSoFar = Math.round(curBet * totalWin * SCALE);
+    var payoutSoFar = BZG.ui.cents(curBet * totalWin * SCALE);
     if (payoutSoFar > 0) {
       winEl.className = "bonanza-win" + (totalWin * SCALE >= 10 ? " big" : "");
       countWin(payoutSoFar);
@@ -435,7 +435,7 @@
       floatWin(Math.round(curBet * ev.pay * SCALE));
       mascotCheer(0);
       winEl.className = "bonanza-win counting";
-      countWin(Math.round(curBet * (totalWin + accWin) * SCALE));
+      countWin(BZG.ui.cents(curBet * (totalWin + accWin) * SCALE));
       if (inFree) updateFreeUI(accWin);
       setTimeout(function () {
         // vencedores explodem antes de sumir
@@ -539,7 +539,7 @@
   }
 
   function finishRound() {
-    var payout = Math.round(curBet * totalWin * SCALE);
+    var payout = BZG.ui.cents(curBet * totalWin * SCALE);
     var effMult = curCost > 0 ? payout / curCost : 0; // multiplicador sobre o custo (base OU compra)
     var won = payout > 0;
 
@@ -568,7 +568,7 @@
       else mascotCheer(0);
       var rect = stageEl.getBoundingClientRect();
       BZG.effects.confetti(rect.left + rect.width / 2, rect.top + rect.height / 2, big ? 120 : 55);
-      if (effMult >= 20 || payout >= 25000) BZG.effects.bigWin(payout, effMult);
+      if (effMult >= 20 || payout >= 2500) BZG.effects.bigWin(payout, effMult);
     } else {
       winEl.className = "bonanza-win";
       setWinText(0);
@@ -703,7 +703,7 @@
     });
     document.getElementById("bet-half").addEventListener("click", function () { quickBet(function (v) { return v / 2; }); });
     document.getElementById("bet-double").addEventListener("click", function () { quickBet(function (v) { return v * 2; }); });
-    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return b; }); });
+    document.getElementById("bet-max").addEventListener("click", function () { quickBet(function (v, b) { return Math.floor(b); }); });
 
     // botao (i): leva para as regras e abre a tabela de pagamentos
     var infoBtn = document.getElementById("bonanza-info-btn");

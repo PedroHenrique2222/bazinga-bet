@@ -134,7 +134,7 @@ BZG.effects = (function () {
   // nivel final pelo multiplicador (e premio, para apostas altas com mult baixo)
   function bigWinTier(amount, mult) {
     if (mult >= 100) return 2;
-    if (mult >= 25 || amount >= 100000) return 1;
+    if (mult >= 25 || amount >= 10000) return 1;
     return 0;
   }
 
@@ -292,7 +292,7 @@ BZG.effects = (function () {
   document.addEventListener("bzg:bet-recorded", function (e) {
     var d = e.detail || {};
     if (!d.won || !(d.payout > 0)) return;
-    if ((d.multiplier || 0) >= 10 || d.payout >= 25000) bigWin(d.payout, d.multiplier || 0);
+    if ((d.multiplier || 0) >= 10 || d.payout >= 2500) bigWin(d.payout, d.multiplier || 0);
   });
 
   // o Big Win esta na tela? (os jogos nao tocam o som de vitoria por cima da fanfarra)
